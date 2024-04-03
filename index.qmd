@@ -1,6 +1,6 @@
 ---
-title: "Title of your work"
-author: "Your Name"
+title: "Forecasting Unemployment rate using Baysian Vars with Regime change"
+author: "Nhu Minh Pham"
 
 execute:
   echo: false
@@ -8,73 +8,206 @@ execute:
 bibliography: references.bib
 ---
 
-> **Abstract.** This is a suggested formatting for your abstract. This **quarto** document is a template for your report. It includes some basic ways of working with such documents. You are invited to learn more about developing online reports with this technology. 
+> **Abstract.** Research on how Baysian Vars with regime change affect the forecasting 
+of unemployment rate
 >
-> **Keywords.** bsvars, impulse responses, quarto, R, tax shocks
+> **Keywords.** bsvars, regime change, forecasting, R, 
 
 # Introduction
 
-This is a template repository for the Research Report for **Macroeconometrics**. Learn more about about developing online reports with **quarto** at [quarto.org](https://quarto.org/).
+The objective of this research project is to develop a Bayesian Vector Autoregression (BVAR) model incorporating regime changes to analyze the dynamic relationships among macroeconomic variables, assess their impact on the unemployment rate over different economic regimes through time-varying parameters, and enhance forecasting accuracy.
 
-## A Simple Example
+The question to be addressed in this research is: Can a Bayesian VAR model with regime changes accurately capture shifts in the relationships between unemployment rate and other macroeconomic variables for improved forecasting performance?
 
-This is a Quarto document in which we can cite the **bsvars** package by @wozniakBsvarsBayesianEstimation2022. Look for more info at [package CRAN website](https://cran.r-project.org/package=bsvars).
+# Motivation
+Understanding the impact of economic regime changes on the unemployment rate dynamics holds substantial importance in grasping the complexities of the labour market. The labour market is highly susceptible to various shocks and policy interventions, making accurate forecasting of the unemployment rate crucial for informed decision-making. By employing a Bayesian Vector Autoregression (BVAR) model that allows the parameters to vary across different economic regimes, we can gain a nuanced understanding of how the unemployment rate responds to diverse economic conditions and the efficacy of policies. This research enhances forecasting accuracy and offers valuable insights into the underlying drivers of unemployment fluctuations. By better understanding these dynamics, policymakers can make more informed decisions to counter economic instability.
 
-Simply load the package by running
-```{r package load}
-library(bsvars)
+
+# Data properties
+
+For the investigation of the problem at hand, the selection of variables includes a comprehensive set of economic indicators and demographic factors that are crucial for understanding labour market dynamics and their impact on unemployment rates. 
+
+For instance, GDP growth provides a broad measure of economic activity, serving as an indicator of overall labour market. Consumer price index, wage price index and interest rate reflect macroeconomic conditions and monetary policy, influencing consumer spending, business investment, and hiring decisions, thereby affecting unemployment trends. Government spending impacts aggregate demand and employment levels, while demographic factors such as population growth rate, average age of the workforce, and level of highest educational attainment offer insights into labour force participation and composition. 
+
+Each variable's form/transformation will depend on its specific characteristics and the nature of its relationship with unemployment. For instance, variables like GDP growth may be included in their original form, while others, such as wpi might need to be computed from the index data. 
+
+It's important to note that all data will be quarterly since the interest forecasting for unemployment will be conducted at a quarterly frequency. Quarterly frequency is suitable for capturing the diverse movements influencing unemployment, including short-term shocks, long-term trends, and policy changes, providing a balanced perspective.
+
+
+
+\begin{align*}
+& unmp_{t} & : & \text{Unemployment rate} \\
+& par_{t} & : & \text{Participation rate} \\
+& gdp_{t} & : & \text{GDP per capita: Chain volume measures - Percentage changes} \\
+& cpi_{t} & : & \text{Consumer price index} \\
+& wpi_{t} & : & \text{Wage price index} \\
+& cashrate_{t} & : & \text{Cash rate} \\
+& hr_full{t} & : & \text{Average hours worked Full time} \\
+& hr_part{t} & : & \text{Average hours worked Full time} \\
+& oversea_{t} & : & \text{Oversea migration} \\
+& pop_{t} & : & \text{Population growth rate} \\
+\end{align*}
+
+# Data Visualisation
+```{r, hide = TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+library(readrba)
+library(readabs)
+library(ggplot2)
+library(tsibble)
+library(xts)
 ```
 
-The code below performs simple computations for sampling posterior draws of the impulse responses. The first line uploads the data from the package,another sets the seed for reproducible computations, and then the pipe `|>` is used to streamline the model specification, estimation including the first burn-in run to obtain convergence and finally, the computed impulse responses are saved in object `irf`.
-```{r estimate irf}
-#| message: false
-#| echo: true
 
-data(us_fiscal_lsuw)
-set.seed(123)
-us_fiscal_lsuw |>
-  specify_bsvar$new(p = 1) |>
-  estimate(S = 1000, show_progress = FALSE) |> 
-  estimate(S = 2000, show_progress = FALSE) |> 
-  compute_impulse_responses(horizon = 20) -> irf
+```{r,echo=FALSE, warning=FALSE, message=FALSE}
+# Unemployment rate #################
+unmp <- read_abs(series_id = "A84423130A")
+# "6202.0", tables = 37
+
+# Participation rate #######
+par_pre <- read_abs(series_id = "A84423051C")
+par <- xts(par_pre$value, par_pre$date)
+par<- apply.quarterly(par,mean)
+par_df <- data.frame(date = index(par), value = coredata(par))
+
+
+# GDP #################
+gdp <- read_abs(series_id = "A2304372W")
+# 5206.0
+
+# WPI #################
+wpi <- read_abs(series_id = "A2615579C")
+# 6345.0
+percentage_change <- c(NA, diff(wpi$value) / lag(wpi$value, default = 1) * 100)
+# Assign the percentage_change vector to the dataset
+wpi$percentage_change <- percentage_change[1:nrow(wpi)]
+
+# CPI #################
+cpi <- read_abs(series_id = "A2325850V")
+# 6401.0
+
+# Interest rate ##################
+cashrate <- read_rba(series_id = "FIRMMCRT")
+cashrate_subset <- cashrate[cashrate$date >= "1991-01-01", ]
+cashrate_xts <- xts(cashrate_subset$value, order.by = cashrate_subset$date)
+# Aggregate to quarterly frequency
+cashrate_quarterly <- apply.quarterly(cashrate_xts, mean)
+colnames(cashrate_quarterly) <- c("value")
+cashrate_quarterly_df <- data.frame(date = index(cashrate_quarterly), value = coredata(cashrate_quarterly))
+
+# Monthly hours works - Full time. "6202.0"
+hrs_full_pre <- read_abs(series_id = "A84426278A") 
+hrs_full <- xts(hrs_full_pre$value, hrs_full_pre$date)
+hrs_full<- apply.quarterly(hrs_full,mean)
+hrs_full_df <- data.frame(date = index(hrs_full), value = coredata(hrs_full))
+
+# Monthly hours works - Part time. "6202.0"
+hrs_part_pre <- read_abs(series_id = "A84426279C")
+hrs_part <- xts(hrs_part_pre$value, hrs_part_pre$date)
+hrs_part<- apply.quarterly(hrs_part,mean)
+hrs_part_df <- data.frame(date = index(hrs_part), value = coredata(hrs_part))
+
+# Net Overseas Migration
+oversea <- read_abs(series_id = "A2133254C")
+
+# Population growth rate
+pop <- read_abs(series_id = "A2133256J")
+
 ```
 
-The code above is visible as the **R** chunk contains the setting `#| echo: true`.
 
-@tbl-irf reports the posterior means of the gross domestic product response to an unanticipated tax increase by 1 pp.
-```{r}
-#| label: tbl-irf
-#| tbl-cap: Impulse response of gdp to unanticipated tax increase by 1 pp. within two years
+```{r, plot, echo=FALSE}
+par(mfrow = c(3, 4))
 
-irf_gdp_tax = matrix(apply(irf[3,1,1:9,],1, mean), nrow = 1)
-rownames(irf_gdp_tax) = "change in gdp [%]"
-colnames(irf_gdp_tax) = 0:8
-knitr::kable(irf_gdp_tax, digits = 3)
+plot(unmp$date, unmp$value, type = "l", xlab = "Date", ylab = "Value", main = "Unemployment
+     rate")
+plot(par_df$date, par_df$value, type = "l", xlab = "Date", ylab = "Value", main =
+       "Participation rate")
+plot(gdp$date[gdp$date >= "1991-03-01"], gdp$value[gdp$date >= "1991-03-01"], 
+     type = "l", xlab = "Date", ylab = "Value", main = "GDP per capita")
+plot(wpi$date[wpi$date >= "1991-03-01"], wpi$percentage_change[wpi$date >= "1991-03-01"], 
+     type = "l", xlab = "Date", ylab = "Value", main = "WPI")
+plot(cpi$date[cpi$date >= "1991-03-01"], cpi$value[cpi$date >= "1991-03-01"], 
+     type = "l", xlab = "Date", ylab = "Value", main = "CPI")
+plot(cashrate_quarterly_df$date, cashrate_quarterly_df$value, 
+     type = "l", xlab = "Date", ylab = "Value", main = "Cash rate")
+plot(hrs_full_df$date, hrs_full_df$value, 
+     type = "l", xlab = "Date", ylab = "Value", main = "Hours worked Full time")
+plot(hrs_part_pre$date, hrs_part_pre$value, 
+     type = "l", xlab = "Date", ylab = "Value", main = "Hours worked Part time")
+plot(oversea$date, oversea$value, 
+     type = "l", xlab = "Date", ylab = "Value", main = "Net Overseas Migration")
+plot(pop$date, pop$value, 
+     type = "l", xlab = "Date", ylab = "Value", main = "Population growth")
+
+
 ```
 
-@fig-irf presents the same reaction over the horizon of five years.
-```{r}
-#| label: fig-irf
-#| fig-cap: Impulse response of gdp to unanticipated tax increase by 1 pp. within five years
+From the plot of the variables, they all show non-stationary, which can make it challanging 
+to analyse data. Therefore, the ACF test is performed to identify patterns and trend
 
-irf_median    = apply(irf[3,1,,],1, median)
-irf_hdi       = apply(irf[3,1,,],1, HDInterval::hdi, credMass = .68)
-plot(x = 0:20, y = irf_median, type = "l", bty = "n", 
-     xlab = "horizon", ylab = "change in gdp [%]",
-     ylim = range(irf_hdi))
-polygon(x = c(0:20, 20:0), y = c(irf_hdi[1,], irf_hdi[2,21:1]), col = "deepskyblue1", border = "deepskyblue1")
-lines(x = 0:20, y = irf_median, lwd = 2, col = "deepskyblue3")
+
+```{r,echo=FALSE}
+par(mfrow = c(3, 4))
+
+# Calculate ACF manually for each variable
+acf_unmp <- acf(unmp$value, plot = TRUE)
+acf_par <- acf(par_df$value, plot = TRUE)
+acf_gdp <- acf(gdp$value, plot = TRUE, na.action = na.pass)
+acf_wpi <- acf(wpi$percentage_change, plot = TRUE, na.action = na.pass)
+acf_cpi <- acf(cpi$value, plot = TRUE, na.action = na.pass)
+acf_cashrate <- acf(cashrate_quarterly_df$value, plot = TRUE)
+acf_hrs_full <- acf(hrs_full_df$value, plot = TRUE)
+acf_hrs_part <- acf(hrs_part_pre$value, plot = TRUE)
+acf_oversea <- acf(oversea$value, plot = TRUE)
+acf_pop <- acf(pop$value, plot = TRUE, na.action = na.pass)
+
+
 ```
+The ACF plots show the variables have high memory pattern, indicates that there is a strong correlation between each variable and its past values, suggesting persistence or dependence over time.
 
-## Some Hints
+## Model
 
-Have a look at how to work with **RStudio** and **GitHub** at: [How to use git and GitHub with R](https://rfortherestofus.com/2021/02/how-to-use-git-github-with-r/). 
+### Hypothesis
 
-These are many different ways of how to work with references in **RStudio**: [Preview Citations](https://posit.co/blog/rstudio-1-4-preview-citations/).
+Var(p) model
+\begin{aligned}
+y_t = \beta_0 + \beta_1 y_{t-1} + \beta_2 x_{1, t-1} + \beta_3 x_{2, t-1} + \ldots + \beta_n x_{n, t-1} + \varepsilon_t
+\end{aligned}
 
-To make all the **R** code visible on the website change the settings in the preabmble of this document to:
-```
-execute:
-  echo: true
-```
-## References {.unnumbered}
+
+Var(p) model with regime change, meaning time-varying parameters
+\begin{aligned}
+y_t &= \beta_{0,S_t} + \beta_{1,S_t} y_{t-1} + \beta_{2,S_t} x_{1, t-1} + \beta_{3,S_t} x_{2, t-1} + \ldots + \beta_{n,S_t} x_{n, t-1} + \varepsilon_t \\
+\end{aligned}
+
+Probability of transitioning from one state to another
+\begin{aligned}
+P(S_t = j | S_{t-1} = i) &= \pi_{ij}
+\end{aligned}
+
+
+
+### Matrix form
+
+
+\begin{align*}
+\mathbf{Y}_t = \boldsymbol{\beta}_{S_t} \mathbf{X}_t + \boldsymbol{E}_t
+\end{align*}
+
+\begin{align*}
+\boldsymbol{E}_t
+\sim N(0_T, \Sigma, I_T)
+\end{align*}
+
+\\begin{align*}
+\\mathbf{Y}_t & : \\text{Matrix of response variables} \\\\
+\\boldsymbol{\\beta} & : \\text{Coefficient matrix corresponding to regime state} \\\\
+S_t & : \\text{Regime state} \\\\
+\\mathbf{X}_t & : \\text{Matrix of predictor variables} \\\\
+\\boldsymbol{\\varepsilon}_t & : \\text{Error term vector} 
+\\end{align*}
+
+The model's equations include time-varying parameters, such as the coefficients of lagged variables, which adapt to changing economic conditions.
+
+
+# References {.unnumbered}
