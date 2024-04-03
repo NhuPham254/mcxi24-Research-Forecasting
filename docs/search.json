@@ -2,22 +2,15 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Title of your work",
+    "title": "Forecasting Unemployment rate using Baysian Vars with Regime change",
     "section": "",
-    "text": "Abstract. This is a suggested formatting for your abstract. This quarto document is a template for your report. It includes some basic ways of working with such documents. You are invited to learn more about developing online reports with this technology.\nKeywords. bsvars, impulse responses, quarto, R, tax shocks"
+    "text": "Abstract. Research on how Baysian Vars with regime change affect the forecasting of unemployment rate\nKeywords. bsvars, regime change, forecasting, R,"
   },
   {
-    "objectID": "index.html#a-simple-example",
-    "href": "index.html#a-simple-example",
-    "title": "Title of your work",
-    "section": "A Simple Example",
-    "text": "A Simple Example\nThis is a Quarto document in which we can cite the bsvars package by Woźniak (2022). Look for more info at package CRAN website.\nSimply load the package by running\n\n\n\nThe code below performs simple computations for sampling posterior draws of the impulse responses. The first line uploads the data from the package,another sets the seed for reproducible computations, and then the pipe |> is used to streamline the model specification, estimation including the first burn-in run to obtain convergence and finally, the computed impulse responses are saved in object irf.\n\ndata(us_fiscal_lsuw)\nset.seed(123)\nus_fiscal_lsuw |>\n  specify_bsvar$new(p = 1) |>\n  estimate(S = 1000, show_progress = FALSE) |> \n  estimate(S = 2000, show_progress = FALSE) |> \n  compute_impulse_responses(horizon = 20) -> irf\n\nThe code above is visible as the R chunk contains the setting #| echo: true.\nTable 1 reports the posterior means of the gross domestic product response to an unanticipated tax increase by 1 pp.\n\n\n\n\nTable 1: Impulse response of gdp to unanticipated tax increase by 1 pp. within two years\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n0\n1\n2\n3\n4\n5\n6\n7\n8\n\n\n\n\nchange in gdp [%]\n0.199\n0.184\n0.17\n0.159\n0.148\n0.139\n0.13\n0.123\n0.116\n\n\n\n\n\n\nFigure 1 presents the same reaction over the horizon of five years.\n\n\n\n\n\nFigure 1: Impulse response of gdp to unanticipated tax increase by 1 pp. within five years"
-  },
-  {
-    "objectID": "index.html#some-hints",
-    "href": "index.html#some-hints",
-    "title": "Title of your work",
-    "section": "Some Hints",
-    "text": "Some Hints\nHave a look at how to work with RStudio and GitHub at: How to use git and GitHub with R.\nThese are many different ways of how to work with references in RStudio: Preview Citations.\nTo make all the R code visible on the website change the settings in the preabmble of this document to:\nexecute:\n  echo: true"
+    "objectID": "index.html#model",
+    "href": "index.html#model",
+    "title": "Forecasting Unemployment rate using Baysian Vars with Regime change",
+    "section": "Model",
+    "text": "Model\n\nHypothesis\nVar(p) model\n\\[\\begin{aligned}\ny_t = \\beta_0 + \\beta_1 y_{t-1} + \\beta_2 x_{1, t-1} + \\beta_3 x_{2, t-1} + \\ldots + \\beta_n x_{n, t-1} + \\varepsilon_t\n\\end{aligned}\\]\nVar(p) model with regime change, meaning time-varying parameters\n\\[\\begin{aligned}\ny_t &= \\beta_{0,S_t} + \\beta_{1,S_t} y_{t-1} + \\beta_{2,S_t} x_{1, t-1} + \\beta_{3,S_t} x_{2, t-1} + \\ldots + \\beta_{n,S_t} x_{n, t-1} + \\varepsilon_t \\\\\n\\end{aligned}\\]\nProbability of transitioning from one state to another\n\\[\\begin{aligned}\nP(S_t = j | S_{t-1} = i) &= \\pi_{ij}\n\\end{aligned}\\]\n\n\nMatrix form\n\\[\\begin{align*}\n\\mathbf{Y}_t = \\boldsymbol{\\beta}_{S_t} \\mathbf{X}_t + \\boldsymbol{E}_t\n\\end{align*}\\]\n\\[\\begin{align*}\n\\boldsymbol{E}_t\n\\sim N(0_T, \\Sigma, I_T)\n\\end{align*}\\]\n\\begin{align*} \\mathbf{Y}_t & : \\text{Matrix of response variables} \\\\ \\boldsymbol{\\beta} & : \\text{Coefficient matrix corresponding to regime state} \\\\ S_t & : \\text{Regime state} \\\\ \\mathbf{X}_t & : \\text{Matrix of predictor variables} \\\\ \\boldsymbol{\\varepsilon}_t & : \\text{Error term vector} \\end{align*}\nThe model’s equations include time-varying parameters, such as the coefficients of lagged variables, which adapt to changing economic conditions."
   }
 ]
