@@ -42,8 +42,8 @@ It's important to note that all data will be quarterly since the interest foreca
 & cpi_{t} & : & \text{Consumer price index} \\
 & wpi_{t} & : & \text{Wage price index} \\
 & cashrate_{t} & : & \text{Cash rate} \\
-& hrfull{t} & : & \text{Average hours worked Full time} \\
-& hrpart{t} & : & \text{Average hours worked Full time} \\
+& hrfull_{t} & : & \text{Average hours worked Full time} \\
+& hrpart_{t} & : & \text{Average hours worked Full time} \\
 & oversea_{t} & : & \text{Oversea migration} \\
 & pop_{t} & : & \text{Population growth rate} \\
 \end{align*}
