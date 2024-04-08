@@ -196,8 +196,8 @@ window.Quarto = {
 &amp; cpi_{t} &amp; : &amp; \text{Consumer price index} \\
 &amp; wpi_{t} &amp; : &amp; \text{Wage price index} \\
 &amp; cashrate_{t} &amp; : &amp; \text{Cash rate} \\
-&amp; hr_full{t} &amp; : &amp; \text{Average hours worked Full time} \\
-&amp; hr_part{t} &amp; : &amp; \text{Average hours worked Full time} \\
+&amp; hrfull_{t} &amp; : &amp; \text{Average hours worked Full time} \\
+&amp; hrpart_{t} &amp; : &amp; \text{Average hours worked Part time} \\
 &amp; oversea_{t} &amp; : &amp; \text{Oversea migration} \\
 &amp; pop_{t} &amp; : &amp; \text{Population growth rate} \\
 \end{align*}\]</span></p>
@@ -248,7 +248,7 @@ P(S_t = j | S_{t-1} = i) &amp;= \pi_{ij}
 \end{align*}\]</span></p>
 <p><span class="math display">\[\begin{align*}
 \boldsymbol{E}_t
-\sim N(0_T, \Sigma, I_T)
+\sim MN(0_T, \Sigma, I_T)
 \end{align*}\]</span></p>
 <p>\begin{align*} \mathbf{Y}_t &amp; : \text{Matrix of response variables} \\ \boldsymbol{\beta} &amp; : \text{Coefficient matrix corresponding to regime state} \\ S_t &amp; : \text{Regime state} \\ \mathbf{X}_t &amp; : \text{Matrix of predictor variables} \\ \boldsymbol{\varepsilon}_t &amp; : \text{Error term vector} \end{align*}</p>
 <p>The model’s equations include time-varying parameters, such as the coefficients of lagged variables, which adapt to changing economic conditions.</p>
