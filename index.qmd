@@ -1,5 +1,5 @@
 ---
-title: "Forecasting Unemployment rate using Baysian Vars with Regime change"
+title: "Forecasting Unemployment rate using Bayesian VARs with Regime change"
 author: "Nhu Minh Pham"
 
 execute:
@@ -8,14 +8,14 @@ execute:
 bibliography: references.bib
 ---
 
-> **Abstract.** Research on how Baysian Vars with regime change affect the forecasting 
+> **Abstract.** Research on how Bayesian VARs with regime change affect the forecasting 
 of unemployment rate
 >
 > **Keywords.** bsvars, regime change, forecasting, R, 
 
 # Introduction
 
-The objective of this research project is to develop a Bayesian Vector Autoregression (BVAR) model incorporating regime changes to analyze the dynamic relationships among macroeconomic variables, assess their impact on the unemployment rate over different economic regimes through time-varying parameters, and enhance forecasting accuracy.
+The objective of this research project is to develop a Bayesian Vector Autoregression (BVAR) model incorporating regime changes to analyse the dynamic relationships among macroeconomic variables, assess their impact on the unemployment rate over different economic regimes through time-varying parameters, and enhance forecasting accuracy.
 
 The question to be addressed in this research is: Can a Bayesian VAR model with regime changes accurately capture shifts in the relationships between unemployment rate and other macroeconomic variables for improved forecasting performance?
 
@@ -48,6 +48,13 @@ It's important to note that all data will be quarterly since the interest foreca
 & pop_{t} & : & \text{Population growth rate} \\
 \end{align*}
 
+```{r}
+# Set global options to hide the source code, messages, and warnings
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
 # Data Visualisation
 ```{r, hide = TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 library(readrba)
@@ -66,9 +73,10 @@ unmp <- read_abs(series_id = "A84423130A")
 # Participation rate #######
 par_pre <- read_abs(series_id = "A84423051C")
 par <- xts(par_pre$value, par_pre$date)
-par<- apply.quarterly(par,mean)
-par_df <- data.frame(date = index(par), value = coredata(par))
-
+par_quarterly <- apply.quarterly(par, mean)
+par_quarterly <- as.zoo(par_quarterly)
+par_df <- data.frame(date = time(par_quarterly), value = coredata(par_quarterly))
+#par_df <- data.frame(date = index(par_quarterly), value = coredata(par_quarterly)) # Error: par is not tsibble
 
 # GDP #################
 gdp <- read_abs(series_id = "A2304372W")
@@ -92,19 +100,25 @@ cashrate_xts <- xts(cashrate_subset$value, order.by = cashrate_subset$date)
 # Aggregate to quarterly frequency
 cashrate_quarterly <- apply.quarterly(cashrate_xts, mean)
 colnames(cashrate_quarterly) <- c("value")
-cashrate_quarterly_df <- data.frame(date = index(cashrate_quarterly), value = coredata(cashrate_quarterly))
+cashrate_quarterly <- as.zoo(cashrate_quarterly)
+cashrate_quarterly_df <- data.frame(date = time(cashrate_quarterly), value = coredata(cashrate_quarterly))
+#cashrate_quarterly_df <- data.frame(date = index(cashrate_quarterly), value = coredata(cashrate_quarterly))  # Error: cashrate_quarterly_df is not tsibble
 
 # Monthly hours works - Full time. "6202.0"
 hrs_full_pre <- read_abs(series_id = "A84426278A") 
 hrs_full <- xts(hrs_full_pre$value, hrs_full_pre$date)
 hrs_full<- apply.quarterly(hrs_full,mean)
-hrs_full_df <- data.frame(date = index(hrs_full), value = coredata(hrs_full))
+hrs_full <- as.zoo(hrs_full)
+hrs_full_df <- data.frame(date = time(hrs_full), value = coredata(hrs_full))
+#hrs_full_df <- data.frame(date = index(hrs_full), value = coredata(hrs_full))   # Error: hrs_full_df is not tsibble
 
 # Monthly hours works - Part time. "6202.0"
 hrs_part_pre <- read_abs(series_id = "A84426279C")
 hrs_part <- xts(hrs_part_pre$value, hrs_part_pre$date)
-hrs_part<- apply.quarterly(hrs_part,mean)
-hrs_part_df <- data.frame(date = index(hrs_part), value = coredata(hrs_part))
+hrs_part <- apply.quarterly(hrs_part,mean)
+hrs_part <- as.zoo(hrs_part)
+hrs_part_df <- data.frame(date = time(hrs_part), value = coredata(hrs_part))
+#hrs_part_df <- data.frame(date = index(hrs_part), value = coredata(hrs_part))   # Error: hrs_part_df is not tsibble
 
 # Net Overseas Migration
 oversea <- read_abs(series_id = "A2133254C")
@@ -115,7 +129,7 @@ pop <- read_abs(series_id = "A2133256J")
 ```
 
 
-```{r, plot, echo=FALSE}
+```{r, plot, echo=FALSE, fig.width=8, fig.height=6}
 par(mfrow = c(3, 4))
 
 plot(unmp$date, unmp$value, type = "l", xlab = "Date", ylab = "Value", main = "Unemployment
@@ -141,12 +155,15 @@ plot(pop$date, pop$value,
 
 
 ```
+<div id="figure1" style="text-align: center; color: #696969;">
+###### Figure 1: Time series plots
+</div>
 
 From the plot of the variables, they all show non-stationary, which can make it challanging 
-to analyse data. Therefore, the ACF test is performed to identify patterns and trend
+to analyse data. Therefore, the ACF test is performed to identify patterns and trend.
 
 
-```{r,echo=FALSE}
+```{r,echo=FALSE, fig.width=8, fig.height=6}
 par(mfrow = c(3, 4))
 
 # Calculate ACF manually for each variable
@@ -160,9 +177,11 @@ acf_hrs_full <- acf(hrs_full_df$value, plot = TRUE)
 acf_hrs_part <- acf(hrs_part_pre$value, plot = TRUE)
 acf_oversea <- acf(oversea$value, plot = TRUE)
 acf_pop <- acf(pop$value, plot = TRUE, na.action = na.pass)
-
-
 ```
+<div id="figure2" style="text-align: center; color: #696969;">
+###### Figure 2: ACF plots
+</div>
+
 The ACF plots show the variables have high memory pattern, indicates that there is a strong correlation between each variable and its past values, suggesting persistence or dependence over time.
 
 ## Model
