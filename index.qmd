@@ -1,5 +1,5 @@
 ---
-title: "Forecasting Unemployment rate using Baysian Vars with Regime change"
+title: "Forecasting Unemployment rate using Bayesian VARs with Regime change"
 author: "Nhu Minh Pham"
 
 execute:
@@ -8,14 +8,14 @@ execute:
 bibliography: references.bib
 ---
 
-> **Abstract.** Research on how Baysian Vars with regime change affect the forecasting 
+> **Abstract.** Research on how Bayesian VARs with regime change affect the forecasting 
 of unemployment rate
 >
 > **Keywords.** bsvars, regime change, forecasting, R, 
 
 # Introduction
 
-The objective of this research project is to develop a Bayesian Vector Autoregression (BVAR) model incorporating regime changes to analyze the dynamic relationships among macroeconomic variables, assess their impact on the unemployment rate over different economic regimes through time-varying parameters, and enhance forecasting accuracy.
+The objective of this research project is to develop a Bayesian Vector Autoregression (BVAR) model incorporating regime changes to analyse the dynamic relationships among macroeconomic variables, assess their impact on the unemployment rate over different economic regimes through time-varying parameters, and enhance forecasting accuracy.
 
 The question to be addressed in this research is: Can a Bayesian VAR model with regime changes accurately capture shifts in the relationships between unemployment rate and other macroeconomic variables for improved forecasting performance?
 
@@ -48,6 +48,13 @@ It's important to note that all data will be quarterly since the interest foreca
 & pop_{t} & : & \text{Population growth rate} \\
 \end{align*}
 
+```{r}
+# Set global options to hide the source code, messages, and warnings
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
 # Data Visualisation
 ```{r, hide = TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 library(readrba)
@@ -57,112 +64,158 @@ library(tsibble)
 library(xts)
 ```
 
+```{r,echo=FALSE, warning=FALSE, message=FALSE}
+start_date <- as.Date("1991-03-01")
+end_date <- as.Date("2023-12-01")
+
+########################################
+# Define a function to process ABS data
+########################################
+process_abs_data <- function(series_id, start_date, end_date) {
+  # Read raw data from ABS
+  abs_data <- read_abs(series_id = series_id)
+  
+  # Convert to xts object
+  abs_xts <- xts(abs_data$value, order.by = as.Date(abs_data$date))
+  
+  # Check if data is already in quarterly frequency
+  if (abs_data$frequency == "Quarterly") {
+    # Data is already in quarterly frequency
+    abs_quarterly <- abs_xts
+  } else {
+    # Aggregate to quarterly frequency
+    abs_quarterly <- apply.quarterly(abs_xts, mean)
+  }
+  
+  # Convert to dataframe
+  abs_df <- data.frame(Date = index(abs_quarterly),
+                       Value = coredata(abs_quarterly))
+  
+  # Subset to specified date range
+  abs_df <- abs_df[abs_df$Date >= start_date & abs_df$Date <= end_date, ]
+  
+  # Return the processed dataframe
+  return(abs_df)
+}
+
+########################################
+# Define a function to process RBA data
+########################################
+process_rba_data <- function(series_id, start_date, end_date) {
+  # Read raw data from ABS
+  rba_data <- read_rba(series_id = series_id)
+  
+  # Convert to xts object
+  rba_xts <- xts(rba_data$value, order.by = as.Date(rba_data$date))
+  
+  # Check if data is already in quarterly frequency
+  if (rba_data$frequency == "Quarterly") {
+    # Data is already in quarterly frequency
+    rba_quarterly <- rba_xts
+  } else {
+    # Aggregate to quarterly frequency
+    rba_quarterly <- apply.quarterly(rba_xts, mean)
+  }
+  
+  # Convert to dataframe
+  rba_df <- data.frame(Date = index(rba_quarterly),
+                       Value = coredata(rba_quarterly))
+  
+  # Subset to specified date range
+  rba_df <- rba_df[rba_df$Date >= start_date & rba_df$Date <= end_date, ]
+  
+  # Return the processed dataframe
+  return(rba_df)
+}
+
+```
+
 
 ```{r,echo=FALSE, warning=FALSE, message=FALSE}
-# Unemployment rate #################
-unmp <- read_abs(series_id = "A84423130A")
-# "6202.0", tables = 37
 
-# Participation rate #######
-par_pre <- read_abs(series_id = "A84423051C")
-par <- xts(par_pre$value, par_pre$date)
-par<- apply.quarterly(par,mean)
-par_df <- data.frame(date = index(par), value = coredata(par))
+# Unemployment rate ################## "6202.0", tables = 37
+unmp_df <- process_abs_data("A84423130A", start_date, end_date)
 
+# Participation rate
+par_df <- process_abs_data("A84423051C", start_date, end_date)
 
-# GDP #################
-gdp <- read_abs(series_id = "A2304372W")
-# 5206.0
+# GDP ################## 5206.0
+gdp_df <- process_abs_data("A2304372W", start_date, end_date)
 
-# WPI #################
-wpi <- read_abs(series_id = "A2615579C")
-# 6345.0
-percentage_change <- c(NA, diff(wpi$value) / lag(wpi$value, default = 1) * 100)
+# WPI ################## 6345.0
+wpi_df <- process_abs_data("A2615579C", start_date, end_date)
+# Calculate percentage change
+percentage_change <- c(NA, diff(wpi_df$Value) / lag(wpi_df$Value, default = 1) * 100)
 # Assign the percentage_change vector to the dataset
-wpi$percentage_change <- percentage_change[1:nrow(wpi)]
+wpi_df$percentage_change <- percentage_change[1:nrow(wpi_df)]
 
-# CPI #################
-cpi <- read_abs(series_id = "A2325850V")
-# 6401.0
+# CPI ################## 6401.0
+cpi_df <- process_abs_data("A2325850V", start_date, end_date)
 
 # Interest rate ##################
-cashrate <- read_rba(series_id = "FIRMMCRT")
-cashrate_subset <- cashrate[cashrate$date >= "1991-01-01", ]
-cashrate_xts <- xts(cashrate_subset$value, order.by = cashrate_subset$date)
-# Aggregate to quarterly frequency
-cashrate_quarterly <- apply.quarterly(cashrate_xts, mean)
-colnames(cashrate_quarterly) <- c("value")
-cashrate_quarterly_df <- data.frame(date = index(cashrate_quarterly), value = coredata(cashrate_quarterly))
+cashrate_df <- process_rba_data("FIRMMCRT", start_date, end_date)
 
 # Monthly hours works - Full time. "6202.0"
-hrs_full_pre <- read_abs(series_id = "A84426278A") 
-hrs_full <- xts(hrs_full_pre$value, hrs_full_pre$date)
-hrs_full<- apply.quarterly(hrs_full,mean)
-hrs_full_df <- data.frame(date = index(hrs_full), value = coredata(hrs_full))
+hrs_full_df <- process_abs_data("A84426278A", start_date, end_date)
 
 # Monthly hours works - Part time. "6202.0"
-hrs_part_pre <- read_abs(series_id = "A84426279C")
-hrs_part <- xts(hrs_part_pre$value, hrs_part_pre$date)
-hrs_part<- apply.quarterly(hrs_part,mean)
-hrs_part_df <- data.frame(date = index(hrs_part), value = coredata(hrs_part))
+hrs_part_df <- process_abs_data("A84426279C", start_date, end_date)
 
 # Net Overseas Migration
-oversea <- read_abs(series_id = "A2133254C")
+oversea_df <- process_abs_data("A2133254C", start_date, end_date)
 
 # Population growth rate
-pop <- read_abs(series_id = "A2133256J")
-
+pop_df <- process_abs_data("A2133256J", start_date, end_date)
 ```
 
 
-```{r, plot, echo=FALSE}
+```{r, plot, echo=FALSE, fig.width=8, fig.height=6}
+dataframes <- list(unmp_df = "Unemployment rate",
+                    par_df = "Participation rate",
+                    gdp_df = "GDP per capita",
+                    wpi_df = "WPI",
+                    cpi_df = "CPI",
+                    cashrate_df = "Cash rate",
+                    hrs_full_df = "Hours worked Full time",
+                    hrs_part_df = "Hours worked Part time",
+                    oversea_df = "Net Overseas Migration",
+                    pop_df = "Population growth")
+
 par(mfrow = c(3, 4))
 
-plot(unmp$date, unmp$value, type = "l", xlab = "Date", ylab = "Value", main = "Unemployment
-     rate")
-plot(par_df$date, par_df$value, type = "l", xlab = "Date", ylab = "Value", main =
-       "Participation rate")
-plot(gdp$date[gdp$date >= "1991-03-01"], gdp$value[gdp$date >= "1991-03-01"], 
-     type = "l", xlab = "Date", ylab = "Value", main = "GDP per capita")
-plot(wpi$date[wpi$date >= "1991-03-01"], wpi$percentage_change[wpi$date >= "1991-03-01"], 
-     type = "l", xlab = "Date", ylab = "Value", main = "WPI")
-plot(cpi$date[cpi$date >= "1991-03-01"], cpi$value[cpi$date >= "1991-03-01"], 
-     type = "l", xlab = "Date", ylab = "Value", main = "CPI")
-plot(cashrate_quarterly_df$date, cashrate_quarterly_df$value, 
-     type = "l", xlab = "Date", ylab = "Value", main = "Cash rate")
-plot(hrs_full_df$date, hrs_full_df$value, 
-     type = "l", xlab = "Date", ylab = "Value", main = "Hours worked Full time")
-plot(hrs_part_pre$date, hrs_part_pre$value, 
-     type = "l", xlab = "Date", ylab = "Value", main = "Hours worked Part time")
-plot(oversea$date, oversea$value, 
-     type = "l", xlab = "Date", ylab = "Value", main = "Net Overseas Migration")
-plot(pop$date, pop$value, 
-     type = "l", xlab = "Date", ylab = "Value", main = "Population growth")
-
+for (df_name in names(dataframes)) {
+  df <- get(df_name)
+  y_values <- if (df_name == "wpi_df") df$percentage_change else df$Value
+  plot(df$Date, y_values, type = "l", 
+       xlab = "Date", 
+       ylab = if (df_name == "wpi") "Percentage Change" else "Value", 
+       main = dataframes[[df_name]])
+}
 
 ```
+<div id="figure1" style="text-align: center; color: #696969;">
+###### Figure 1: Time series plots
+</div>
 
 From the plot of the variables, they all show non-stationary, which can make it challanging 
-to analyse data. Therefore, the ACF test is performed to identify patterns and trend
+to analyse data. Therefore, the ACF test is performed to identify patterns and trend.
 
 
-```{r,echo=FALSE}
+```{r,echo=FALSE, fig.width=8, fig.height=6}
 par(mfrow = c(3, 4))
 
-# Calculate ACF manually for each variable
-acf_unmp <- acf(unmp$value, plot = TRUE)
-acf_par <- acf(par_df$value, plot = TRUE)
-acf_gdp <- acf(gdp$value, plot = TRUE, na.action = na.pass)
-acf_wpi <- acf(wpi$percentage_change, plot = TRUE, na.action = na.pass)
-acf_cpi <- acf(cpi$value, plot = TRUE, na.action = na.pass)
-acf_cashrate <- acf(cashrate_quarterly_df$value, plot = TRUE)
-acf_hrs_full <- acf(hrs_full_df$value, plot = TRUE)
-acf_hrs_part <- acf(hrs_part_pre$value, plot = TRUE)
-acf_oversea <- acf(oversea$value, plot = TRUE)
-acf_pop <- acf(pop$value, plot = TRUE, na.action = na.pass)
-
-
+# Loop through each dataframe and create ACF plot
+for (df_name in names(dataframes)) {
+  df <- get(df_name)
+  y_values <- if (df_name == "wpi_df") df$percentage_change else df$Value
+  acf(y_values, plot = TRUE, na.action = na.pass, main = paste("ACF of",
+                                                               dataframes[[df_name]]))
+}
 ```
+<div id="figure2" style="text-align: center; color: #696969;">
+###### Figure 2: ACF plots
+</div>
+
 The ACF plots show the variables have high memory pattern, indicates that there is a strong correlation between each variable and its past values, suggesting persistence or dependence over time.
 
 ## Model
