@@ -8,7 +8,7 @@
 
 <meta name="author" content="Nhu Minh Pham">
 
-<title>Macroeconometrics Research Report - Forecasting Unemployment rate using Baysian Vars with Regime change</title>
+<title>Macroeconometrics Research Report - Forecasting Unemployment rate using Bayesian VARs with Regime change</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -147,7 +147,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Forecasting Unemployment rate using Baysian Vars with Regime change</h1>
+<h1 class="title">Forecasting Unemployment rate using Bayesian VARs with Regime change</h1>
 </div>
 
 
@@ -171,12 +171,12 @@ window.Quarto = {
 
 
 <blockquote class="blockquote">
-<p><strong>Abstract.</strong> Research on how Baysian Vars with regime change affect the forecasting of unemployment rate</p>
+<p><strong>Abstract.</strong> Research on how Bayesian VARs with regime change affect the forecasting of unemployment rate</p>
 <p><strong>Keywords.</strong> bsvars, regime change, forecasting, R,</p>
 </blockquote>
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>The objective of this research project is to develop a Bayesian Vector Autoregression (BVAR) model incorporating regime changes to analyze the dynamic relationships among macroeconomic variables, assess their impact on the unemployment rate over different economic regimes through time-varying parameters, and enhance forecasting accuracy.</p>
+<p>The objective of this research project is to develop a Bayesian Vector Autoregression (BVAR) model incorporating regime changes to analyse the dynamic relationships among macroeconomic variables, assess their impact on the unemployment rate over different economic regimes through time-varying parameters, and enhance forecasting accuracy.</p>
 <p>The question to be addressed in this research is: Can a Bayesian VAR model with regime changes accurately capture shifts in the relationships between unemployment rate and other macroeconomic variables for improved forecasting performance?</p>
 </section>
 <section id="motivation" class="level1">
@@ -208,20 +208,30 @@ window.Quarto = {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/plot-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/plot-1.png" class="img-fluid figure-img" width="768"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>From the plot of the variables, they all show non-stationary, which can make it challanging to analyse data. Therefore, the ACF test is performed to identify patterns and trend</p>
+<div id="figure1" style="text-align: center; color: #696969;">
+<section id="figure-1-time-series-plots" class="level6">
+<h6 class="anchored" data-anchor-id="figure-1-time-series-plots">Figure 1: Time series plots</h6>
+</section>
+</div>
+<p>From the plot of the variables, they all show non-stationary, which can make it challanging to analyse data. Therefore, the ACF test is performed to identify patterns and trend.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="768"></p>
 </figure>
 </div>
 </div>
+</div>
+<div id="figure2" style="text-align: center; color: #696969;">
+<section id="figure-2-acf-plots" class="level6">
+<h6 class="anchored" data-anchor-id="figure-2-acf-plots">Figure 2: ACF plots</h6>
+</section>
 </div>
 <p>The ACF plots show the variables have high memory pattern, indicates that there is a strong correlation between each variable and its past values, suggesting persistence or dependence over time.</p>
 <section id="model" class="level2">

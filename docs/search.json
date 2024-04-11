@@ -2,14 +2,14 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Forecasting Unemployment rate using Baysian Vars with Regime change",
+    "title": "Forecasting Unemployment rate using Bayesian VARs with Regime change",
     "section": "",
-    "text": "Abstract. Research on how Baysian Vars with regime change affect the forecasting of unemployment rate\nKeywords. bsvars, regime change, forecasting, R,"
+    "text": "Abstract. Research on how Bayesian VARs with regime change affect the forecasting of unemployment rate\nKeywords. bsvars, regime change, forecasting, R,"
   },
   {
     "objectID": "index.html#model",
     "href": "index.html#model",
-    "title": "Forecasting Unemployment rate using Baysian Vars with Regime change",
+    "title": "Forecasting Unemployment rate using Bayesian VARs with Regime change",
     "section": "Model",
     "text": "Model\n\nHypothesis\nVar(p) model\n\\[\\begin{aligned}\ny_t = \\beta_0 + \\beta_1 y_{t-1} + \\beta_2 x_{1, t-1} + \\beta_3 x_{2, t-1} + \\ldots + \\beta_n x_{n, t-1} + \\varepsilon_t\n\\end{aligned}\\]\nVar(p) model with regime change, meaning time-varying parameters\n\\[\\begin{aligned}\ny_t &= \\beta_{0,S_t} + \\beta_{1,S_t} y_{t-1} + \\beta_{2,S_t} x_{1, t-1} + \\beta_{3,S_t} x_{2, t-1} + \\ldots + \\beta_{n,S_t} x_{n, t-1} + \\varepsilon_t \\\\\n\\end{aligned}\\]\nProbability of transitioning from one state to another\n\\[\\begin{aligned}\nP(S_t = j | S_{t-1} = i) &= \\pi_{ij}\n\\end{aligned}\\]\n\n\nMatrix form\n\\[\\begin{align*}\n\\mathbf{Y}_t = \\boldsymbol{\\beta}_{S_t} \\mathbf{X}_t + \\boldsymbol{E}_t\n\\end{align*}\\]\n\\[\\begin{align*}\n\\boldsymbol{E}_t\n\\sim MN(0_T, \\Sigma, I_T)\n\\end{align*}\\]\n\\begin{align*} \\mathbf{Y}_t & : \\text{Matrix of response variables} \\\\ \\boldsymbol{\\beta} & : \\text{Coefficient matrix corresponding to regime state} \\\\ S_t & : \\text{Regime state} \\\\ \\mathbf{X}_t & : \\text{Matrix of predictor variables} \\\\ \\boldsymbol{\\varepsilon}_t & : \\text{Error term vector} \\end{align*}\nThe model’s equations include time-varying parameters, such as the coefficients of lagged variables, which adapt to changing economic conditions."
   }
