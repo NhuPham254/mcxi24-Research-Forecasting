@@ -60,8 +60,8 @@ knitr::opts_chunk$set(warning = FALSE)
 library(readrba)
 library(readabs)
 library(ggplot2)
-library(tsibble)
 library(xts)
+library(tseries)
 ```
 
 ```{r,echo=FALSE, warning=FALSE, message=FALSE}
@@ -88,8 +88,7 @@ process_abs_data <- function(series_id, start_date, end_date) {
   }
   
   # Convert to dataframe
-  abs_df <- data.frame(Date = index(abs_quarterly),
-                       Value = coredata(abs_quarterly))
+  abs_df <- data.frame(Date = index(abs_quarterly), Value = coredata(abs_quarterly))
   
   # Subset to specified date range
   abs_df <- abs_df[abs_df$Date >= start_date & abs_df$Date <= end_date, ]
@@ -118,8 +117,7 @@ process_rba_data <- function(series_id, start_date, end_date) {
   }
   
   # Convert to dataframe
-  rba_df <- data.frame(Date = index(rba_quarterly),
-                       Value = coredata(rba_quarterly))
+  rba_df <- data.frame(Date = index(rba_quarterly), Value = coredata(rba_quarterly))
   
   # Subset to specified date range
   rba_df <- rba_df[rba_df$Date >= start_date & rba_df$Date <= end_date, ]
@@ -131,41 +129,42 @@ process_rba_data <- function(series_id, start_date, end_date) {
 ```
 
 
+
 ```{r,echo=FALSE, warning=FALSE, message=FALSE}
 
-# Unemployment rate ################## "6202.0", tables = 37
-unmp_df <- process_abs_data("A84423130A", start_date, end_date)
+# Unemployment rate ################## "6202.0", A84423130A trend, A84423046K seasonadj
+unmp_df <- process_abs_data("A84423046K", start_date, end_date)
 
-# Participation rate
+# Participation rate ################## "6202.0", A84423051C seasonadj
 par_df <- process_abs_data("A84423051C", start_date, end_date)
 
-# GDP ################## 5206.0
-gdp_df <- process_abs_data("A2304372W", start_date, end_date)
+# GDP per capita: Chain volume measures; ##### "5206.0", A2304404C seasonadj, old A2304372W
+gdp_df <- process_abs_data("A2304404C", start_date, end_date)
 
-# WPI ################## 6345.0
-wpi_df <- process_abs_data("A2615579C", start_date, end_date)
+# WPI, Total hourly rates of pay including bonuses ###### 6345.0, A2713849C seasonadj
+wpi_df <- process_abs_data("A2713849C", start_date, end_date)
 # Calculate percentage change
-percentage_change <- c(NA, diff(wpi_df$Value) / lag(wpi_df$Value, default = 1) * 100)
+# percentage_change <- c(NA, diff(wpi_df$Value) / lag(wpi_df$Value, default = 1) * 100)
 # Assign the percentage_change vector to the dataset
-wpi_df$percentage_change <- percentage_change[1:nrow(wpi_df)]
+# wpi_df$percentage_change <- percentage_change[1:nrow(wpi_df)]
 
-# CPI ################## 6401.0
-cpi_df <- process_abs_data("A2325850V", start_date, end_date)
+# CPI ################## 6401.0, A3604506F seasonadj
+cpi_df <- process_abs_data("A3604506F", start_date, end_date)
 
-# Interest rate ##################
+# Cash rate ################## original
 cashrate_df <- process_rba_data("FIRMMCRT", start_date, end_date)
 
-# Monthly hours works - Full time. "6202.0"
+# Monthly hours works - Full time. "6202.0", A84426278A seasonadj
 hrs_full_df <- process_abs_data("A84426278A", start_date, end_date)
 
-# Monthly hours works - Part time. "6202.0"
+# Monthly hours works - Part time. "6202.0", A84426279C seasonadj
 hrs_part_df <- process_abs_data("A84426279C", start_date, end_date)
 
-# Net Overseas Migration
+# Net Overseas Migration ################## "3101.0",  A2133254C original
 oversea_df <- process_abs_data("A2133254C", start_date, end_date)
 
-# Population growth rate
-pop_df <- process_abs_data("A2133256J", start_date, end_date)
+# Population ############# "3101.0", A2060842F original
+pop_df <- process_abs_data("A2060842F", start_date, end_date)
 ```
 
 
@@ -185,20 +184,72 @@ par(mfrow = c(3, 4))
 
 for (df_name in names(dataframes)) {
   df <- get(df_name)
-  y_values <- if (df_name == "wpi_df") df$percentage_change else df$Value
+  y_values <- df$Value
   plot(df$Date, y_values, type = "l", 
        xlab = "Date", 
-       ylab = if (df_name == "wpi") "Percentage Change" else "Value", 
+       ylab = "Value", 
        main = dataframes[[df_name]])
 }
+
+#for (df_name in names(dataframes)) {
+#  df <- get(df_name)
+#  y_values <- if (df_name == "wpi_df") df$percentage_change else df$Value
+#  plot(df$Date, y_values, type = "l", 
+#      xlab = "Date", 
+#       ylab = if (df_name == "wpi") "Percentage Change" else "Value", 
+#       main = dataframes[[df_name]])}
 
 ```
 <div id="figure1" style="text-align: center; color: #696969;">
 ###### Figure 1: Time series plots
 </div>
 
-From the plot of the variables, they all show non-stationary, which can make it challanging 
-to analyse data. Therefore, the ACF test is performed to identify patterns and trend.
+```{r}
+# Log-transformation
+log_dataframes <- c("gdp_df", "wpi_df", "cpi_df", "hrs_full_df", "hrs_part_df", "oversea_df", "pop_df")
+
+# Log-transform the specified dataframes
+for (df_name in log_dataframes) {
+  df <- get(df_name)
+  df$Value <- log(df$Value)  # Log-transform the 'Value' column
+  assign(df_name, df)         # Assign the modified dataframe back to its original name
+}
+
+oversea_df <- na.omit(oversea_df)
+
+```
+
+
+
+
+```{r, echo=FALSE, fig.width=8, fig.height=6}
+
+dataframes <- list(unmp_df = "Unemployment rate",
+                    par_df = "Participation rate",
+                    gdp_df = "GDP per capita",
+                    wpi_df = "WPI",
+                    cpi_df = "CPI",
+                    cashrate_df = "Cash rate",
+                    hrs_full_df = "Hours worked Full time",
+                    hrs_part_df = "Hours worked Part time",
+                    oversea_df = "Net Overseas Migration",
+                    pop_df = "Population growth")
+
+par(mfrow = c(3, 4))
+
+for (df_name in names(dataframes)) {
+  df <- get(df_name)
+  y_values <- df$Value
+  plot(df$Date, y_values, type = "l", 
+       xlab = "Date", 
+       ylab = "Value", 
+       main = dataframes[[df_name]])
+}
+```
+To stabilize the variance, log tranformation is performed on all variables except 
+unemployment rate, participation rate and cash rate.
+
+From the plot of the variables, some show stationary and some non-stationary, which can make it challenging to analyse data. Therefore, the ACF test is performed to identify patterns and trend.
 
 
 ```{r,echo=FALSE, fig.width=8, fig.height=6}
@@ -207,16 +258,102 @@ par(mfrow = c(3, 4))
 # Loop through each dataframe and create ACF plot
 for (df_name in names(dataframes)) {
   df <- get(df_name)
-  y_values <- if (df_name == "wpi_df") df$percentage_change else df$Value
+  y_values <- df$Value
   acf(y_values, plot = TRUE, na.action = na.pass, main = paste("ACF of",
                                                                dataframes[[df_name]]))
 }
+
+#for (df_name in names(dataframes)) {
+#  df <- get(df_name)
+#  y_values <- if (df_name == "wpi_df") df$percentage_change else df$Value
+#  acf(y_values, plot = TRUE, na.action = na.pass, main = paste("ACF of",
+#                                                               dataframes[[df_name]]))
+#}
 ```
 <div id="figure2" style="text-align: center; color: #696969;">
 ###### Figure 2: ACF plots
 </div>
 
-The ACF plots show the variables have high memory pattern, indicates that there is a strong correlation between each variable and its past values, suggesting persistence or dependence over time.
+The ACF plots show the variables have persistence or dependence in the data as the they are slowly decaying, indicates that there is a strong correlation between each variable 
+and its past values, though this auto correlations decrease as lags increase.
+
+```{r,echo=FALSE, fig.width=8, fig.height=6}
+par(mfrow = c(3, 4))
+
+# Loop through each dataframe and create ACF plot
+for (df_name in names(dataframes)) {
+  df <- get(df_name)
+  y_values <- df$Value
+  pacf(y_values, plot = TRUE, na.action = na.pass, main = paste("PACF of",
+                                                               dataframes[[df_name]]))
+}
+```
+<div id="figure3" style="text-align: center; color: #696969;">
+###### Figure 3: PACF plots
+</div>
+
+The PACF plots show high autocorrelation at lag 1, and have clear cut offs.
+
+The ADF is performed to further determine the stationary properties of the data.
+Null hypothesis: a unit root is present
+Alternative hypothesis: stationary
+```{r}
+# Perform ADF test for each variable
+dataframes <- list(unmp_df = "Unemployment rate",
+                    par_df = "Participation rate",
+                    gdp_df = "GDP per capita",
+                    wpi_df = "WPI",
+                    cpi_df = "CPI",
+                    cashrate_df = "Cash rate",
+                    hrs_full_df = "Hours worked Full time",
+                    hrs_part_df = "Hours worked Part time",
+                    oversea_df = "Net Overseas Migration",
+                    pop_df = "Population growth")
+
+# Create an empty dataframe to store ADF test results
+adf <- data.frame(Dickey_Fuller = numeric(length(dataframes)), 
+                  p_value = numeric(length(dataframes)))
+
+# Set row names to variable names
+rownames(adf) <- names(dataframes)
+
+# Perform ADF test for each variable
+for (i in 1:length(dataframes)) {
+  df <- get(names(dataframes)[i])  # Get the dataframe corresponding to the current variable
+  adf_tmp <- adf.test(df$Value)    # Perform ADF test on the 'Value' column of the dataframe
+  adf[i, "Dickey_Fuller"] <- as.numeric(adf_tmp$statistic)
+  adf[i, "p_value"] <- as.numeric(adf_tmp$p.value)
+}
+
+# Round the numeric values to desired precision
+adf <- round(adf, 3)
+
+# Print the ADF test results
+print(adf)
+```
+Based on the ADF test, all variables except Net overseas migration has p-values > 0.05, 
+thus fail to reject null hypothesis of unit root.
+```{r}
+# Create an empty dataframe to store ADF test results for differenced variables
+diff_adf <- data.frame(Dickey_Fuller = numeric(length(dataframes)), 
+                       p_value =numeric(length(dataframes)))
+
+# Set row names to variable names
+rownames(diff_adf) <- names(dataframes)
+
+# Perform ADF test for each variable after differencing
+for (i in 1:length(dataframes)) {
+  df <- get(names(dataframes)[i])  # Get the dataframe corresponding to the current variable
+  diff_data <- diff(df$Value)      # Take the first difference of the variable
+  adf_tmp <- adf.test(diff_data)   # Perform ADF test on the differenced series
+  diff_adf[i, "Dickey_Fuller"] <- as.numeric(adf_tmp$statistic)
+  diff_adf[i, "p_value"] <- as.numeric(adf_tmp$p.value)
+}
+
+# Print the ADF test results for differenced variables
+print(diff_adf)
+```
+
 
 ## Model
 
@@ -260,7 +397,24 @@ S_t & : \\text{Regime state} \\\\
 \\boldsymbol{\\varepsilon}_t & : \\text{Error term vector} 
 \\end{align*}
 
+\\begin{align*}
+\\mathbf{Y}_t = \\begin{pmatrix}
+\\text{Unemployment}_t \\\\
+\\text{Participation}_t \\\\
+\\text{GDP}_t \\\\
+\\text{WPI}_t \\\\
+\\text{CPI}_t \\\\
+\\text{CashRate}_t \\\\
+\\text{HoursFull}_t \\\\
+\\text{HoursPart}_t \\\\
+\\text{OverseasMigration}_t \\\\
+\\text{Population}_t \\\\
+\\end{pmatrix}
+\\end{align*}
+
 The model's equations include time-varying parameters, such as the coefficients of lagged variables, which adapt to changing economic conditions.
+
+P
 
 
 # References {.unnumbered}
