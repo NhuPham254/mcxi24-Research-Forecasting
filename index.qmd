@@ -38,7 +38,7 @@ It's important to note that all data will be quarterly since the interest foreca
 \begin{align*}
 & unmp_{t} & : & \text{Unemployment rate} \\
 & par_{t} & : & \text{Participation rate} \\
-& gdp_{t} & : & \text{GDP per capita: Chain volume measures - Percentage changes} \\
+& gdp_{t} & : & \text{GDP per capita: Chain volume measures} \\
 & cpi_{t} & : & \text{Consumer price index} \\
 & wpi_{t} & : & \text{Wage price index} \\
 & cashrate_{t} & : & \text{Cash rate} \\
