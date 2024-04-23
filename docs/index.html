@@ -137,6 +137,10 @@ window.Quarto = {
   <li><a href="#hypothesis" id="toc-hypothesis" class="nav-link" data-scroll-target="#hypothesis">Hypothesis</a></li>
   <li><a href="#matrix-form" id="toc-matrix-form" class="nav-link" data-scroll-target="#matrix-form">Matrix form</a></li>
   </ul></li>
+  <li><a href="#basic-model" id="toc-basic-model" class="nav-link" data-scroll-target="#basic-model">Basic Model</a>
+  <ul class="collapse">
+  <li><a href="#prior-distribution" id="toc-prior-distribution" class="nav-link" data-scroll-target="#prior-distribution">Prior distribution</a></li>
+  </ul></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
@@ -218,12 +222,22 @@ window.Quarto = {
 <h6 class="anchored" data-anchor-id="figure-1-time-series-plots">Figure 1: Time series plots</h6>
 </section>
 </div>
-<p>From the plot of the variables, they all show non-stationary, which can make it challanging to analyse data. Therefore, the ACF test is performed to identify patterns and trend.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="768"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To stabilize the variance, log tranformation is performed on all variables except unemployment rate, participation rate and cash rate.</p>
+<p>From the plot of the variables, some show stationary and some non-stationary, which can make it challenging to analyse data. Therefore, the ACF test is performed to identify patterns and trend.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="768"></p>
 </figure>
 </div>
 </div>
@@ -233,7 +247,38 @@ window.Quarto = {
 <h6 class="anchored" data-anchor-id="figure-2-acf-plots">Figure 2: ACF plots</h6>
 </section>
 </div>
-<p>The ACF plots show the variables have high memory pattern, indicates that there is a strong correlation between each variable and its past values, suggesting persistence or dependence over time.</p>
+<p>The ACF plots show the variables have persistence or dependence in the data as the they are slowly decaying, indicates that there is a strong correlation between each variable and its past values, though this auto correlations decrease as lags increase.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="figure3" style="text-align: center; color: #696969;">
+<section id="figure-3-pacf-plots" class="level6">
+<h6 class="anchored" data-anchor-id="figure-3-pacf-plots">Figure 3: PACF plots</h6>
+</section>
+</div>
+<p>The PACF plots show high autocorrelation at lag 1, and have clear cut offs.</p>
+<p>The ADF is performed to further determine the stationary properties of the data. Null hypothesis: a unit root is present Alternative hypothesis: stationary</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>            Dickey_Fuller p_value
+unmp_df            -2.477   0.378
+par_df             -2.180   0.502
+gdp_df             -1.823   0.650
+wpi_df             -2.181   0.502
+cpi_df             -2.804   0.242
+cashrate_df        -3.409   0.056
+hrs_full_df        -3.462   0.049
+hrs_part_df        -1.326   0.857
+oversea_df         -3.582   0.038
+pop_df             -2.065   0.550</code></pre>
+</div>
+</div>
 <section id="model" class="level2">
 <h2 class="anchored" data-anchor-id="model">Model</h2>
 <section id="hypothesis" class="level3">
@@ -261,7 +306,76 @@ P(S_t = j | S_{t-1} = i) &amp;= \pi_{ij}
 \sim MN(0_T, \Sigma, I_T)
 \end{align*}\]</span></p>
 <p>\begin{align*} \mathbf{Y}_t &amp; : \text{Matrix of response variables} \\ \boldsymbol{\beta} &amp; : \text{Coefficient matrix corresponding to regime state} \\ S_t &amp; : \text{Regime state} \\ \mathbf{X}_t &amp; : \text{Matrix of predictor variables} \\ \boldsymbol{\varepsilon}_t &amp; : \text{Error term vector} \end{align*}</p>
+<p>\begin{align*} \mathbf{Y}_t = \begin{pmatrix} \text{Unemployment}_t \\ \text{Participation}_t \\ \text{GDP}_t \\ \text{WPI}_t \\ \text{CPI}_t \\ \text{CashRate}_t \\ \text{HoursFull}_t \\ \text{HoursPart}_t \\ \text{OverseasMigration}_t \\ \text{Population}_t \\ \end{pmatrix} \end{align*}</p>
 <p>The model’s equations include time-varying parameters, such as the coefficients of lagged variables, which adapt to changing economic conditions.</p>
+</section>
+</section>
+<section id="basic-model" class="level2">
+<h2 class="anchored" data-anchor-id="basic-model">Basic Model</h2>
+<p>The model follows the Normal Inverse Wishart distribution.</p>
+<section id="prior-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="prior-distribution">Prior distribution</h3>
+<p>The Minnesota prior is commonly used in Bayesian Vector Autoregression (BVAR) models due to its ability to impose shrinkage towards zero on the coefficients, effectively regularizing the estimation process. The Minnesota prior aligns effectively with the stylized fact of nonstationarity observed in macroeconomic variables.</p>
+<p><span class="math display">\[\begin{align*}
+p(A, \Sigma) = p(A \mid \Sigma) \cdot p(\Sigma) \\
+A \mid \Sigma \sim \text{MN}_{K \times N} (\underline{A}, \Sigma, \underline{V}) \\
+\Sigma \sim  \text{IW}_{N} (\underline{S}, \underline{v})\\
+\end{align*}\]</span></p>
+<p>With lags = 2 and N = 4</p>
+<p><span class="math display">\[\begin{align*}
+\underline{A} = \begin{bmatrix}
+\mathbf{0}_{4 \times 1} &amp; \mathbf{I}_{4} &amp; \mathbf{0}_{4 \times (2-1)4}
+\end{bmatrix}
+= \begin{bmatrix}
+0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+\end{bmatrix}
+\end{align*}\]</span></p>
+<p>The column-specific prior covariance of A <span class="math display">\[\begin{align*}
+\underline{V} &amp;= \text{diag}\left( \begin{bmatrix}
+k_2 &amp; k_1(\mathbf{p}^{-2} \otimes 1'_4)
+\end{bmatrix} \right)\\
+\mathbf{p} &amp;= \begin{bmatrix}
+1 &amp; 2 &amp; \cdots &amp; p \\
+\end{bmatrix}
+\end{align*}\]</span> <span class="math display">\[\begin{align*}
+&amp; k_2 : \text{overall shrinkage for the constant term} \\
+&amp; k_1 : \text{overall shrinkage levels for autoregressive slopes} \\
+\end{align*}\]</span></p>
+Prior covariance matrix
+<span class="math display">\[\begin{bmatrix}
+k_2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; \frac{k_1}{\sigma_1^{2}} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; \frac{k_1}{\sigma_1^{2}} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; \frac{k_1}{\sigma_1^{2}} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{\sigma_1^{2}} &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4\sigma_1^{2}} &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4\sigma_1^{2}} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4\sigma_1^{2}} &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4\sigma_1^{2}} \\
+\end{bmatrix}\]</span>
+<p>The joint posterior distribution</p>
+<p><span class="math display">\[\begin{align*}
+p(A, \Sigma) &amp;= p(A \mid \Sigma) \cdot p(\Sigma) \\
+A \mid \Sigma &amp;\sim \text{MN}_{K \times N} (\underline{A}, \Sigma, \underline{V}) \\
+\Sigma &amp;\sim \text{IW}_{N} (\underline{S}, \underline{v})\\
+\end{align*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+p(A,\Sigma | Y,X) &amp;= p(A|Y,X,\Sigma)p(\Sigma|Y,X) \\
+p(A|Y,X,\Sigma) &amp;\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\
+p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
+\\
+\overline{V} &amp;= (X'X + \underline{V}^{-1})^{-1} \\
+\overline{A} &amp;= \overline{V}(X'Y+\underline{V}^{-1}\underline{A}) \\
+\overline{v} &amp;= T + \underline{v} \\
+\overline{S} &amp;= \underline{S}+Y'Y+\underline{A}'\underline{V}^{-1}\underline{A}-\overline{A}'
+\overline{V}^{-1}\overline{A} \\
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+
+\end{align}\]</span></p>
 </section>
 </section>
 </section>
