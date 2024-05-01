@@ -380,10 +380,21 @@ S_t & : \\text{Regime state} \\\\
 
 The model's equations include time-varying parameters, such as the coefficients of lagged variables, which adapt to changing economic conditions.
 
+```{r}
+# Combine data frames into one data frame
+# Truncate dates to the first day of the month
+cashrate_df$Date <- as.Date(format(cashrate_df$Date, "%Y-%m-01"))
+# Merge data frames by Date
+merged_df <- merge(unmp_df, gdp_df, by = "Date", suffixes = c("_unmp", "_gdp"))
+merged_df <- merge(merged_df, wpi_df, by = "Date", suffixes = c("", "_wpi"))
+merged_df <- merge(merged_df, cashrate_df, by = "Date", suffixes = c("", "_cash"))
+
+```
+
 ## Basic Model
 The model follows the Normal Inverse Wishart distribution.
 
-### Prior distribution
+### Minnesota Prior distribution
 
 The Minnesota prior is commonly used in Bayesian Vector Autoregression (BVAR) models due to its ability to impose shrinkage towards zero on the coefficients, effectively regularizing the estimation process. The Minnesota prior aligns effectively with the stylized fact of nonstationarity observed in macroeconomic variables.
 
@@ -393,18 +404,18 @@ A \mid \Sigma \sim \text{MN}_{K \times N} (\underline{A}, \Sigma, \underline{V})
 \Sigma \sim  \text{IW}_{N} (\underline{S}, \underline{v})\\
 \end{align*}
 
-With lags = 2 and N = 4
+With lags = 4 and N = 4
 
 \begin{align*}
 \underline{A} = \begin{bmatrix}
-\mathbf{0}_{4 \times 1} & \mathbf{I}_{4} & \mathbf{0}_{4 \times (2-1)4}
-\end{bmatrix}
+\mathbf{0}_{4 \times 1} & \mathbf{I}_{4} & \mathbf{0}_{4 \times (4-1)4}
+\end{bmatrix}'
 = \begin{bmatrix}
-0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
-\end{bmatrix}
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+\end{bmatrix}'
 \end{align*}
 
 The column-specific prior covariance of A
@@ -413,7 +424,7 @@ The column-specific prior covariance of A
 k_2 & k_1(\mathbf{p}^{-2} \otimes 1'_4)
 \end{bmatrix} \right)\\
 \mathbf{p} &= \begin{bmatrix}
-1 & 2 & \cdots & p \\
+1 & 2 & 3 & 4 \\
 \end{bmatrix}
 \end{align*}
 \begin{align*}
@@ -423,26 +434,38 @@ k_2 & k_1(\mathbf{p}^{-2} \otimes 1'_4)
 
 Prior covariance matrix
 \begin{bmatrix}
-k_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & \frac{k_1}{\sigma_1^{2}} & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & \frac{k_1}{\sigma_1^{2}} & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & \frac{k_1}{\sigma_1^{2}} & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & \frac{k_1}{\sigma_1^{2}} & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & \frac{k_1}{4\sigma_1^{2}} & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{4\sigma_1^{2}} & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{4\sigma_1^{2}} & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{4\sigma_1^{2}} \\
+k_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \cdots & 0\\
+0 & k_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \cdots & 0\\
+0 & 0 & k_1 & 0 & 0 & 0 & 0 & 0 & 0 & \cdots & 0\\
+0 & 0 & 0 & k_1 & 0 & 0 & 0 & 0 & 0 & \cdots & 0\\
+0 & 0 & 0 & 0 & k_1 & 0 & 0 & 0 & 0 & \cdots & 0\\ 
+0 & 0 & 0 & 0 & 0 & \frac{k_1}{4} & 0 & 0 & 0 & \cdots & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{4} & 0 & 0 & \cdots & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{4} & 0 & \cdots & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{4} & \cdots & 0\\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \ddots & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{16}      
 \end{bmatrix}
 
 
-The joint posterior distribution
+```{r}
+# Data configuration
+N       = 4
+p       = 4
+S       = 1000
 
-\begin{align*}
-p(A, \Sigma) &= p(A \mid \Sigma) \cdot p(\Sigma) \\
-A \mid \Sigma &\sim \text{MN}_{K \times N} (\underline{A}, \Sigma, \underline{V}) \\
-\Sigma &\sim \text{IW}_{N} (\underline{S}, \underline{v})\\
-\end{align*}
+y       = merged_df
+y       = ts(y[,c(2,3,4,5)], start=c(1997,9), frequency=4,
+             names=c("unmp","gdp","wpi","cashrate"))
+Y       = ts(y[5:nrow(y),], start=c(1998,9), frequency=4)
 
+X       = matrix(1,nrow(Y),1)
+for (i in 1:p){
+  X     = cbind(X,y[5:nrow(y)-i,])
+}
+```
+
+### The joint posterior distribution
 
 \begin{align}
 p(A,\Sigma | Y,X) &= p(A|Y,X,\Sigma)p(\Sigma|Y,X) \\
@@ -456,9 +479,158 @@ p(\Sigma|Y,X) &\sim IW_{N}(\overline{S}, \overline{v})\\
 \overline{V}^{-1}\overline{A} \\
 \end{align}
 
+
+```{r, results='hide'}
+# MLE
+############################################################
+A.hat       = solve(t(X)%*%X)%*%t(X)%*%Y
+Sigma.hat   = t(Y-X%*%A.hat)%*%(Y-X%*%A.hat)/T
+round(A.hat,3)
+round(Sigma.hat,3)
+round(cov2cor(Sigma.hat),3)
+
+# Prior distribution
+############################################################
+kappa.1     = 0.02^2
+kappa.2     = 100
+A.prior     = matrix(0,nrow(A.hat),ncol(A.hat))
+A.prior[2:5, 1:4] <- diag(1, nrow = 4)
+V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
+S.prior     = diag(diag(Sigma.hat))
+nu.prior    = N+1
+
+# Normal-inverse Wishard posterior parameters
+############################################################
+V.bar.inv   = t(X)%*%X + diag(1/diag(V.prior))
+V.bar       = solve(V.bar.inv)
+A.bar       = V.bar%*%(t(X)%*%Y + diag(1/diag(V.prior))%*%A.prior)
+nu.bar      = nrow(Y) + nu.prior
+S.bar       = S.prior + t(Y)%*%Y + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.bar)%*%V.bar.inv%*%A.bar
+S.bar.inv   = solve(S.bar)
+```
+
+1000 Sample draws from the joint distribution with Minnesota prior.
 ```{r}
+# posterior draws 
+############################################################
+Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
+Sigma.posterior   = apply(Sigma.posterior,3,solve)
+Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
+A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
+L                 = t(chol(V.bar))
+for (s in 1:S){
+  A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%chol(Sigma.posterior[,,s])
+}
+
+# round(apply(A.posterior,1:2,mean),3)
+```
+
+```{r, results='hide' }
+# report posterior means and sd of parameters
+A.E         = apply(A.posterior,1:2,mean)
+A.sd        = apply(A.posterior,1:2,sd)
+Sigma.E     = apply(Sigma.posterior,1:2,mean)
+Sigma.sd    = apply(Sigma.posterior,1:2,sd)
+
+library(xtable)
+xtable(rbind(format(t(A.E),digits=1, scientific=FALSE)[1,],
+      format(t(A.sd),digits=1, scientific=FALSE)[1,],
+      format(t(A.E),digits=1, scientific=FALSE)[2,],
+      format(t(A.sd),digits=1, scientific=FALSE)[2,]))
+
+xtable(rbind(format(Sigma.E,digits=1, scientific=FALSE)[1,],
+             format(Sigma.sd,digits=1, scientific=FALSE)[1,],
+             format(Sigma.E,digits=1, scientific=FALSE)[2,],
+             format(Sigma.sd,digits=1, scientific=FALSE)[2,]))
+
+
+# simulate draws from the predictive density
+# WARNING! This takes a while
+############################################################
 
 ```
+Table 
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rlllllllllllllllll}
+  \hline
+ & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 & 16 & 17 \\ 
+  \hline
+1 & 48.09440166 &  1.28178657 &  0.03163478 &  0.04085992 & -0.12287201 & -0.30906308 &  0.00141876 &  0.00525711 & -0.00867471 & -0.12901623 &  0.01479746 & -0.00816151 & -0.00361686 &  0.07787646 &  0.00557509 &  0.01145551 &  0.01212629 \\ 
+  2 & 34.394276 &  0.118867 &  0.824480 &  0.836935 &  0.790465 &  0.171764 &  0.403564 &  0.418450 &  0.397149 &  0.145780 &  0.276347 &  0.268899 &  0.265922 &  0.099096 &  0.197875 &  0.207806 &  0.205609 \\ 
+  3 & -0.00906363 &  0.00004789 &  1.00000271 & -0.00001920 &  0.00011165 &  0.00000768 & -0.00000076 & -0.00000147 &  0.00002436 & -0.00005963 & -0.00000272 &  0.00000277 &  0.00001155 &  0.00002312 &  0.00000123 &  0.00000093 &  0.00000380 \\ 
+  4 &  0.011129 &  0.000041 &  0.000297 &  0.000284 &  0.000281 &  0.000061 &  0.000144 &  0.000143 &  0.000143 &  0.000053 &  0.000098 &  0.000101 &  0.000096 &  0.000035 &  0.000072 &  0.000071 &  0.000071 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+
+Y.h         = array(NA,c(h,N,S))
+
+for (s in 1:S){
+  x.Ti        = Y[(nrow(Y)-h+1):nrow(Y),]
+  x.Ti        = x.Ti[4:1,]
+  for (i in 1:h){
+    x.T         = c(1,as.vector(t(x.Ti)))
+    Y.h[i,,s]   = rmvnorm(1, mean = x.T%*%A.posterior[,,s], sigma=Sigma.posterior[,,s])
+    x.Ti        = rbind(Y.h[i,,s],x.Ti[1:3,])
+  }
+}
+
+
+
+#######################################################################################
+## Extension 1 Model
+Cointegration is when the non-stationary variables have an equilibrium long term 
+relationship or a common trend. The model is extended to incorporate dummy-observation-prior, aiming to account for the potential cointegration amongst the variables, capturing the underlying economic relationships and dynamics.
+
+This approach allows us to leverage both the observed data and additional information about the structural relationships among variables, leading to more accurate parameter estimation and potentially improved forecasting performance.
+
+### Minnesota and Dummy Observation Prior distribution
+
+\begin{align*}
+p(A, \Sigma) = p(A \mid \Sigma) \cdot p(\Sigma) \\
+A \mid \Sigma \sim \text{MN}_{K \times N} (\underline{A}, \Sigma, \underline{V}, \lambda) \\
+\Sigma \sim  \text{IW}_{N} (\underline{S}, \underline{v})\\
+\end{align*}
+
+With lags = 4 and N = 4
+
+Prior covariance matrix
+\begin{bmatrix}
+k_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & \frac{k_1}{\lambda} & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & \frac{k_1}{\lambda} & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & \frac{k_1}{\lambda} & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & \frac{k_1}{\lambda} & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & \frac{k_1}{4\lambda} & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{4\lambda} & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{4\lambda} & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{4\lambda} \\
+\end{bmatrix}
+
+
+# MLE
+############################################################
+A.hat       = solve(t(X)%*%X)%*%t(X)%*%Y
+Sigma.hat   = t(Y-X%*%A.hat)%*%(Y-X%*%A.hat)/T
+round(A.hat,3)
+round(Sigma.hat,3)
+round(cov2cor(Sigma.hat),3)
+
+# Prior distribution
+############################################################
+kappa.1     = 10
+kappa.2     = 100
+A.prior     = matrix(0,nrow(A.hat),ncol(A.hat))
+A.prior[2:4,] <- diag(1)  ??????
+V.prior     = diag(c(kappa.2,(1/lambda)*kappa.1*((1:p)^(-2))%x%rep(1,N)))
+S.prior     = diag(diag(Sigma.hat))
+nu.prior    = N+1
+```
+```
+
 
 
 ```{r}
