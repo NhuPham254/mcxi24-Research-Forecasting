@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.552">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Nhu Minh Pham">
+
+<title>Macroeconometrics Research Report - Forecasting Unemployment rate using Bayesian VARs with Regime change</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Macroeconometrics Research Report</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#motivation" id="toc-motivation" class="nav-link" data-scroll-target="#motivation">Motivation</a></li>
+  <li><a href="#data-properties" id="toc-data-properties" class="nav-link" data-scroll-target="#data-properties">Data properties</a></li>
+  <li><a href="#data-visualisation" id="toc-data-visualisation" class="nav-link" data-scroll-target="#data-visualisation">Data Visualisation</a>
+  <ul class="collapse">
+  <li><a href="#model" id="toc-model" class="nav-link" data-scroll-target="#model">Model</a>
+  <ul class="collapse">
+  <li><a href="#hypothesis" id="toc-hypothesis" class="nav-link" data-scroll-target="#hypothesis">Hypothesis</a></li>
+  <li><a href="#matrix-form" id="toc-matrix-form" class="nav-link" data-scroll-target="#matrix-form">Matrix form</a></li>
+  </ul></li>
+  <li><a href="#basic-model" id="toc-basic-model" class="nav-link" data-scroll-target="#basic-model">Basic Model</a>
+  <ul class="collapse">
+  <li><a href="#minnesota-prior-distribution" id="toc-minnesota-prior-distribution" class="nav-link" data-scroll-target="#minnesota-prior-distribution">Minnesota Prior distribution</a></li>
+  <li><a href="#the-joint-posterior-distribution" id="toc-the-joint-posterior-distribution" class="nav-link" data-scroll-target="#the-joint-posterior-distribution">The joint posterior distribution</a></li>
+  </ul></li>
+  <li><a href="#extension-1-model" id="toc-extension-1-model" class="nav-link" data-scroll-target="#extension-1-model">Extension 1 Model</a>
+  <ul class="collapse">
+  <li><a href="#minnesota-and-dummy-observation-prior-distribution" id="toc-minnesota-and-dummy-observation-prior-distribution" class="nav-link" data-scroll-target="#minnesota-and-dummy-observation-prior-distribution">Minnesota and Dummy Observation Prior distribution</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#mle" id="toc-mle" class="nav-link" data-scroll-target="#mle">MLE</a></li>
+  <li><a href="#prior-distribution" id="toc-prior-distribution" class="nav-link" data-scroll-target="#prior-distribution">Prior distribution</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Forecasting Unemployment rate using Bayesian VARs with Regime change</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Nhu Minh Pham </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p><strong>Abstract.</strong> Research on how Bayesian VARs with regime change affect the forecasting of unemployment rate</p>
+<p><strong>Keywords.</strong> bsvars, regime change, forecasting, R,</p>
+</blockquote>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>The objective of this research project is to develop a Bayesian Vector Autoregression (BVAR) model incorporating regime changes to analyse the dynamic relationships among macroeconomic variables, assess their impact on the unemployment rate over different economic regimes through time-varying parameters, and enhance forecasting accuracy.</p>
+<p>The question to be addressed in this research is: Can a Bayesian VAR model with regime changes accurately capture shifts in the relationships between unemployment rate and other macroeconomic variables for improved forecasting performance?</p>
+</section>
+<section id="motivation" class="level1">
+<h1>Motivation</h1>
+<p>Understanding the impact of economic regime changes on the unemployment rate dynamics holds substantial importance in grasping the complexities of the labour market. The labour market is highly susceptible to various shocks and policy interventions, making accurate forecasting of the unemployment rate crucial for informed decision-making. By employing a Bayesian Vector Autoregression (BVAR) model that allows the parameters to vary across different economic regimes, we can gain a nuanced understanding of how the unemployment rate responds to diverse economic conditions and the efficacy of policies. This research enhances forecasting accuracy and offers valuable insights into the underlying drivers of unemployment fluctuations. By better understanding these dynamics, policymakers can make more informed decisions to counter economic instability.</p>
+</section>
+<section id="data-properties" class="level1">
+<h1>Data properties</h1>
+<p>For the investigation of the problem at hand, the selection of variables includes a comprehensive set of economic indicators and demographic factors that are crucial for understanding labour market dynamics and their impact on unemployment rates.</p>
+<p>For instance, GDP growth provides a broad measure of economic activity, serving as an indicator of overall labour market. Consumer price index, wage price index and interest rate reflect macroeconomic conditions and monetary policy, influencing consumer spending, business investment, and hiring decisions, thereby affecting unemployment trends. Government spending impacts aggregate demand and employment levels, while demographic factors such as population growth rate, average age of the workforce, and level of highest educational attainment offer insights into labour force participation and composition.</p>
+<p>Each variable’s form/transformation will depend on its specific characteristics and the nature of its relationship with unemployment. For instance, variables like GDP growth may be included in their original form, while others, such as wpi might need to be computed from the index data.</p>
+<p>It’s important to note that all data will be quarterly since the interest forecasting for unemployment will be conducted at a quarterly frequency. Quarterly frequency is suitable for capturing the diverse movements influencing unemployment, including short-term shocks, long-term trends, and policy changes, providing a balanced perspective.</p>
+<p><span class="math display">\[\begin{align*}
+&amp; unmp_{t} &amp; : &amp; \text{Unemployment rate} \\
+&amp; par_{t} &amp; : &amp; \text{Participation rate} \\
+&amp; gdp_{t} &amp; : &amp; \text{GDP per capita: Chain volume measures - Percentage changes} \\
+&amp; cpi_{t} &amp; : &amp; \text{Consumer price index} \\
+&amp; wpi_{t} &amp; : &amp; \text{Wage price index} \\
+&amp; cashrate_{t} &amp; : &amp; \text{Cash rate} \\
+&amp; hrfull_{t} &amp; : &amp; \text{Average hours worked Full time} \\
+&amp; hrpart_{t} &amp; : &amp; \text{Average hours worked Part time} \\
+&amp; oversea_{t} &amp; : &amp; \text{Oversea migration} \\
+&amp; pop_{t} &amp; : &amp; \text{Population growth rate} \\
+\end{align*}\]</span></p>
+</section>
+<section id="data-visualisation" class="level1">
+<h1>Data Visualisation</h1>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="figure1" style="text-align: center; color: #696969;">
+<section id="figure-1-time-series-plots" class="level6">
+<h6 class="anchored" data-anchor-id="figure-1-time-series-plots">Figure 1: Time series plots</h6>
+</section>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To stabilize the variance, log tranformation is performed on all variables except unemployment rate, participation rate and cash rate.</p>
+<p>From the plot of the variables, some show stationary and some non-stationary, which can make it challenging to analyse data. Therefore, the ACF test is performed to identify patterns and trend.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="figure2" style="text-align: center; color: #696969;">
+<section id="figure-2-acf-plots" class="level6">
+<h6 class="anchored" data-anchor-id="figure-2-acf-plots">Figure 2: ACF plots</h6>
+</section>
+</div>
+<p>The ACF plots show the variables have persistence or dependence in the data as the they are slowly decaying, indicates that there is a strong correlation between each variable and its past values, though this auto correlations decrease as lags increase.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="figure3" style="text-align: center; color: #696969;">
+<section id="figure-3-pacf-plots" class="level6">
+<h6 class="anchored" data-anchor-id="figure-3-pacf-plots">Figure 3: PACF plots</h6>
+</section>
+</div>
+<p>The PACF plots show high autocorrelation at lag 1, and have clear cut offs.</p>
+<p>The ADF is performed to further determine the stationary properties of the data. Null hypothesis: a unit root is present Alternative hypothesis: stationary</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>            Dickey_Fuller p_value
+unmp_df            -2.477   0.378
+par_df             -2.180   0.502
+gdp_df             -1.823   0.650
+wpi_df             -2.181   0.502
+cpi_df             -2.804   0.242
+cashrate_df        -3.409   0.056
+hrs_full_df        -3.462   0.049
+hrs_part_df        -1.326   0.857
+oversea_df         -3.582   0.038
+pop_df             -2.065   0.550</code></pre>
+</div>
+</div>
+<section id="model" class="level2">
+<h2 class="anchored" data-anchor-id="model">Model</h2>
+<section id="hypothesis" class="level3">
+<h3 class="anchored" data-anchor-id="hypothesis">Hypothesis</h3>
+Var(p) model
+<span class="math display">\[\begin{aligned}
+y_t = \beta_0 + \beta_1 y_{t-1} + \beta_2 x_{1, t-1} + \beta_3 x_{2, t-1} + \ldots + \beta_n x_{n, t-1} + \varepsilon_t
+\end{aligned}\]</span>
+Var(p) model with regime change, meaning time-varying parameters
+<span class="math display">\[\begin{aligned}
+y_t &amp;= \beta_{0,S_t} + \beta_{1,S_t} y_{t-1} + \beta_{2,S_t} x_{1, t-1} + \beta_{3,S_t} x_{2, t-1} + \ldots + \beta_{n,S_t} x_{n, t-1} + \varepsilon_t \\
+\end{aligned}\]</span>
+Probability of transitioning from one state to another
+<span class="math display">\[\begin{aligned}
+P(S_t = j | S_{t-1} = i) &amp;= \pi_{ij}
+\end{aligned}\]</span>
+</section>
+<section id="matrix-form" class="level3">
+<h3 class="anchored" data-anchor-id="matrix-form">Matrix form</h3>
+<p><span class="math display">\[\begin{align*}
+\mathbf{Y}_t = \boldsymbol{\beta}_{S_t} \mathbf{X}_t + \boldsymbol{E}_t
+\end{align*}\]</span></p>
+<p><span class="math display">\[\begin{align*}
+\boldsymbol{E}_t
+\sim MN(0_T, \Sigma, I_T)
+\end{align*}\]</span></p>
+<p>\begin{align*} \mathbf{Y}_t &amp; : \text{Matrix of response variables} \\ \boldsymbol{\beta} &amp; : \text{Coefficient matrix corresponding to regime state} \\ S_t &amp; : \text{Regime state} \\ \mathbf{X}_t &amp; : \text{Matrix of predictor variables} \\ \boldsymbol{\varepsilon}_t &amp; : \text{Error term vector} \end{align*}</p>
+<p>\begin{align*} \mathbf{Y}_t = \begin{pmatrix} \text{Unemployment}_t \\ \text{Participation}_t \\ \text{GDP}_t \\ \text{WPI}_t \\ \text{CPI}_t \\ \text{CashRate}_t \\ \text{HoursFull}_t \\ \text{HoursPart}_t \\ \text{OverseasMigration}_t \\ \text{Population}_t \\ \end{pmatrix} \end{align*}</p>
+<p>The model’s equations include time-varying parameters, such as the coefficients of lagged variables, which adapt to changing economic conditions.</p>
+</section>
+</section>
+<section id="basic-model" class="level2">
+<h2 class="anchored" data-anchor-id="basic-model">Basic Model</h2>
+<p>The model follows the Normal Inverse Wishart distribution.</p>
+<section id="minnesota-prior-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="minnesota-prior-distribution">Minnesota Prior distribution</h3>
+<p>The Minnesota prior is commonly used in Bayesian Vector Autoregression (BVAR) models due to its ability to impose shrinkage towards zero on the coefficients, effectively regularizing the estimation process. The Minnesota prior aligns effectively with the stylized fact of nonstationarity observed in macroeconomic variables.</p>
+<p><span class="math display">\[\begin{align*}
+p(A, \Sigma) = p(A \mid \Sigma) \cdot p(\Sigma) \\
+A \mid \Sigma \sim \text{MN}_{K \times N} (\underline{A}, \Sigma, \underline{V}) \\
+\Sigma \sim  \text{IW}_{N} (\underline{S}, \underline{v})\\
+\end{align*}\]</span></p>
+<p>With lags = 4 and N = 4</p>
+<p><span class="math display">\[\begin{align*}
+\underline{A} = \begin{bmatrix}
+\mathbf{0}_{4 \times 1} &amp; \mathbf{I}_{4} &amp; \mathbf{0}_{4 \times (4-1)4}
+\end{bmatrix}'
+= \begin{bmatrix}
+0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
+0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
+\end{bmatrix}'
+\end{align*}\]</span></p>
+<p>The column-specific prior covariance of A <span class="math display">\[\begin{align*}
+\underline{V} &amp;= \text{diag}\left( \begin{bmatrix}
+k_2 &amp; k_1(\mathbf{p}^{-2} \otimes 1'_4)
+\end{bmatrix} \right)\\
+\mathbf{p} &amp;= \begin{bmatrix}
+1 &amp; 2 &amp; 3 &amp; 4 \\
+\end{bmatrix}
+\end{align*}\]</span> <span class="math display">\[\begin{align*}
+&amp; k_2 : \text{overall shrinkage for the constant term} \\
+&amp; k_1 : \text{overall shrinkage levels for autoregressive slopes} \\
+\end{align*}\]</span></p>
+Prior covariance matrix
+<span class="math display">\[\begin{bmatrix}
+k_2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \cdots &amp; 0\\
+0 &amp; k_1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \cdots &amp; 0\\
+0 &amp; 0 &amp; k_1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \cdots &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; k_1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \cdots &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; k_1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \cdots &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4} &amp; 0 &amp; 0 &amp; 0 &amp; \cdots &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4} &amp; 0 &amp; 0 &amp; \cdots &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4} &amp; 0 &amp; \cdots &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4} &amp; \cdots &amp; 0\\
+\vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{16}      
+\end{bmatrix}\]</span>
+</section>
+<section id="the-joint-posterior-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="the-joint-posterior-distribution">The joint posterior distribution</h3>
+<p><span class="math display">\[\begin{align}
+p(A,\Sigma | Y,X) &amp;= p(A|Y,X,\Sigma)p(\Sigma|Y,X) \\
+p(A|Y,X,\Sigma) &amp;\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\
+p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
+\\
+\overline{V} &amp;= (X'X + \underline{V}^{-1})^{-1} \\
+\overline{A} &amp;= \overline{V}(X'Y+\underline{V}^{-1}\underline{A}) \\
+\overline{v} &amp;= T + \underline{v} \\
+\overline{S} &amp;= \underline{S}+Y'Y+\underline{A}'\underline{V}^{-1}\underline{A}-\overline{A}'
+\overline{V}^{-1}\overline{A} \\
+\end{align}\]</span></p>
+<p>1000 Sample draws from the joint distribution with Minnesota prior.</p>
+<p>Table</p>
+<p>Y.h = array(NA,c(h,N,S))</p>
+<p>for (s in 1:S){ x.Ti = Y[(nrow(Y)-h+1):nrow(Y),] x.Ti = x.Ti[4:1,] for (i in 1:h){ x.T = c(1,as.vector(t(x.Ti))) Y.h[i,,s] = rmvnorm(1, mean = x.T%*%A.posterior[,,s], sigma=Sigma.posterior[,,s]) x.Ti = rbind(Y.h[i,,s],x.Ti[1:3,]) } }</p>
+<section id="section" class="level87">
+<p class="heading"></p>
+</section>
+</section>
+</section>
+<section id="extension-1-model" class="level2">
+<h2 class="anchored" data-anchor-id="extension-1-model">Extension 1 Model</h2>
+<p>Cointegration is when the non-stationary variables have an equilibrium long term relationship or a common trend. The model is extended to incorporate dummy-observation-prior, aiming to account for the potential cointegration amongst the variables, capturing the underlying economic relationships and dynamics.</p>
+<p>This approach allows us to leverage both the observed data and additional information about the structural relationships among variables, leading to more accurate parameter estimation and potentially improved forecasting performance.</p>
+<section id="minnesota-and-dummy-observation-prior-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="minnesota-and-dummy-observation-prior-distribution">Minnesota and Dummy Observation Prior distribution</h3>
+<p><span class="math display">\[\begin{align*}
+p(A, \Sigma) = p(A \mid \Sigma) \cdot p(\Sigma) \\
+A \mid \Sigma \sim \text{MN}_{K \times N} (\underline{A}, \Sigma, \underline{V}, \lambda) \\
+\Sigma \sim  \text{IW}_{N} (\underline{S}, \underline{v})\\
+\end{align*}\]</span></p>
+<p>With lags = 4 and N = 4</p>
+Prior covariance matrix
+<span class="math display">\[\begin{bmatrix}
+k_2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; \frac{k_1}{\lambda} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; \frac{k_1}{\lambda} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; \frac{k_1}{\lambda} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{\lambda} &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4\lambda} &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4\lambda} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4\lambda} &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4\lambda} \\
+\end{bmatrix}\]</span>
+</section>
+</section>
+</section>
+<section id="mle" class="level1">
+<h1>MLE</h1>
+<section id="section-1" class="level60">
+<p class="heading"></p>
+<p>A.hat = solve(t(X)%<em>%X)%</em>%t(X)%<em>%Y Sigma.hat = t(Y-X%</em>%A.hat)%<em>%(Y-X%</em>%A.hat)/T round(A.hat,3) round(Sigma.hat,3) round(cov2cor(Sigma.hat),3)</p>
+</section>
+</section>
+<section id="prior-distribution" class="level1">
+<h1>Prior distribution</h1>
+<section id="section-2" class="level60">
+<p class="heading"></p>
+<p>kappa.1 = 10 kappa.2 = 100 A.prior = matrix(0,nrow(A.hat),ncol(A.hat)) A.prior[2:4,] &lt;- diag(1) ?????? V.prior = diag(c(kappa.2,(1/lambda)<em>kappa.1</em>((1:p)^(-2))%x%rep(1,N))) S.prior = diag(diag(Sigma.hat)) nu.prior = N+1</p>
+<pre><code></code></pre>
+</section>
+</section>
+<section id="references" class="level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
