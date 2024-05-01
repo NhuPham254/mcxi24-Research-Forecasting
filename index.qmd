@@ -37,15 +37,9 @@ It's important to note that all data will be quarterly since the interest foreca
 
 \begin{align*}
 & unmp_{t} & : & \text{Unemployment rate} \\
-& par_{t} & : & \text{Participation rate} \\
 & gdp_{t} & : & \text{GDP per capita: Chain volume measures - Percentage changes} \\
-& cpi_{t} & : & \text{Consumer price index} \\
 & wpi_{t} & : & \text{Wage price index} \\
 & cashrate_{t} & : & \text{Cash rate} \\
-& hrfull_{t} & : & \text{Average hours worked Full time} \\
-& hrpart_{t} & : & \text{Average hours worked Part time} \\
-& oversea_{t} & : & \text{Oversea migration} \\
-& pop_{t} & : & \text{Population growth rate} \\
 \end{align*}
 
 ```{r}
@@ -63,6 +57,8 @@ library(ggplot2)
 library(xts)
 library(tseries)
 library(MSwM)
+library(xtable)
+library(knitr)
 ```
 
 
@@ -81,14 +77,8 @@ process_abs_data <- function(series_id, start_date, end_date) {
   # Convert to xts object
   abs_xts <- xts(abs_data$value, order.by = as.Date(abs_data$date))
   
-  # Check if data is already in quarterly frequency
-  if (abs_data$frequency == "Quarterly") {
-    # Data is already in quarterly frequency
-    abs_quarterly <- abs_xts
-  } else {
-    # Aggregate to quarterly frequency
-    abs_quarterly <- apply.quarterly(abs_xts, mean)
-  }
+  # Change frequency
+  abs_quarterly <- apply.quarterly(abs_xts, last)
   
   # Convert to dataframe
   abs_df <- data.frame(Date = index(abs_quarterly), Value = coredata(abs_quarterly))
@@ -110,14 +100,7 @@ process_rba_data <- function(series_id, start_date, end_date) {
   # Convert to xts object
   rba_xts <- xts(rba_data$value, order.by = as.Date(rba_data$date))
   
-  # Check if data is already in quarterly frequency
-  if (rba_data$frequency == "Quarterly") {
-    # Data is already in quarterly frequency
-    rba_quarterly <- rba_xts
-  } else {
-    # Aggregate to quarterly frequency
-    rba_quarterly <- apply.quarterly(rba_xts, mean)
-  }
+  rba_quarterly <- apply.quarterly(rba_xts, mean)
   
   # Convert to dataframe
   rba_df <- data.frame(Date = index(rba_quarterly), Value = coredata(rba_quarterly))
@@ -132,7 +115,6 @@ process_rba_data <- function(series_id, start_date, end_date) {
 ```
 
 
-
 ```{r,echo=FALSE, warning=FALSE, message=FALSE}
 
 #### check flow and stock, stock = end of quarter, flow= sum up
@@ -140,48 +122,25 @@ process_rba_data <- function(series_id, start_date, end_date) {
 # Unemployment rate ################## "6202.0", A84423130A trend, A84423046K seasonadj
 unmp_df <- process_abs_data("A84423046K", start_date, end_date)
 
-# Participation rate ################## "6202.0", A84423051C seasonadj
-par_df <- process_abs_data("A84423051C", start_date, end_date)
-
 # GDP per capita: Chain volume measures; ##### "5206.0", A2304404C seasonadj, old A2304372W
 gdp_df <- process_abs_data("A2304404C", start_date, end_date)
 
 # WPI, Total hourly rates of pay including bonuses ###### 6345.0, A2713849C seasonadj
 wpi_df <- process_abs_data("A2713849C", start_date, end_date)
 
-# CPI ################## 6401.0, A3604506F seasonadj
-cpi_df <- process_abs_data("A3604506F", start_date, end_date)
-
 # Cash rate ################## original
 cashrate_df <- process_rba_data("FIRMMCRT", start_date, end_date)
 
-# Monthly hours works - Full time. "6202.0", A84426278A seasonadj
-hrs_full_df <- process_abs_data("A84426278A", start_date, end_date)
-
-# Monthly hours works - Part time. "6202.0", A84426279C seasonadj
-hrs_part_df <- process_abs_data("A84426279C", start_date, end_date)
-
-# Net Overseas Migration ################## "3101.0",  A2133254C original
-oversea_df <- process_abs_data("A2133254C", start_date, end_date)
-
-# Population ############# "3101.0", A2060842F original
-pop_df <- process_abs_data("A2060842F", start_date, end_date)
 ```
 
 
 ```{r, plot, echo=FALSE, fig.width=8, fig.height=6}
 dataframes <- list(unmp_df = "Unemployment rate",
-                    par_df = "Participation rate",
                     gdp_df = "GDP per capita",
                     wpi_df = "WPI",
-                    cpi_df = "CPI",
-                    cashrate_df = "Cash rate",
-                    hrs_full_df = "Hours worked Full time",
-                    hrs_part_df = "Hours worked Part time",
-                    oversea_df = "Net Overseas Migration",
-                    pop_df = "Population growth")
+                    cashrate_df = "Cash rate")
 
-par(mfrow = c(3, 4))
+par(mfrow = c(2, 2))
 
 for (df_name in names(dataframes)) {
   df <- get(df_name)
@@ -193,7 +152,6 @@ for (df_name in names(dataframes)) {
 }
 
 
-
 ```
 <div id="figure1" style="text-align: center; color: #696969;">
 ###### Figure 1: Time series plots
@@ -201,7 +159,7 @@ for (df_name in names(dataframes)) {
 
 ```{r}
 # Log-transformation
-log_dataframes <- c("gdp_df", "wpi_df", "cpi_df", "hrs_full_df", "hrs_part_df", "oversea_df", "pop_df")
+log_dataframes <- c("gdp_df", "wpi_df")
 
 # Log-transform the specified dataframes
 for (df_name in log_dataframes) {
@@ -209,8 +167,6 @@ for (df_name in log_dataframes) {
   df$Value <- log(df$Value)  # Log-transform the 'Value' column
   assign(df_name, df)         # Assign the modified dataframe back to its original name
 }
-
-oversea_df <- na.omit(oversea_df)
 
 ```
 
@@ -220,17 +176,11 @@ oversea_df <- na.omit(oversea_df)
 ```{r, echo=FALSE, fig.width=8, fig.height=6}
 
 dataframes <- list(unmp_df = "Unemployment rate",
-                    par_df = "Participation rate",
                     gdp_df = "GDP per capita",
                     wpi_df = "WPI",
-                    cpi_df = "CPI",
-                    cashrate_df = "Cash rate",
-                    hrs_full_df = "Hours worked Full time",
-                    hrs_part_df = "Hours worked Part time",
-                    oversea_df = "Net Overseas Migration",
-                    pop_df = "Population growth")
+                    cashrate_df = "Cash rate")
 
-par(mfrow = c(3, 4))
+par(mfrow = c(2, 2))
 
 for (df_name in names(dataframes)) {
   df <- get(df_name)
@@ -248,7 +198,7 @@ From the plot of the variables, some show stationary and some non-stationary, wh
 
 
 ```{r,echo=FALSE, fig.width=8, fig.height=6}
-par(mfrow = c(3, 4))
+par(mfrow = c(2, 2))
 
 # Loop through each dataframe and create ACF plot
 for (df_name in names(dataframes)) {
@@ -266,7 +216,7 @@ The ACF plots show the variables have persistence or dependence in the data as t
 and its past values, though this auto correlations decrease as lags increase.
 
 ```{r,echo=FALSE, fig.width=8, fig.height=6}
-par(mfrow = c(3, 4))
+par(mfrow = c(2, 2))
 
 # Loop through each dataframe and create ACF plot
 for (df_name in names(dataframes)) {
@@ -288,15 +238,9 @@ Alternative hypothesis: stationary
 ```{r}
 # Perform ADF test for each variable
 dataframes <- list(unmp_df = "Unemployment rate",
-                    par_df = "Participation rate",
                     gdp_df = "GDP per capita",
                     wpi_df = "WPI",
-                    cpi_df = "CPI",
-                    cashrate_df = "Cash rate",
-                    hrs_full_df = "Hours worked Full time",
-                    hrs_part_df = "Hours worked Part time",
-                    oversea_df = "Net Overseas Migration",
-                    pop_df = "Population growth")
+                    cashrate_df = "Cash rate")
 
 # Create an empty dataframe to store ADF test results
 adf <- data.frame(Dickey_Fuller = numeric(length(dataframes)), 
@@ -366,15 +310,9 @@ S_t & : \\text{Regime state} \\\\
 \\begin{align*}
 \\mathbf{Y}_t = \\begin{pmatrix}
 \\text{Unemployment}_t \\\\
-\\text{Participation}_t \\\\
 \\text{GDP}_t \\\\
 \\text{WPI}_t \\\\
-\\text{CPI}_t \\\\
 \\text{CashRate}_t \\\\
-\\text{HoursFull}_t \\\\
-\\text{HoursPart}_t \\\\
-\\text{OverseasMigration}_t \\\\
-\\text{Population}_t \\\\
 \\end{pmatrix}
 \\end{align*}
 
@@ -498,7 +436,10 @@ A.prior[2:5, 1:4] <- diag(1, nrow = 4)
 V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
 S.prior     = diag(diag(Sigma.hat))
 nu.prior    = N+1
+```
 
+1000 Sample draws from the joint distribution with Minnesota prior.
+```{r}
 # Normal-inverse Wishard posterior parameters
 ############################################################
 V.bar.inv   = t(X)%*%X + diag(1/diag(V.prior))
@@ -507,11 +448,8 @@ A.bar       = V.bar%*%(t(X)%*%Y + diag(1/diag(V.prior))%*%A.prior)
 nu.bar      = nrow(Y) + nu.prior
 S.bar       = S.prior + t(Y)%*%Y + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.bar)%*%V.bar.inv%*%A.bar
 S.bar.inv   = solve(S.bar)
-```
 
-1000 Sample draws from the joint distribution with Minnesota prior.
-```{r}
-# posterior draws 
+# Posterior draws 
 ############################################################
 Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
 Sigma.posterior   = apply(Sigma.posterior,3,solve)
@@ -525,61 +463,38 @@ for (s in 1:S){
 # round(apply(A.posterior,1:2,mean),3)
 ```
 
-```{r, results='hide' }
-# report posterior means and sd of parameters
-A.E         = apply(A.posterior,1:2,mean)
-A.sd        = apply(A.posterior,1:2,sd)
-Sigma.E     = apply(Sigma.posterior,1:2,mean)
-Sigma.sd    = apply(Sigma.posterior,1:2,sd)
+```{r, results='asis'}
+# Report posterior means and sd of parameters
+A.E         = round(apply(A.posterior,1:2,mean),6)
+A.sd        = round(apply(A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(Sigma.posterior,1:2,sd),6)
 
-library(xtable)
-xtable(rbind(format(t(A.E),digits=1, scientific=FALSE)[1,],
-      format(t(A.sd),digits=1, scientific=FALSE)[1,],
-      format(t(A.E),digits=1, scientific=FALSE)[2,],
-      format(t(A.sd),digits=1, scientific=FALSE)[2,]))
+A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
+Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
 
-xtable(rbind(format(Sigma.E,digits=1, scientific=FALSE)[1,],
-             format(Sigma.sd,digits=1, scientific=FALSE)[1,],
-             format(Sigma.E,digits=1, scientific=FALSE)[2,],
-             format(Sigma.sd,digits=1, scientific=FALSE)[2,]))
+kable(A_table, format = "html", caption = "Posterior means table",
+      col.names = paste0(1:ncol(A_table)))
 
+kable(Sigma_table, format = "html", caption = "Posterior standard deviation table",
+      col.names = paste0(1:ncol(Sigma_table)))
 
 # simulate draws from the predictive density
 # WARNING! This takes a while
 ############################################################
+# Y.h         = array(NA,c(h,N,S))
+
+# for (s in 1:S){
+#  x.Ti        = Y[(nrow(Y)-h+1):nrow(Y),]
+#  x.Ti        = x.Ti[4:1,]
+#  for (i in 1:h){
+#    x.T         = c(1,as.vector(t(x.Ti)))
+#    Y.h[i,,s]   = rmvnorm(1, mean = x.T%*%A.posterior[,,s], sigma=Sigma.posterior[,,s])
+#    x.Ti        = rbind(Y.h[i,,s],x.Ti[1:3,])
+#  }
+#}
 
 ```
-Table 
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{rlllllllllllllllll}
-  \hline
- & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 & 16 & 17 \\ 
-  \hline
-1 & 48.09440166 &  1.28178657 &  0.03163478 &  0.04085992 & -0.12287201 & -0.30906308 &  0.00141876 &  0.00525711 & -0.00867471 & -0.12901623 &  0.01479746 & -0.00816151 & -0.00361686 &  0.07787646 &  0.00557509 &  0.01145551 &  0.01212629 \\ 
-  2 & 34.394276 &  0.118867 &  0.824480 &  0.836935 &  0.790465 &  0.171764 &  0.403564 &  0.418450 &  0.397149 &  0.145780 &  0.276347 &  0.268899 &  0.265922 &  0.099096 &  0.197875 &  0.207806 &  0.205609 \\ 
-  3 & -0.00906363 &  0.00004789 &  1.00000271 & -0.00001920 &  0.00011165 &  0.00000768 & -0.00000076 & -0.00000147 &  0.00002436 & -0.00005963 & -0.00000272 &  0.00000277 &  0.00001155 &  0.00002312 &  0.00000123 &  0.00000093 &  0.00000380 \\ 
-  4 &  0.011129 &  0.000041 &  0.000297 &  0.000284 &  0.000281 &  0.000061 &  0.000144 &  0.000143 &  0.000143 &  0.000053 &  0.000098 &  0.000101 &  0.000096 &  0.000035 &  0.000072 &  0.000071 &  0.000071 \\ 
-   \hline
-\end{tabular}
-\end{table}
-
-
-Y.h         = array(NA,c(h,N,S))
-
-for (s in 1:S){
-  x.Ti        = Y[(nrow(Y)-h+1):nrow(Y),]
-  x.Ti        = x.Ti[4:1,]
-  for (i in 1:h){
-    x.T         = c(1,as.vector(t(x.Ti)))
-    Y.h[i,,s]   = rmvnorm(1, mean = x.T%*%A.posterior[,,s], sigma=Sigma.posterior[,,s])
-    x.Ti        = rbind(Y.h[i,,s],x.Ti[1:3,])
-  }
-}
-
-
-
 #######################################################################################
 ## Extension 1 Model
 Cointegration is when the non-stationary variables have an equilibrium long term 
@@ -587,28 +502,76 @@ relationship or a common trend. The model is extended to incorporate dummy-obser
 
 This approach allows us to leverage both the observed data and additional information about the structural relationships among variables, leading to more accurate parameter estimation and potentially improved forecasting performance.
 
-### Minnesota and Dummy Observation Prior distribution
+Dummy observation prior proposed by Doan et al. (1984) required a set of artificial 
+observations for each variable. 
 
 \begin{align*}
-p(A, \Sigma) = p(A \mid \Sigma) \cdot p(\Sigma) \\
-A \mid \Sigma \sim \text{MN}_{K \times N} (\underline{A}, \Sigma, \underline{V}, \lambda) \\
-\Sigma \sim  \text{IW}_{N} (\underline{S}, \underline{v})\\
+\underset{4\times 4}y^{+} &= diag(\frac{\overline{y_0}}{\mu}) \\
+\underset{4 \times (1+4\times 4)}{x^{+}} &= [\underset{n \times 1}0,y^{+},...,y^{+}]
 \end{align*}
 
-With lags = 4 and N = 4
+To be consistent with cointegration, an additional prior proposed by Sims (1993)
+is also added.
+\begin{align*}
+\underset{1\times 4}y^{++} &= \frac{\overline{y_0}^{'}}{\delta}\\
+\underset{1 \times (1+4\times 4)}{x^{++}} &= [\frac{1}{\delta},y^{++},...,y^{++}]\\
+\end{align*}
+\begin{align*}
+& \overline{y_0} : \text{average of the first 4 lag observations for each variable}\\
+& \mu: \text{controls variance }\\
+& \delta: \text{controls the tightness of the prior}
+\end{align*}
 
-Prior covariance matrix
-\begin{bmatrix}
-k_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & \frac{k_1}{\lambda} & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & \frac{k_1}{\lambda} & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & \frac{k_1}{\lambda} & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & \frac{k_1}{\lambda} & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & \frac{k_1}{4\lambda} & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{4\lambda} & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{4\lambda} & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \frac{k_1}{4\lambda} \\
+From the above, the following matrix form is created:
+\begin{align*}
+Y^{+} & = X^{+}A+E^{+} \\
+Y^{+} & = \begin{bmatrix}
+\frac{\overline{y_0}_1}{\mu} & 0 & 0 & 0 \\
+0 & \frac{\overline{y_0}_2}{\mu} & 0 & 0 \\
+0 & 0 & \frac{\overline{y_0}_3}{\mu} & 0 \\
+0 & 0 & 0 & \frac{\overline{y_0}_4}{\mu} \\
+\frac{\overline{y_0}_1}{\delta} & \frac{\overline{y_0}_2}{\delta} & \frac{\overline{y_0}_3}{\delta} & \frac{\overline{y_0}_4}{\delta} \\
 \end{bmatrix}
+\end{align*}
+
+\begin{align*}
+X^{+} = \begin{bmatrix}
+0 & \frac{\overline{y_0}_1}{\mu} & 0 & 0 & 0 & \cdots & 0 \\
+0 & 0 & \frac{\overline{y_0}_2}{\mu} & 0 & 0 & \cdots & 0 \\
+0 & 0 & 0 & \frac{\overline{y_0}_3}{\mu} & 0 & \cdots & 0 \\
+0 & 0 & 0 & 0 & \frac{\overline{y_0}_4}{\mu} & \cdots & \frac{\overline{y_0}_4}{\mu} \\
+\frac{1}{\delta} & \frac{\overline{y_0}_1}{\delta} & \frac{\overline{y_0}_2}{\delta} & \frac{\overline{y_0}_3}{\delta} & \frac{\overline{y_0}_4}{\delta} & \cdots & \frac{\overline{y_0}_4}{\delta} \\
+\end{bmatrix}
+\end{align*}
+
+The prior distribution is
+
+\begin{align*}
+A \mid \Sigma &\sim \text{MN}_{K \times N} (\underline{A}^{+}, \Sigma, \underline{V}^{+}) \\
+\Sigma &\sim  \text{IW}_{N} (\underline{S}^{+}, \underline{v}^{+})\\
+\\
+\underline{A}^{+} &= (X^{+'}X )^{-1}X^{+'}Y^{+} \\
+\underline{V}^{+} &= (X^{+'}X )^{-1} \\
+\underline{v}^{+} &= T^{+} - K - N - 1\\ 
+\underline{S}^{+} &= (Y^{+}-X^{+}\underline{A}^{+})^{'}(Y^{+}-X^{+}\underline{A}^{+})\\
+\end{align*}
+
+
+### Minnesota and dummy observation prior distribution 
+The newly created matrix specified the model has 5 dummy observations. The above prior distribution is likely to encounter the problem of not having enough observations and 
+lead to many challenges to meet the requirements for degree of freedom or 
+invertibility of matrices. To resolve this, the combination of specifying the prior 
+through both Normal inverse Wishart and dummy-observations is proposed. 
+
+\begin{align*}
+A \mid \Sigma &\sim \text{MN}_{K \times N} (\overset{~}{A}, \Sigma, \overset{~}{V}) \\
+\Sigma &\sim  \text{IW}_{N} (\overset{~}{S}, \overset{~}{v})\\
+\\
+\overset{~}{A} &= \overset{~}{V}(X^{+'}Y{+}+\underline{V}^{-1}\underline{A}) \\
+\overset{~}{V} &= (X^{+'}X^{+} + \underline{V}^{-1})^{-1} \\
+\overset{~}{v} &= T^{+} + \underline{v} \\ 
+\overset{~}{S} &= \underline{S}+Y^{+'}Y^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\overset{~}{A}'\overset{~}{V}^{-1}\overset{~}{A} \\
+\end{align*}
 
 
 # MLE
