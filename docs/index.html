@@ -144,7 +144,7 @@ window.Quarto = {
   </ul></li>
   <li><a href="#extension-1-model" id="toc-extension-1-model" class="nav-link" data-scroll-target="#extension-1-model">Extension 1 Model</a>
   <ul class="collapse">
-  <li><a href="#minnesota-and-dummy-observation-prior-distribution" id="toc-minnesota-and-dummy-observation-prior-distribution" class="nav-link" data-scroll-target="#minnesota-and-dummy-observation-prior-distribution">Minnesota and Dummy Observation Prior distribution</a></li>
+  <li><a href="#minnesota-and-dummy-observation-prior-distribution" id="toc-minnesota-and-dummy-observation-prior-distribution" class="nav-link" data-scroll-target="#minnesota-and-dummy-observation-prior-distribution">Minnesota and dummy observation prior distribution</a></li>
   </ul></li>
   </ul></li>
   <li><a href="#mle" id="toc-mle" class="nav-link" data-scroll-target="#mle">MLE</a></li>
@@ -202,15 +202,9 @@ window.Quarto = {
 <p>It’s important to note that all data will be quarterly since the interest forecasting for unemployment will be conducted at a quarterly frequency. Quarterly frequency is suitable for capturing the diverse movements influencing unemployment, including short-term shocks, long-term trends, and policy changes, providing a balanced perspective.</p>
 <p><span class="math display">\[\begin{align*}
 &amp; unmp_{t} &amp; : &amp; \text{Unemployment rate} \\
-&amp; par_{t} &amp; : &amp; \text{Participation rate} \\
 &amp; gdp_{t} &amp; : &amp; \text{GDP per capita: Chain volume measures - Percentage changes} \\
-&amp; cpi_{t} &amp; : &amp; \text{Consumer price index} \\
 &amp; wpi_{t} &amp; : &amp; \text{Wage price index} \\
 &amp; cashrate_{t} &amp; : &amp; \text{Cash rate} \\
-&amp; hrfull_{t} &amp; : &amp; \text{Average hours worked Full time} \\
-&amp; hrpart_{t} &amp; : &amp; \text{Average hours worked Part time} \\
-&amp; oversea_{t} &amp; : &amp; \text{Oversea migration} \\
-&amp; pop_{t} &amp; : &amp; \text{Population growth rate} \\
 \end{align*}\]</span></p>
 </section>
 <section id="data-visualisation" class="level1">
@@ -274,16 +268,10 @@ window.Quarto = {
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>            Dickey_Fuller p_value
-unmp_df            -2.477   0.378
-par_df             -2.180   0.502
+unmp_df            -2.581   0.335
 gdp_df             -1.823   0.650
 wpi_df             -2.181   0.502
-cpi_df             -2.804   0.242
-cashrate_df        -3.409   0.056
-hrs_full_df        -3.462   0.049
-hrs_part_df        -1.326   0.857
-oversea_df         -3.582   0.038
-pop_df             -2.065   0.550</code></pre>
+cashrate_df        -3.409   0.056</code></pre>
 </div>
 </div>
 <section id="model" class="level2">
@@ -313,7 +301,7 @@ P(S_t = j | S_{t-1} = i) &amp;= \pi_{ij}
 \sim MN(0_T, \Sigma, I_T)
 \end{align*}\]</span></p>
 <p>\begin{align*} \mathbf{Y}_t &amp; : \text{Matrix of response variables} \\ \boldsymbol{\beta} &amp; : \text{Coefficient matrix corresponding to regime state} \\ S_t &amp; : \text{Regime state} \\ \mathbf{X}_t &amp; : \text{Matrix of predictor variables} \\ \boldsymbol{\varepsilon}_t &amp; : \text{Error term vector} \end{align*}</p>
-<p>\begin{align*} \mathbf{Y}_t = \begin{pmatrix} \text{Unemployment}_t \\ \text{Participation}_t \\ \text{GDP}_t \\ \text{WPI}_t \\ \text{CPI}_t \\ \text{CashRate}_t \\ \text{HoursFull}_t \\ \text{HoursPart}_t \\ \text{OverseasMigration}_t \\ \text{Population}_t \\ \end{pmatrix} \end{align*}</p>
+<p>\begin{align*} \mathbf{Y}_t = \begin{pmatrix} \text{Unemployment}_t \\ \text{GDP}_t \\ \text{WPI}_t \\ \text{CashRate}_t \\ \end{pmatrix} \end{align*}</p>
 <p>The model’s equations include time-varying parameters, such as the coefficients of lagged variables, which adapt to changing economic conditions.</p>
 </section>
 </section>
@@ -380,9 +368,150 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 \overline{V}^{-1}\overline{A} \\
 \end{align}\]</span></p>
 <p>1000 Sample draws from the joint distribution with Minnesota prior.</p>
-<p>Table</p>
-<p>Y.h = array(NA,c(h,N,S))</p>
-<p>for (s in 1:S){ x.Ti = Y[(nrow(Y)-h+1):nrow(Y),] x.Ti = x.Ti[4:1,] for (i in 1:h){ x.T = c(1,as.vector(t(x.Ti))) Y.h[i,,s] = rmvnorm(1, mean = x.T%*%A.posterior[,,s], sigma=Sigma.posterior[,,s]) x.Ti = rbind(Y.h[i,,s],x.Ti[1:3,]) } }</p>
+<div>
+<table data-quarto-postprocess="true" class="table">
+<caption>Posterior means table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">6</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">7</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">9</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">10</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">11</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">12</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">13</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">14</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">15</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">16</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">17</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">64.928949</td>
+<td style="text-align: right;">1.074541</td>
+<td style="text-align: right;">-0.019540</td>
+<td style="text-align: right;">0.052691</td>
+<td style="text-align: right;">-0.158973</td>
+<td style="text-align: right;">-0.059927</td>
+<td style="text-align: right;">0.023773</td>
+<td style="text-align: right;">-0.012792</td>
+<td style="text-align: right;">-0.028521</td>
+<td style="text-align: right;">-0.161524</td>
+<td style="text-align: right;">-0.016416</td>
+<td style="text-align: right;">0.002111</td>
+<td style="text-align: right;">-0.000432</td>
+<td style="text-align: right;">0.042871</td>
+<td style="text-align: right;">-0.000136</td>
+<td style="text-align: right;">0.018729</td>
+<td style="text-align: right;">-0.002462</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">41.870751</td>
+<td style="text-align: right;">0.130563</td>
+<td style="text-align: right;">1.044038</td>
+<td style="text-align: right;">1.038582</td>
+<td style="text-align: right;">1.022146</td>
+<td style="text-align: right;">0.180910</td>
+<td style="text-align: right;">0.542803</td>
+<td style="text-align: right;">0.566508</td>
+<td style="text-align: right;">0.516469</td>
+<td style="text-align: right;">0.161068</td>
+<td style="text-align: right;">0.355271</td>
+<td style="text-align: right;">0.345938</td>
+<td style="text-align: right;">0.373419</td>
+<td style="text-align: right;">0.110875</td>
+<td style="text-align: right;">0.255471</td>
+<td style="text-align: right;">0.280244</td>
+<td style="text-align: right;">0.264118</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-0.007982</td>
+<td style="text-align: right;">0.000030</td>
+<td style="text-align: right;">0.999993</td>
+<td style="text-align: right;">-0.000018</td>
+<td style="text-align: right;">0.000097</td>
+<td style="text-align: right;">0.000027</td>
+<td style="text-align: right;">-0.000013</td>
+<td style="text-align: right;">-0.000001</td>
+<td style="text-align: right;">0.000026</td>
+<td style="text-align: right;">-0.000040</td>
+<td style="text-align: right;">0.000000</td>
+<td style="text-align: right;">-0.000002</td>
+<td style="text-align: right;">0.000011</td>
+<td style="text-align: right;">0.000001</td>
+<td style="text-align: right;">-0.000003</td>
+<td style="text-align: right;">-0.000004</td>
+<td style="text-align: right;">0.000003</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.011414</td>
+<td style="text-align: right;">0.000034</td>
+<td style="text-align: right;">0.000290</td>
+<td style="text-align: right;">0.000290</td>
+<td style="text-align: right;">0.000273</td>
+<td style="text-align: right;">0.000047</td>
+<td style="text-align: right;">0.000147</td>
+<td style="text-align: right;">0.000143</td>
+<td style="text-align: right;">0.000141</td>
+<td style="text-align: right;">0.000043</td>
+<td style="text-align: right;">0.000096</td>
+<td style="text-align: right;">0.000096</td>
+<td style="text-align: right;">0.000093</td>
+<td style="text-align: right;">0.000030</td>
+<td style="text-align: right;">0.000071</td>
+<td style="text-align: right;">0.000069</td>
+<td style="text-align: right;">0.000071</td>
+</tr>
+</tbody>
+</table>
+``````````{=html}
+<table data-quarto-postprocess="true" class="table">
+<caption>Posterior standard deviation table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2820.861080</td>
+<td style="text-align: right;">-0.283467</td>
+<td style="text-align: right;">-0.016480</td>
+<td style="text-align: right;">-5.437817</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">401.556190</td>
+<td style="text-align: right;">0.081118</td>
+<td style="text-align: right;">0.008126</td>
+<td style="text-align: right;">2.329402</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-0.283467</td>
+<td style="text-align: right;">0.000206</td>
+<td style="text-align: right;">0.000005</td>
+<td style="text-align: right;">0.000669</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.081118</td>
+<td style="text-align: right;">0.000028</td>
+<td style="text-align: right;">0.000002</td>
+<td style="text-align: right;">0.000634</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
 <section id="section" class="level87">
 <p class="heading"></p>
 </section>
@@ -392,26 +521,60 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 <h2 class="anchored" data-anchor-id="extension-1-model">Extension 1 Model</h2>
 <p>Cointegration is when the non-stationary variables have an equilibrium long term relationship or a common trend. The model is extended to incorporate dummy-observation-prior, aiming to account for the potential cointegration amongst the variables, capturing the underlying economic relationships and dynamics.</p>
 <p>This approach allows us to leverage both the observed data and additional information about the structural relationships among variables, leading to more accurate parameter estimation and potentially improved forecasting performance.</p>
-<section id="minnesota-and-dummy-observation-prior-distribution" class="level3">
-<h3 class="anchored" data-anchor-id="minnesota-and-dummy-observation-prior-distribution">Minnesota and Dummy Observation Prior distribution</h3>
+<p>Dummy observation prior proposed by Doan et al.&nbsp;(1984) required a set of artificial observations for each variable.</p>
 <p><span class="math display">\[\begin{align*}
-p(A, \Sigma) = p(A \mid \Sigma) \cdot p(\Sigma) \\
-A \mid \Sigma \sim \text{MN}_{K \times N} (\underline{A}, \Sigma, \underline{V}, \lambda) \\
-\Sigma \sim  \text{IW}_{N} (\underline{S}, \underline{v})\\
+\underset{4\times 4}y^{+} &amp;= diag(\frac{\overline{y_0}}{\mu}) \\
+\underset{4 \times (1+4\times 4)}{x^{+}} &amp;= [\underset{n \times 1}0,y^{+},...,y^{+}]
 \end{align*}\]</span></p>
-<p>With lags = 4 and N = 4</p>
-Prior covariance matrix
-<span class="math display">\[\begin{bmatrix}
-k_2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
-0 &amp; \frac{k_1}{\lambda} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
-0 &amp; 0 &amp; \frac{k_1}{\lambda} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
-0 &amp; 0 &amp; 0 &amp; \frac{k_1}{\lambda} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
-0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{\lambda} &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
-0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4\lambda} &amp; 0 &amp; 0 &amp; 0 \\
-0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4\lambda} &amp; 0 &amp; 0 \\
-0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4\lambda} &amp; 0 \\
-0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{4\lambda} \\
-\end{bmatrix}\]</span>
+<p>To be consistent with cointegration, an additional prior proposed by Sims (1993) is also added. <span class="math display">\[\begin{align*}
+\underset{1\times 4}y^{++} &amp;= \frac{\overline{y_0}^{'}}{\delta}\\
+\underset{1 \times (1+4\times 4)}{x^{++}} &amp;= [\frac{1}{\delta},y^{++},...,y^{++}]\\
+\end{align*}\]</span> <span class="math display">\[\begin{align*}
+&amp; \overline{y_0} : \text{average of the first 4 lag observations for each variable}\\
+&amp; \mu: \text{controls variance }\\
+&amp; \delta: \text{controls the tightness of the prior}
+\end{align*}\]</span></p>
+<p>From the above, the following matrix form is created: <span class="math display">\[\begin{align*}
+Y^{+} &amp; = X^{+}A+E^{+} \\
+Y^{+} &amp; = \begin{bmatrix}
+\frac{\overline{y_0}_1}{\mu} &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; \frac{\overline{y_0}_2}{\mu} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; \frac{\overline{y_0}_3}{\mu} &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; \frac{\overline{y_0}_4}{\mu} \\
+\frac{\overline{y_0}_1}{\delta} &amp; \frac{\overline{y_0}_2}{\delta} &amp; \frac{\overline{y_0}_3}{\delta} &amp; \frac{\overline{y_0}_4}{\delta} \\
+\end{bmatrix}
+\end{align*}\]</span></p>
+<p><span class="math display">\[\begin{align*}
+X^{+} = \begin{bmatrix}
+0 &amp; \frac{\overline{y_0}_1}{\mu} &amp; 0 &amp; 0 &amp; 0 &amp; \cdots &amp; 0 \\
+0 &amp; 0 &amp; \frac{\overline{y_0}_2}{\mu} &amp; 0 &amp; 0 &amp; \cdots &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; \frac{\overline{y_0}_3}{\mu} &amp; 0 &amp; \cdots &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{\overline{y_0}_4}{\mu} &amp; \cdots &amp; \frac{\overline{y_0}_4}{\mu} \\
+\frac{1}{\delta} &amp; \frac{\overline{y_0}_1}{\delta} &amp; \frac{\overline{y_0}_2}{\delta} &amp; \frac{\overline{y_0}_3}{\delta} &amp; \frac{\overline{y_0}_4}{\delta} &amp; \cdots &amp; \frac{\overline{y_0}_4}{\delta} \\
+\end{bmatrix}
+\end{align*}\]</span></p>
+<p>The prior distribution is</p>
+<p><span class="math display">\[\begin{align*}
+A \mid \Sigma &amp;\sim \text{MN}_{K \times N} (\underline{A}^{+}, \Sigma, \underline{V}^{+}) \\
+\Sigma &amp;\sim  \text{IW}_{N} (\underline{S}^{+}, \underline{v}^{+})\\
+\\
+\underline{A}^{+} &amp;= (X^{+'}X )^{-1}X^{+'}Y^{+} \\
+\underline{V}^{+} &amp;= (X^{+'}X )^{-1} \\
+\underline{v}^{+} &amp;= T^{+} - K - N - 1\\
+\underline{S}^{+} &amp;= (Y^{+}-X^{+}\underline{A}^{+})^{'}(Y^{+}-X^{+}\underline{A}^{+})\\
+\end{align*}\]</span></p>
+<section id="minnesota-and-dummy-observation-prior-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="minnesota-and-dummy-observation-prior-distribution">Minnesota and dummy observation prior distribution</h3>
+<p>The newly created matrix specified the model has 5 dummy observations. The above prior distribution is likely to encounter the problem of not having enough observations and lead to many challenges to meet the requirements for degree of freedom or invertibility of matrices. To resolve this, the combination of specifying the prior through both Normal inverse Wishart and dummy-observations is proposed.</p>
+<p><span class="math display">\[\begin{align*}
+A \mid \Sigma &amp;\sim \text{MN}_{K \times N} (\overset{~}{A}, \Sigma, \overset{~}{V}) \\
+\Sigma &amp;\sim  \text{IW}_{N} (\overset{~}{S}, \overset{~}{v})\\
+\\
+\overset{~}{A} &amp;= \overset{~}{V}(X^{+'}Y{+}+\underline{V}^{-1}\underline{A}) \\
+\overset{~}{V} &amp;= (X^{+'}X^{+} + \underline{V}^{-1})^{-1} \\
+\overset{~}{v} &amp;= T^{+} + \underline{v} \\
+\overset{~}{S} &amp;= \underline{S}+Y^{+'}Y^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\overset{~}{A}'\overset{~}{V}^{-1}\overset{~}{A} \\
+\end{align*}\]</span></p>
 </section>
 </section>
 </section>
