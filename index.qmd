@@ -150,8 +150,6 @@ for (df_name in names(dataframes)) {
        ylab = "Value", 
        main = dataframes[[df_name]])
 }
-
-
 ```
 <div id="figure1" style="text-align: center; color: #696969;">
 ###### Figure 1: Time series plots
@@ -332,6 +330,12 @@ merged_df <- merge(merged_df, cashrate_df, by = "Date", suffixes = c("", "_cash"
 ## Basic Model
 The model follows the Normal Inverse Wishart distribution.
 
+Likelihood function kernel
+\begin{align}
+L(A,\Sigma|Y,X) \propto det(\Sigma)^{-\frac{T}{2}}exp\{-\frac{1}{2}tr[\Sigma^{-1}(Y-XA)'(Y-XA)]\}
+\end{align}
+
+
 ### Minnesota Prior distribution
 
 The Minnesota prior is commonly used in Bayesian Vector Autoregression (BVAR) models due to its ability to impose shrinkage towards zero on the coefficients, effectively regularizing the estimation process. The Minnesota prior aligns effectively with the stylized fact of nonstationarity observed in macroeconomic variables.
@@ -404,9 +408,21 @@ for (i in 1:p){
 ```
 
 ### The joint posterior distribution
+\begin{align*}
+p(A,\Sigma|Y,X) &\propto L(A,\Sigma|Y,X)p(A,\Sigma) \\
+&= L(A,\Sigma|Y,X)p(A|\Sigma)p(\Sigma)
+\end{align*}
 
 \begin{align}
-p(A,\Sigma | Y,X) &= p(A|Y,X,\Sigma)p(\Sigma|Y,X) \\
+p(A,\Sigma|Y,X) &\propto \det(\Sigma)^{-\frac{T}{2}} \\
+&\times exp\{-\frac{1}{2}tr[\Sigma^{-1}(Y-XA)'(Y-XA)]\} \\
+&\times \det(\Sigma)^{-\frac{N+K+\underline{v}+1}{2}} \\
+&\times exp\{-\frac{1}{2}tr[\Sigma^{-1}(A-\underline{A}) \underline{V}^{-1}(A-\underline{A})]\} \\
+&\times exp\{-\frac{1}{2}tr[\Sigma^{-1}\underline{S}]\}
+\end{align}
+
+The full conditional joint posterior have the following form
+\begin{align}
 p(A|Y,X,\Sigma) &\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\ 
 p(\Sigma|Y,X) &\sim IW_{N}(\overline{S}, \overline{v})\\
 \\
@@ -429,7 +445,7 @@ round(cov2cor(Sigma.hat),3)
 
 # Prior distribution
 ############################################################
-kappa.1     = 0.02^2
+kappa.1     = 1
 kappa.2     = 100
 A.prior     = matrix(0,nrow(A.hat),ncol(A.hat))
 A.prior[2:5, 1:4] <- diag(1, nrow = 4)
@@ -463,7 +479,7 @@ for (s in 1:S){
 # round(apply(A.posterior,1:2,mean),3)
 ```
 
-```{r, results='asis'}
+```{r}
 # Report posterior means and sd of parameters
 A.E         = round(apply(A.posterior,1:2,mean),6)
 A.sd        = round(apply(A.posterior,1:2,sd),6)
@@ -473,10 +489,10 @@ Sigma.sd    = round(apply(Sigma.posterior,1:2,sd),6)
 A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
 Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
 
-kable(A_table, format = "html", caption = "Posterior means table",
+kable(A_table, format = "html", caption = "Posterior A means and sd table",
       col.names = paste0(1:ncol(A_table)))
 
-kable(Sigma_table, format = "html", caption = "Posterior standard deviation table",
+kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
       col.names = paste0(1:ncol(Sigma_table)))
 
 # simulate draws from the predictive density
@@ -502,8 +518,7 @@ relationship or a common trend. The model is extended to incorporate dummy-obser
 
 This approach allows us to leverage both the observed data and additional information about the structural relationships among variables, leading to more accurate parameter estimation and potentially improved forecasting performance.
 
-Dummy observation prior proposed by Doan et al. (1984) required a set of artificial 
-observations for each variable. 
+Dummy observation prior also known as known as “sum-of-coefficients” proposed by Doan, Litterman, and Sims (1984) required a set of artificial observations for each variable. 
 
 \begin{align*}
 \underset{4\times 4}y^{+} &= diag(\frac{\overline{y_0}}{\mu}) \\
@@ -561,39 +576,232 @@ A \mid \Sigma &\sim \text{MN}_{K \times N} (\underline{A}^{+}, \Sigma, \underlin
 The newly created matrix specified the model has 5 dummy observations. The above prior distribution is likely to encounter the problem of not having enough observations and 
 lead to many challenges to meet the requirements for degree of freedom or 
 invertibility of matrices. To resolve this, the combination of specifying the prior 
-through both Normal inverse Wishart and dummy-observations is proposed. 
+through both Normal inverse Wishart and dummy-observations is proposed, which is detived similarly to the posterior distribution in the basic model. 
 
 \begin{align*}
-A \mid \Sigma &\sim \text{MN}_{K \times N} (\overset{~}{A}, \Sigma, \overset{~}{V}) \\
-\Sigma &\sim  \text{IW}_{N} (\overset{~}{S}, \overset{~}{v})\\
+A \mid \Sigma &\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}) \\
+\Sigma &\sim  \text{IW}_{N} (\widetilde{S}, \widetilde{v})\\
 \\
-\overset{~}{A} &= \overset{~}{V}(X^{+'}Y{+}+\underline{V}^{-1}\underline{A}) \\
-\overset{~}{V} &= (X^{+'}X^{+} + \underline{V}^{-1})^{-1} \\
-\overset{~}{v} &= T^{+} + \underline{v} \\ 
-\overset{~}{S} &= \underline{S}+Y^{+'}Y^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\overset{~}{A}'\overset{~}{V}^{-1}\overset{~}{A} \\
+\widetilde{A} &= \widetilde{V}(X^{+'}Y{+}+\underline{V}^{-1}\underline{A}) \\
+\widetilde{V} &= (X^{+'}X^{+} + \underline{V}^{-1})^{-1} \\
+\widetilde{v} &= T^{+} + \underline{v} \\ 
+\widetilde{S} &= \underline{S}+Y^{+'}Y^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\widetilde{A}'\widetilde{V}^{-1}\widetilde{A} \\
 \end{align*}
 
+```{r}
+# Data configuration
+N       = 4
+p       = 4
+S       = 1000
+mu      = 2
+delta   = 2
+
+avg_unmp <- mean(X[1, c(2, 6, 10, 14)])
+avg_gdp <- mean(X[1, c(3, 7, 11, 15)])
+avg_wpi <- mean(X[1, c(4, 8, 12, 16)])
+avg_cash <- mean(X[1, c(5, 9, 13, 17)])
+
+diag_mu <- diag(c(avg_unmp/mu, avg_gdp/mu, avg_wpi/mu, avg_cash/mu))
+row_delta <-  matrix(c(avg_unmp/delta, avg_gdp/delta, avg_wpi/delta, avg_cash/delta), nrow = 1)
+
+Y_d       = rbind(diag_mu, row_delta)
+  
+first_vector <- matrix(c(0,0,0,0, 1/delta), ncol = 1)
+X_d      = cbind(first_vector, Y_d, Y_d, Y_d, Y_d)
+```
+
+
+```{r}
+# Normal-inverse Wishard posterior parameters
+############################################################
+V.tilde.inv   = t(X_d)%*%X_d + diag(1/diag(V.prior))
+V.tilde       = solve(V.tilde.inv)
+A.tilde       = V.tilde%*%(t(X_d)%*%Y_d + diag(1/diag(V.prior))%*%A.prior)
+nu.tilde      = nrow(Y_d) + nu.prior
+S.tilde       = S.prior + t(Y_d)%*%Y_d + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.tilde)%*%V.tilde.inv%*%A.tilde
+S.tilde.inv   = solve(S.tilde)
+
+```
+
+The full conditional joint posterior have the following form
+\begin{align}
+p(A|Y,X,\Sigma) &\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\ 
+p(\Sigma|Y,X) &\sim IW_{N}(\overline{S}, \overline{v})\\
+\\
+\overline{V} &= (X'X + \widetilde{V}^{-1})^{-1} \\
+\overline{A} &= \overline{V}(X'Y+\widetilde{V}^{-1}\widetilde{A}) \\
+\overline{v} &= T + \widetilde{v} \\ 
+\overline{S} &= \widetilde{S}+Y'Y+\widetilde{A}'\widetilde{V}^{-1}\widetilde{A}-\overline{A}'
+\overline{V}^{-1}\overline{A} \\
+\end{align}
+
+```{r}
+# Normal-inverse Wishard posterior parameters
+############################################################
+V.bar.inv   = t(X)%*%X + diag(1/diag(V.tilde))
+V.bar       = solve(V.bar.inv)
+A.bar       = V.bar%*%(t(X)%*%Y + diag(1/diag(V.tilde))%*%A.tilde)
+nu.bar      = nrow(Y) + nu.tilde
+S.bar       = S.tilde + t(Y)%*%Y + t(A.tilde)%*%diag(1/diag(V.tilde))%*%A.tilde - t(A.bar)%*%V.bar.inv%*%A.bar
+S.bar.inv   = solve(S.bar)
+
+# Posterior draws 
+############################################################
+Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
+Sigma.posterior   = apply(Sigma.posterior,3,solve)
+Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
+A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
+L                 = t(chol(V.bar))
+for (s in 1:S){
+  A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%chol(Sigma.posterior[,,s])
+}
+
+# Report posterior means and sd of parameters
+A.E         = round(apply(A.posterior,1:2,mean),6)
+A.sd        = round(apply(A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(Sigma.posterior,1:2,sd),6)
+
+A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
+Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
+
+kable(A_table, format = "html", caption = "Posterior A means and sd table",
+      col.names = paste0(1:ncol(A_table)))
+
+kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
+      col.names = paste0(1:ncol(Sigma_table)))
+
+```
+## Model Proof
+1000 observations are simulated from a bi-variate Gaussian random walk process annd is used as data for the below proofs.
+
+### Basic model
+```{r}
+set.seed(123456)
+N       = 2
+p       = 1
+S       = 1000
+
+r1 = cumsum(rnorm(1000,0,1))
+r2 = cumsum(rnorm(1000,0,1))
+
+r = cbind(r1, r2) 
+
+Y = ts(r[2:nrow(r),], frequency=1)
+
+X     = matrix(1,nrow(Y),1)
+X     = cbind(X,r[2:nrow(r)-1,])
 
 # MLE
 ############################################################
 A.hat       = solve(t(X)%*%X)%*%t(X)%*%Y
-Sigma.hat   = t(Y-X%*%A.hat)%*%(Y-X%*%A.hat)/T
-round(A.hat,3)
-round(Sigma.hat,3)
-round(cov2cor(Sigma.hat),3)
+Sigma.hat   = t(Y-X%*%A.hat)%*%(Y-X%*%A.hat)/nrow(Y)
 
 # Prior distribution
 ############################################################
-kappa.1     = 10
+kappa.1     = 1
 kappa.2     = 100
 A.prior     = matrix(0,nrow(A.hat),ncol(A.hat))
-A.prior[2:4,] <- diag(1)  ??????
-V.prior     = diag(c(kappa.2,(1/lambda)*kappa.1*((1:p)^(-2))%x%rep(1,N)))
+A.prior[2:(N + 1),] = diag(N)
+V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
 S.prior     = diag(diag(Sigma.hat))
 nu.prior    = N+1
-```
-```
 
+# Normal-inverse Wishard posterior parameters
+############################################################
+V.bar.inv   = t(X)%*%X + diag(1/diag(V.prior))
+V.bar       = solve(V.bar.inv)
+A.bar       = V.bar%*%(t(X)%*%Y + diag(1/diag(V.prior))%*%A.prior)
+nu.bar      = nrow(Y) + nu.prior
+S.bar       = S.prior + t(Y)%*%Y + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.bar)%*%V.bar.inv%*%A.bar
+S.bar.inv   = solve(S.bar)
+
+# Posterior draws 
+############################################################
+Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
+Sigma.posterior   = apply(Sigma.posterior,3,solve)
+Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
+A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
+L                 = t(chol(V.bar))
+for (s in 1:S){
+  A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%chol(Sigma.posterior[,,s])
+}
+
+# Report posterior means and sd of parameters
+A.E         = round(apply(A.posterior,1:2,mean),6)
+A.sd        = round(apply(A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(Sigma.posterior,1:2,sd),6)
+
+
+kable(A.E, format = "html", caption = "Posterior mean of autoregressive",
+      col.names = paste0(1:ncol(A.E)))
+
+kable(Sigma.E, format = "html", caption = "Posterior mean of covarince",
+      col.names = paste0(1:ncol(Sigma.E)))
+
+
+
+# Ask A.prior Correct
+# Ask Dummy Good
+# Derivation do need the steps? Yes
+# Table presentation OK
+# Use artificial as data? Yes. construct Y and X
+# do this for basic and extension? Yes
+```
+### Extended model
+```{r}
+diag_mu <- diag(c(X[1,2]/mu, X[1,3]/mu))
+row_delta <-  matrix(c(X[1,2]/delta, X[1,3]/delta), nrow = 1)
+
+Y_d       = rbind(diag_mu, row_delta)
+  
+first_vector <- matrix(c(0,0, 1/delta), ncol = 1)
+X_d      = cbind(first_vector, Y_d)
+
+# Normal-inverse Wishard prior parameters
+############################################################
+V.tilde.inv     = t(X_d)%*%X_d + diag(1/diag(V.prior))
+V.tilde       = solve(V.tilde.inv)
+A.tilde       = V.tilde%*%(t(X_d)%*%Y_d + diag(1/diag(V.prior))%*%A.prior)
+nu.tilde      = nrow(Y_d) + nu.prior
+S.tilde       = S.prior + t(Y_d)%*%Y_d + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.tilde)%*%V.tilde.inv%*%A.tilde
+S.tilde.inv   = solve(S.tilde)
+
+
+# Normal-inverse Wishard posterior parameters
+############################################################
+V.bar.inv   = t(X)%*%X + diag(1/diag(V.tilde))
+V.bar       = solve(V.bar.inv)
+A.bar       = V.bar%*%(t(X)%*%Y + diag(1/diag(V.tilde))%*%A.tilde)
+nu.bar      = nrow(Y) + nu.tilde
+S.bar       = S.tilde + t(Y)%*%Y + t(A.tilde)%*%diag(1/diag(V.tilde))%*%A.tilde - t(A.bar)%*%V.bar.inv%*%A.bar
+S.bar.inv   = solve(S.bar)
+
+# Posterior draws 
+############################################################
+Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
+Sigma.posterior   = apply(Sigma.posterior,3,solve)
+Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
+A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
+L                 = t(chol(V.bar))
+for (s in 1:S){
+  A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%chol(Sigma.posterior[,,s])
+}
+
+# Report posterior means and sd of parameters
+A.E         = round(apply(A.posterior,1:2,mean),6)
+A.sd        = round(apply(A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(Sigma.posterior,1:2,sd),6)
+
+kable(A.E, format = "html", caption = "Posterior mean of autoregressive",
+      col.names = paste0(1:ncol(A.E)))
+
+kable(Sigma.E, format = "html", caption = "Posterior mean of covarince",
+      col.names = paste0(1:ncol(Sigma.E)))
+
+```
 
 
 ```{r}
