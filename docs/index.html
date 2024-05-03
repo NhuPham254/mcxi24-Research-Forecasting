@@ -146,9 +146,12 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#minnesota-and-dummy-observation-prior-distribution" id="toc-minnesota-and-dummy-observation-prior-distribution" class="nav-link" data-scroll-target="#minnesota-and-dummy-observation-prior-distribution">Minnesota and dummy observation prior distribution</a></li>
   </ul></li>
+  <li><a href="#model-proof" id="toc-model-proof" class="nav-link" data-scroll-target="#model-proof">Model Proof</a>
+  <ul class="collapse">
+  <li><a href="#basic-model-1" id="toc-basic-model-1" class="nav-link" data-scroll-target="#basic-model-1">Basic model</a></li>
+  <li><a href="#extended-model" id="toc-extended-model" class="nav-link" data-scroll-target="#extended-model">Extended model</a></li>
   </ul></li>
-  <li><a href="#mle" id="toc-mle" class="nav-link" data-scroll-target="#mle">MLE</a></li>
-  <li><a href="#prior-distribution" id="toc-prior-distribution" class="nav-link" data-scroll-target="#prior-distribution">Prior distribution</a></li>
+  </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
@@ -308,6 +311,9 @@ P(S_t = j | S_{t-1} = i) &amp;= \pi_{ij}
 <section id="basic-model" class="level2">
 <h2 class="anchored" data-anchor-id="basic-model">Basic Model</h2>
 <p>The model follows the Normal Inverse Wishart distribution.</p>
+<p>Likelihood function kernel <span class="math display">\[\begin{align}
+L(A,\Sigma|Y,X) \propto det(\Sigma)^{-\frac{T}{2}}exp\{-\frac{1}{2}tr[\Sigma^{-1}(Y-XA)'(Y-XA)]\}
+\end{align}\]</span></p>
 <section id="minnesota-prior-distribution" class="level3">
 <h3 class="anchored" data-anchor-id="minnesota-prior-distribution">Minnesota Prior distribution</h3>
 <p>The Minnesota prior is commonly used in Bayesian Vector Autoregression (BVAR) models due to its ability to impose shrinkage towards zero on the coefficients, effectively regularizing the estimation process. The Minnesota prior aligns effectively with the stylized fact of nonstationarity observed in macroeconomic variables.</p>
@@ -356,8 +362,18 @@ k_2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \cdots
 </section>
 <section id="the-joint-posterior-distribution" class="level3">
 <h3 class="anchored" data-anchor-id="the-joint-posterior-distribution">The joint posterior distribution</h3>
+<p><span class="math display">\[\begin{align*}
+p(A,\Sigma|Y,X) &amp;\propto L(A,\Sigma|Y,X)p(A,\Sigma) \\
+&amp;= L(A,\Sigma|Y,X)p(A|\Sigma)p(\Sigma)
+\end{align*}\]</span></p>
 <p><span class="math display">\[\begin{align}
-p(A,\Sigma | Y,X) &amp;= p(A|Y,X,\Sigma)p(\Sigma|Y,X) \\
+p(A,\Sigma|Y,X) &amp;\propto \det(\Sigma)^{-\frac{T}{2}} \\
+&amp;\times exp\{-\frac{1}{2}tr[\Sigma^{-1}(Y-XA)'(Y-XA)]\} \\
+&amp;\times \det(\Sigma)^{-\frac{N+K+\underline{v}+1}{2}} \\
+&amp;\times exp\{-\frac{1}{2}tr[\Sigma^{-1}(A-\underline{A}) \underline{V}^{-1}(A-\underline{A})]\} \\
+&amp;\times exp\{-\frac{1}{2}tr[\Sigma^{-1}\underline{S}]\}
+\end{align}\]</span></p>
+<p>The full conditional joint posterior have the following form <span class="math display">\[\begin{align}
 p(A|Y,X,\Sigma) &amp;\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\
 p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 \\
@@ -368,9 +384,11 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 \overline{V}^{-1}\overline{A} \\
 \end{align}\]</span></p>
 <p>1000 Sample draws from the joint distribution with Minnesota prior.</p>
+<div class="cell">
+<div class="cell-output-display">
 <div>
-<table data-quarto-postprocess="true" class="table">
-<caption>Posterior means table</caption>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Posterior A means and sd table</caption>
 <thead>
 <tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
@@ -394,86 +412,91 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">64.928949</td>
-<td style="text-align: right;">1.074541</td>
-<td style="text-align: right;">-0.019540</td>
-<td style="text-align: right;">0.052691</td>
-<td style="text-align: right;">-0.158973</td>
-<td style="text-align: right;">-0.059927</td>
-<td style="text-align: right;">0.023773</td>
-<td style="text-align: right;">-0.012792</td>
-<td style="text-align: right;">-0.028521</td>
-<td style="text-align: right;">-0.161524</td>
-<td style="text-align: right;">-0.016416</td>
-<td style="text-align: right;">0.002111</td>
-<td style="text-align: right;">-0.000432</td>
-<td style="text-align: right;">0.042871</td>
-<td style="text-align: right;">-0.000136</td>
-<td style="text-align: right;">0.018729</td>
-<td style="text-align: right;">-0.002462</td>
+<td style="text-align: right;">-49.263821</td>
+<td style="text-align: right;">0.990548</td>
+<td style="text-align: right;">-1.568638</td>
+<td style="text-align: right;">17.335770</td>
+<td style="text-align: right;">-19.925289</td>
+<td style="text-align: right;">-0.026826</td>
+<td style="text-align: right;">2.279628</td>
+<td style="text-align: right;">4.742509</td>
+<td style="text-align: right;">17.822893</td>
+<td style="text-align: right;">-0.192600</td>
+<td style="text-align: right;">0.995197</td>
+<td style="text-align: right;">1.338894</td>
+<td style="text-align: right;">2.369981</td>
+<td style="text-align: right;">0.096908</td>
+<td style="text-align: right;">-0.185381</td>
+<td style="text-align: right;">1.097724</td>
+<td style="text-align: right;">0.327982</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">41.870751</td>
-<td style="text-align: right;">0.130563</td>
-<td style="text-align: right;">1.044038</td>
-<td style="text-align: right;">1.038582</td>
-<td style="text-align: right;">1.022146</td>
-<td style="text-align: right;">0.180910</td>
-<td style="text-align: right;">0.542803</td>
-<td style="text-align: right;">0.566508</td>
-<td style="text-align: right;">0.516469</td>
-<td style="text-align: right;">0.161068</td>
-<td style="text-align: right;">0.355271</td>
-<td style="text-align: right;">0.345938</td>
-<td style="text-align: right;">0.373419</td>
-<td style="text-align: right;">0.110875</td>
-<td style="text-align: right;">0.255471</td>
-<td style="text-align: right;">0.280244</td>
-<td style="text-align: right;">0.264118</td>
+<td style="text-align: right;">389.440327</td>
+<td style="text-align: right;">0.143459</td>
+<td style="text-align: right;">41.194206</td>
+<td style="text-align: right;">39.902010</td>
+<td style="text-align: right;">14.056783</td>
+<td style="text-align: right;">0.193294</td>
+<td style="text-align: right;">25.411445</td>
+<td style="text-align: right;">24.648048</td>
+<td style="text-align: right;">18.422823</td>
+<td style="text-align: right;">0.187930</td>
+<td style="text-align: right;">17.087096</td>
+<td style="text-align: right;">16.789294</td>
+<td style="text-align: right;">12.867137</td>
+<td style="text-align: right;">0.139286</td>
+<td style="text-align: right;">13.106914</td>
+<td style="text-align: right;">12.908928</td>
+<td style="text-align: right;">8.869126</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">-0.007982</td>
-<td style="text-align: right;">0.000030</td>
-<td style="text-align: right;">0.999993</td>
-<td style="text-align: right;">-0.000018</td>
-<td style="text-align: right;">0.000097</td>
+<td style="text-align: right;">0.025401</td>
+<td style="text-align: right;">0.000044</td>
+<td style="text-align: right;">0.998842</td>
+<td style="text-align: right;">-0.004918</td>
+<td style="text-align: right;">0.001588</td>
+<td style="text-align: right;">0.000039</td>
+<td style="text-align: right;">-0.000412</td>
+<td style="text-align: right;">-0.001388</td>
+<td style="text-align: right;">0.000632</td>
+<td style="text-align: right;">-0.000059</td>
 <td style="text-align: right;">0.000027</td>
-<td style="text-align: right;">-0.000013</td>
-<td style="text-align: right;">-0.000001</td>
-<td style="text-align: right;">0.000026</td>
-<td style="text-align: right;">-0.000040</td>
-<td style="text-align: right;">0.000000</td>
-<td style="text-align: right;">-0.000002</td>
-<td style="text-align: right;">0.000011</td>
-<td style="text-align: right;">0.000001</td>
-<td style="text-align: right;">-0.000003</td>
-<td style="text-align: right;">-0.000004</td>
-<td style="text-align: right;">0.000003</td>
+<td style="text-align: right;">-0.000462</td>
+<td style="text-align: right;">-0.000665</td>
+<td style="text-align: right;">0.000012</td>
+<td style="text-align: right;">0.000188</td>
+<td style="text-align: right;">-0.000288</td>
+<td style="text-align: right;">-0.001033</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.011414</td>
-<td style="text-align: right;">0.000034</td>
-<td style="text-align: right;">0.000290</td>
-<td style="text-align: right;">0.000290</td>
-<td style="text-align: right;">0.000273</td>
-<td style="text-align: right;">0.000047</td>
-<td style="text-align: right;">0.000147</td>
-<td style="text-align: right;">0.000143</td>
-<td style="text-align: right;">0.000141</td>
-<td style="text-align: right;">0.000043</td>
-<td style="text-align: right;">0.000096</td>
-<td style="text-align: right;">0.000096</td>
-<td style="text-align: right;">0.000093</td>
-<td style="text-align: right;">0.000030</td>
-<td style="text-align: right;">0.000071</td>
-<td style="text-align: right;">0.000069</td>
-<td style="text-align: right;">0.000071</td>
+<td style="text-align: right;">0.103274</td>
+<td style="text-align: right;">0.000036</td>
+<td style="text-align: right;">0.010828</td>
+<td style="text-align: right;">0.011492</td>
+<td style="text-align: right;">0.003860</td>
+<td style="text-align: right;">0.000050</td>
+<td style="text-align: right;">0.006765</td>
+<td style="text-align: right;">0.006665</td>
+<td style="text-align: right;">0.004863</td>
+<td style="text-align: right;">0.000052</td>
+<td style="text-align: right;">0.004667</td>
+<td style="text-align: right;">0.004703</td>
+<td style="text-align: right;">0.003506</td>
+<td style="text-align: right;">0.000039</td>
+<td style="text-align: right;">0.003474</td>
+<td style="text-align: right;">0.003447</td>
+<td style="text-align: right;">0.002433</td>
 </tr>
 </tbody>
 </table>
-``````````{=html}
-<table data-quarto-postprocess="true" class="table">
-<caption>Posterior standard deviation table</caption>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Posterior Sigma means and sd table</caption>
 <thead>
 <tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
@@ -484,33 +507,35 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">2820.861080</td>
-<td style="text-align: right;">-0.283467</td>
-<td style="text-align: right;">-0.016480</td>
-<td style="text-align: right;">-5.437817</td>
+<td style="text-align: right;">2721.450856</td>
+<td style="text-align: right;">-0.269260</td>
+<td style="text-align: right;">-0.012879</td>
+<td style="text-align: right;">-3.832776</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">401.556190</td>
-<td style="text-align: right;">0.081118</td>
-<td style="text-align: right;">0.008126</td>
-<td style="text-align: right;">2.329402</td>
+<td style="text-align: right;">376.507272</td>
+<td style="text-align: right;">0.075509</td>
+<td style="text-align: right;">0.007388</td>
+<td style="text-align: right;">2.028547</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">-0.283467</td>
-<td style="text-align: right;">0.000206</td>
-<td style="text-align: right;">0.000005</td>
-<td style="text-align: right;">0.000669</td>
+<td style="text-align: right;">-0.269260</td>
+<td style="text-align: right;">0.000201</td>
+<td style="text-align: right;">0.000004</td>
+<td style="text-align: right;">0.000660</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.081118</td>
-<td style="text-align: right;">0.000028</td>
+<td style="text-align: right;">0.075509</td>
+<td style="text-align: right;">0.000029</td>
 <td style="text-align: right;">0.000002</td>
-<td style="text-align: right;">0.000634</td>
+<td style="text-align: right;">0.000552</td>
 </tr>
 </tbody>
 </table>
 
 
+</div>
+</div>
 </div>
 <section id="section" class="level87">
 <p class="heading"></p>
@@ -521,7 +546,7 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 <h2 class="anchored" data-anchor-id="extension-1-model">Extension 1 Model</h2>
 <p>Cointegration is when the non-stationary variables have an equilibrium long term relationship or a common trend. The model is extended to incorporate dummy-observation-prior, aiming to account for the potential cointegration amongst the variables, capturing the underlying economic relationships and dynamics.</p>
 <p>This approach allows us to leverage both the observed data and additional information about the structural relationships among variables, leading to more accurate parameter estimation and potentially improved forecasting performance.</p>
-<p>Dummy observation prior proposed by Doan et al.&nbsp;(1984) required a set of artificial observations for each variable.</p>
+<p>Dummy observation prior also known as known as “sum-of-coefficients” proposed by Doan, Litterman, and Sims (1984) required a set of artificial observations for each variable.</p>
 <p><span class="math display">\[\begin{align*}
 \underset{4\times 4}y^{+} &amp;= diag(\frac{\overline{y_0}}{\mu}) \\
 \underset{4 \times (1+4\times 4)}{x^{+}} &amp;= [\underset{n \times 1}0,y^{+},...,y^{+}]
@@ -565,32 +590,302 @@ A \mid \Sigma &amp;\sim \text{MN}_{K \times N} (\underline{A}^{+}, \Sigma, \unde
 \end{align*}\]</span></p>
 <section id="minnesota-and-dummy-observation-prior-distribution" class="level3">
 <h3 class="anchored" data-anchor-id="minnesota-and-dummy-observation-prior-distribution">Minnesota and dummy observation prior distribution</h3>
-<p>The newly created matrix specified the model has 5 dummy observations. The above prior distribution is likely to encounter the problem of not having enough observations and lead to many challenges to meet the requirements for degree of freedom or invertibility of matrices. To resolve this, the combination of specifying the prior through both Normal inverse Wishart and dummy-observations is proposed.</p>
+<p>The newly created matrix specified the model has 5 dummy observations. The above prior distribution is likely to encounter the problem of not having enough observations and lead to many challenges to meet the requirements for degree of freedom or invertibility of matrices. To resolve this, the combination of specifying the prior through both Normal inverse Wishart and dummy-observations is proposed, which is detived similarly to the posterior distribution in the basic model.</p>
 <p><span class="math display">\[\begin{align*}
-A \mid \Sigma &amp;\sim \text{MN}_{K \times N} (\overset{~}{A}, \Sigma, \overset{~}{V}) \\
-\Sigma &amp;\sim  \text{IW}_{N} (\overset{~}{S}, \overset{~}{v})\\
+A \mid \Sigma &amp;\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}) \\
+\Sigma &amp;\sim  \text{IW}_{N} (\widetilde{S}, \widetilde{v})\\
 \\
-\overset{~}{A} &amp;= \overset{~}{V}(X^{+'}Y{+}+\underline{V}^{-1}\underline{A}) \\
-\overset{~}{V} &amp;= (X^{+'}X^{+} + \underline{V}^{-1})^{-1} \\
-\overset{~}{v} &amp;= T^{+} + \underline{v} \\
-\overset{~}{S} &amp;= \underline{S}+Y^{+'}Y^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\overset{~}{A}'\overset{~}{V}^{-1}\overset{~}{A} \\
+\widetilde{A} &amp;= \widetilde{V}(X^{+'}Y{+}+\underline{V}^{-1}\underline{A}) \\
+\widetilde{V} &amp;= (X^{+'}X^{+} + \underline{V}^{-1})^{-1} \\
+\widetilde{v} &amp;= T^{+} + \underline{v} \\
+\widetilde{S} &amp;= \underline{S}+Y^{+'}Y^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\widetilde{A}'\widetilde{V}^{-1}\widetilde{A} \\
 \end{align*}\]</span></p>
+<p>The full conditional joint posterior have the following form <span class="math display">\[\begin{align}
+p(A|Y,X,\Sigma) &amp;\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\
+p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
+\\
+\overline{V} &amp;= (X'X + \widetilde{V}^{-1})^{-1} \\
+\overline{A} &amp;= \overline{V}(X'Y+\widetilde{V}^{-1}\widetilde{A}) \\
+\overline{v} &amp;= T + \widetilde{v} \\
+\overline{S} &amp;= \widetilde{S}+Y'Y+\widetilde{A}'\widetilde{V}^{-1}\widetilde{A}-\overline{A}'
+\overline{V}^{-1}\overline{A} \\
+\end{align}\]</span></p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Posterior A means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">6</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">7</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">9</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">10</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">11</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">12</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">13</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">14</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">15</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">16</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">17</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">-7.115452</td>
+<td style="text-align: right;">0.997500</td>
+<td style="text-align: right;">-1.943357</td>
+<td style="text-align: right;">10.765990</td>
+<td style="text-align: right;">-17.920915</td>
+<td style="text-align: right;">-0.020630</td>
+<td style="text-align: right;">0.750714</td>
+<td style="text-align: right;">4.835906</td>
+<td style="text-align: right;">14.754424</td>
+<td style="text-align: right;">-0.200697</td>
+<td style="text-align: right;">1.027433</td>
+<td style="text-align: right;">2.681439</td>
+<td style="text-align: right;">2.942588</td>
+<td style="text-align: right;">0.090622</td>
+<td style="text-align: right;">0.084610</td>
+<td style="text-align: right;">1.293319</td>
+<td style="text-align: right;">0.147829</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">188.143980</td>
+<td style="text-align: right;">0.134920</td>
+<td style="text-align: right;">23.589041</td>
+<td style="text-align: right;">28.145477</td>
+<td style="text-align: right;">11.601603</td>
+<td style="text-align: right;">0.188072</td>
+<td style="text-align: right;">21.563884</td>
+<td style="text-align: right;">22.330042</td>
+<td style="text-align: right;">15.555067</td>
+<td style="text-align: right;">0.186580</td>
+<td style="text-align: right;">14.365063</td>
+<td style="text-align: right;">15.515856</td>
+<td style="text-align: right;">12.410683</td>
+<td style="text-align: right;">0.141644</td>
+<td style="text-align: right;">12.127459</td>
+<td style="text-align: right;">12.508798</td>
+<td style="text-align: right;">8.657531</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.005811</td>
+<td style="text-align: right;">0.000043</td>
+<td style="text-align: right;">0.999846</td>
+<td style="text-align: right;">-0.003039</td>
+<td style="text-align: right;">0.001719</td>
+<td style="text-align: right;">0.000038</td>
+<td style="text-align: right;">0.000100</td>
+<td style="text-align: right;">-0.001462</td>
+<td style="text-align: right;">0.000808</td>
+<td style="text-align: right;">-0.000053</td>
+<td style="text-align: right;">-0.000133</td>
+<td style="text-align: right;">-0.000530</td>
+<td style="text-align: right;">-0.000927</td>
+<td style="text-align: right;">0.000009</td>
+<td style="text-align: right;">-0.000170</td>
+<td style="text-align: right;">-0.000388</td>
+<td style="text-align: right;">-0.000802</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.049034</td>
+<td style="text-align: right;">0.000036</td>
+<td style="text-align: right;">0.006311</td>
+<td style="text-align: right;">0.007781</td>
+<td style="text-align: right;">0.003221</td>
+<td style="text-align: right;">0.000051</td>
+<td style="text-align: right;">0.005514</td>
+<td style="text-align: right;">0.005875</td>
+<td style="text-align: right;">0.004359</td>
+<td style="text-align: right;">0.000050</td>
+<td style="text-align: right;">0.004233</td>
+<td style="text-align: right;">0.004308</td>
+<td style="text-align: right;">0.003421</td>
+<td style="text-align: right;">0.000038</td>
+<td style="text-align: right;">0.003195</td>
+<td style="text-align: right;">0.003225</td>
+<td style="text-align: right;">0.002317</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Posterior Sigma means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2607.741011</td>
+<td style="text-align: right;">-0.260665</td>
+<td style="text-align: right;">-0.012517</td>
+<td style="text-align: right;">-3.757449</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">365.649734</td>
+<td style="text-align: right;">0.074320</td>
+<td style="text-align: right;">0.007305</td>
+<td style="text-align: right;">1.960660</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-0.260665</td>
+<td style="text-align: right;">0.000190</td>
+<td style="text-align: right;">0.000004</td>
+<td style="text-align: right;">0.000660</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.074320</td>
+<td style="text-align: right;">0.000027</td>
+<td style="text-align: right;">0.000002</td>
+<td style="text-align: right;">0.000510</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
 </section>
 </section>
+<section id="model-proof" class="level2">
+<h2 class="anchored" data-anchor-id="model-proof">Model Proof</h2>
+<p>1000 observations are simulated from a bi-variate Gaussian random walk process annd is used as data for the below proofs.</p>
+<section id="basic-model-1" class="level3">
+<h3 class="anchored" data-anchor-id="basic-model-1">Basic model</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Posterior mean of autoregressive</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.077215</td>
+<td style="text-align: right;">-0.005406</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.994250</td>
+<td style="text-align: right;">-0.000284</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.001799</td>
+<td style="text-align: right;">0.996006</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Posterior mean of covarince</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.980363</td>
+<td style="text-align: right;">0.002589</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.002589</td>
+<td style="text-align: right;">1.036363</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
 </section>
-<section id="mle" class="level1">
-<h1>MLE</h1>
-<section id="section-1" class="level60">
-<p class="heading"></p>
-<p>A.hat = solve(t(X)%<em>%X)%</em>%t(X)%<em>%Y Sigma.hat = t(Y-X%</em>%A.hat)%<em>%(Y-X%</em>%A.hat)/T round(A.hat,3) round(Sigma.hat,3) round(cov2cor(Sigma.hat),3)</p>
+<section id="extended-model" class="level3">
+<h3 class="anchored" data-anchor-id="extended-model">Extended model</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Posterior mean of autoregressive</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.076862</td>
+<td style="text-align: right;">-0.007955</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.994228</td>
+<td style="text-align: right;">-0.000258</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.001806</td>
+<td style="text-align: right;">0.995826</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Posterior mean of covarince</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.977325</td>
+<td style="text-align: right;">0.002316</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.002316</td>
+<td style="text-align: right;">1.032249</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
 </section>
-</section>
-<section id="prior-distribution" class="level1">
-<h1>Prior distribution</h1>
-<section id="section-2" class="level60">
-<p class="heading"></p>
-<p>kappa.1 = 10 kappa.2 = 100 A.prior = matrix(0,nrow(A.hat),ncol(A.hat)) A.prior[2:4,] &lt;- diag(1) ?????? V.prior = diag(c(kappa.2,(1/lambda)<em>kappa.1</em>((1:p)^(-2))%x%rep(1,N))) S.prior = diag(diag(Sigma.hat)) nu.prior = N+1</p>
-<pre><code></code></pre>
 </section>
 </section>
 <section id="references" class="level1 unnumbered">
