@@ -543,6 +543,10 @@ $$
 \end{align*}
 
 From the above, the following matrix form is created:
+$$
+Y^+ = [y^+ \  \  \  y^{++}]' \\
+X^+ = [x^+ \  \  \  x^{++}]'
+$$
 \begin{align*}
 Y^{+} & = X^{+}A+E^{+} \\
 Y^{+} & = \begin{bmatrix}
