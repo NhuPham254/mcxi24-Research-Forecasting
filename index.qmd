@@ -587,6 +587,10 @@ lead to many challenges to meet the requirements for degree of freedom or
 invertibility of matrices. To resolve this, the combination of specifying the prior 
 through both Normal inverse Wishart and dummy-observations is proposed, which is detived similarly to the posterior distribution in the basic model. 
 
+$$
+\widetilde{A} = \widetilde{V}(X^{+'}Y^{+}+\underline{V}^{-1}\underline{A})
+$$
+
 \begin{align*}
 A \mid \Sigma &\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}) \\
 \Sigma &\sim  \text{IW}_{N} (\widetilde{S}, \widetilde{v})\\
