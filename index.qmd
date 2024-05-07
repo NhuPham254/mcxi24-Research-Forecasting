@@ -528,7 +528,7 @@ Dummy observation prior also known as known as “sum-of-coefficients” propose
 To be consistent with cointegration, an additional prior proposed by Sims (1993)
 is also added.
 $$
-\underset{{1\times 4}}{y^{++}}= \frac{\overline{y_{oi}}}{\delta}, with \ i =1,2,3,4
+\underset{{1\times 4}}{y^{++}}= \frac{\overline{y_{oi}}}{\delta},   \ i =1,2,3,4
 $$
 
 
@@ -545,6 +545,7 @@ $$
 From the above, the following matrix form is created:
 $$
 Y^+ = [y^+ \  \  \  y^{++}]' \\
+
 X^+ = [x^+ \  \  \  x^{++}]'
 $$
 \begin{align*}
@@ -587,15 +588,12 @@ lead to many challenges to meet the requirements for degree of freedom or
 invertibility of matrices. To resolve this, the combination of specifying the prior 
 through both Normal inverse Wishart and dummy-observations is proposed, which is detived similarly to the posterior distribution in the basic model. 
 
-$$
-\widetilde{A} = \widetilde{V}(X^{+'}Y^{+}+\underline{V}^{-1}\underline{A})
-$$
 
 \begin{align*}
 A \mid \Sigma &\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}) \\
 \Sigma &\sim  \text{IW}_{N} (\widetilde{S}, \widetilde{v})\\
 \\
-\widetilde{A} &= \widetilde{V}(X^{+'}Y{+}+\underline{V}^{-1}\underline{A}) \\
+\widetilde{A} &= \widetilde{V}(X^{+'}Y^{+}+\underline{V}^{-1}\underline{A}) \\
 \widetilde{V} &= (X^{+'}X^{+} + \underline{V}^{-1})^{-1} \\
 \widetilde{v} &= T^{+} + \underline{v} \\ 
 \widetilde{S} &= \underline{S}+Y^{+'}Y^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\widetilde{A}'\widetilde{V}^{-1}\widetilde{A} \\
