@@ -527,13 +527,10 @@ Dummy observation prior also known as known as “sum-of-coefficients” propose
 
 To be consistent with cointegration, an additional prior proposed by Sims (1993)
 is also added.
-$$
-\underset{{1\times 4}}{y^{++}}= \frac{\overline{y_{oi}}}{\delta},   \ i =1,2,3,4
-$$
 
 
 \begin{align*}
-\underset{1\times 4}y^{++} &= \frac{\overline{y_0}^{'}}{\delta}\\
+\underset{1\times 4}y^{++} &= \frac{\overline{y_0}^{'}}{\delta}, ,   \ i =1,2,3,4\\
 \underset{1 \times (1+4\times 4)}{x^{++}} &= [\frac{1}{\delta},y^{++},...,y^{++}]\\
 \end{align*}
 \begin{align*}
@@ -543,12 +540,9 @@ $$
 \end{align*}
 
 From the above, the following matrix form is created:
-$$
-Y^+ = [y^+ \  \  \  y^{++}]' \\
 
-X^+ = [x^+ \  \  \  x^{++}]'
-$$
 \begin{align*}
+Y^{+} & = \begin{bmatrix} y^+ \\ y^{++}\end{bmatrix}', X^{+}  = \begin{bmatrix} x^+ \\ x^{++}\end{bmatrix}'\\
 Y^{+} & = X^{+}A+E^{+} \\
 Y^{+} & = \begin{bmatrix}
 \frac{\overline{y_0}_1}{\mu} & 0 & 0 & 0 \\
