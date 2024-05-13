@@ -884,7 +884,9 @@ forecast_plots(Y, Y.h_minnesota, h)
 # 1] 380.5817 992.4253
 
 ```
-The plot of point forecast and density for 13 periods ahead, equivalent to 13 quarters or 3 years and 1 quarter from Q4 2023 to Q4 2026 shows a clear upward trend. The confidence interval is quite large. For the 3D plot of the density, we can see that the further the period ahead, the density is more dispersed since the data is become less informative as horizon increases.
+The plot of point forecast and density for 13 periods ahead, equivalent to 13 quarters or 3 years and 1 quarter from Q4 2023 to Q4 2026 shows a clear upward trend. The confidence interval is quite large. The unemployment rate seems to go back to the mean. 
+
+For the 3D plot of the density, we can see that the further the period ahead, the density is more dispersed since the data is become less informative as horizon increases.
 
 
 ## Extended model
@@ -947,7 +949,7 @@ forecast_plots(Y, Y.h_dummy, h)
 # range             = range(Y[,1],interval_forecast)
 # [1] 379.9268 987.2176
 ```
-The plot of forecast for the extended model doesn't show any significant differences visually.
+The plot of forecast for the extended model doesn't show any significant differences visually. The confidence interval narrowed insignificantly.
 
 
 
