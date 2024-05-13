@@ -38,7 +38,7 @@ It's important to note that all data will be quarterly since the interest foreca
 \begin{align*}
 & unmp_{t} & : & \text{Unemployment rate} \\
 & gdp_{t} & : & \text{GDP per capita: Chain volume measures - Percentage changes} \\
-& wpi_{t} & : & \text{Wage price index} \\
+& wpi_{t} & : & \text{Wage price index} \\            
 & cashrate_{t} & : & \text{Cash rate} \\
 \end{align*}
 
@@ -59,6 +59,10 @@ library(tseries)
 library(MSwM)
 library(xtable)
 library(knitr)
+library(MASS) 
+library(mvtnorm)
+library(HDInterval)
+library(plot3D)
 ```
 
 
@@ -394,12 +398,11 @@ k_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \cdots & 0\\
 # Data configuration
 N       = 4
 p       = 4
-S       = 1000
 
 y       = merged_df
-y       = ts(y[,c(2,3,4,5)], start=c(1997,9), frequency=4,
+y       = ts(y[,c(2,3,4,5)], start = c(1997,3), frequency = 4,
              names=c("unmp","gdp","wpi","cashrate"))
-Y       = ts(y[5:nrow(y),], start=c(1998,9), frequency=4)
+Y       = ts(y[5:nrow(y),], start = c(1998,3), frequency = 4)
 
 X       = matrix(1,nrow(Y),1)
 for (i in 1:p){
@@ -454,63 +457,41 @@ S.prior     = diag(diag(Sigma.hat))
 nu.prior    = N+1
 ```
 
-1000 Sample draws from the joint distribution with Minnesota prior.
-```{r}
-# Normal-inverse Wishard posterior parameters
-############################################################
-V.bar.inv   = t(X)%*%X + diag(1/diag(V.prior))
-V.bar       = solve(V.bar.inv)
-A.bar       = V.bar%*%(t(X)%*%Y + diag(1/diag(V.prior))%*%A.prior)
-nu.bar      = nrow(Y) + nu.prior
-S.bar       = S.prior + t(Y)%*%Y + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.bar)%*%V.bar.inv%*%A.bar
-S.bar.inv   = solve(S.bar)
-
-# Posterior draws 
-############################################################
-Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
-Sigma.posterior   = apply(Sigma.posterior,3,solve)
-Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
-A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
-L                 = t(chol(V.bar))
-for (s in 1:S){
-  A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%chol(Sigma.posterior[,,s])
+```{r, echo=TRUE}
+###############################################
+# Posterior draws Normal-inverse Wishard
+###############################################
+posterior_draws       = function (S, Y, X){
+    # Posterior parameters
+    V.bar.inv         = t(X)%*%X + diag(1/diag(V.prior))
+    V.bar             = solve(V.bar.inv)
+    A.bar             = V.bar%*%(t(X)%*%Y + diag(1/diag(V.prior))%*%A.prior)
+    nu.bar            = nrow(Y) + nu.prior
+    S.bar             = S.prior + t(Y)%*%Y + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior -
+                        t(A.bar)%*%V.bar.inv%*%A.bar
+    S.bar.inv         = solve(S.bar)
+  
+    # Posterior draws 
+    Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
+    Sigma.posterior   = apply(Sigma.posterior,3,solve)
+    Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
+    A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
+    L                 = t(chol(V.bar))
+    for (s in 1:S){
+      A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%chol(Sigma.posterior[,,s])
+    }
+ 
+    output            = list(A.posterior=A.posterior, Sigma.posterior=Sigma.posterior)
+    return(output)
 }
 
-# round(apply(A.posterior,1:2,mean),3)
+S = 50000
+sample_minnesota        = posterior_draws(S, Y, X)
+sample_minnesota_A      = sample_minnesota$A.posterior
+sample_minnesota_Sigma  = sample_minnesota$Sigma.posterior
+# sample_minnesota = posterior_draws(1000, Y, X)
 ```
 
-```{r}
-# Report posterior means and sd of parameters
-A.E         = round(apply(A.posterior,1:2,mean),6)
-A.sd        = round(apply(A.posterior,1:2,sd),6)
-Sigma.E     = round(apply(Sigma.posterior,1:2,mean),6)
-Sigma.sd    = round(apply(Sigma.posterior,1:2,sd),6)
-
-A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
-Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
-
-kable(A_table, format = "html", caption = "Posterior A means and sd table",
-      col.names = paste0(1:ncol(A_table)))
-
-kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
-      col.names = paste0(1:ncol(Sigma_table)))
-
-# simulate draws from the predictive density
-# WARNING! This takes a while
-############################################################
-# Y.h         = array(NA,c(h,N,S))
-
-# for (s in 1:S){
-#  x.Ti        = Y[(nrow(Y)-h+1):nrow(Y),]
-#  x.Ti        = x.Ti[4:1,]
-#  for (i in 1:h){
-#    x.T         = c(1,as.vector(t(x.Ti)))
-#    Y.h[i,,s]   = rmvnorm(1, mean = x.T%*%A.posterior[,,s], sigma=Sigma.posterior[,,s])
-#    x.Ti        = rbind(Y.h[i,,s],x.Ti[1:3,])
-#  }
-#}
-
-```
 #######################################################################################
 ## Extension 1 Model
 Cointegration is when the non-stationary variables have an equilibrium long term 
@@ -597,7 +578,6 @@ A \mid \Sigma &\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}
 # Data configuration
 N       = 4
 p       = 4
-S       = 1000
 mu      = 2
 delta   = 2
 
@@ -617,13 +597,14 @@ X_d      = cbind(first_vector, Y_d, Y_d, Y_d, Y_d)
 
 
 ```{r}
-# Normal-inverse Wishard posterior parameters
+# Normal-inverse Wishard combination of specifying the prior 
 ############################################################
 V.tilde.inv   = t(X_d)%*%X_d + diag(1/diag(V.prior))
 V.tilde       = solve(V.tilde.inv)
 A.tilde       = V.tilde%*%(t(X_d)%*%Y_d + diag(1/diag(V.prior))%*%A.prior)
 nu.tilde      = nrow(Y_d) + nu.prior
-S.tilde       = S.prior + t(Y_d)%*%Y_d + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.tilde)%*%V.tilde.inv%*%A.tilde
+S.tilde       = S.prior + t(Y_d)%*%Y_d + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior -
+                t(A.tilde)%*%V.tilde.inv%*%A.tilde
 S.tilde.inv   = solve(S.tilde)
 
 ```
@@ -640,67 +621,62 @@ p(\Sigma|Y,X) &\sim IW_{N}(\overline{S}, \overline{v})\\
 \overline{V}^{-1}\overline{A} \\
 \end{align}
 
-```{r}
-# Normal-inverse Wishard posterior parameters
-############################################################
-V.bar.inv   = t(X)%*%X + diag(1/diag(V.tilde))
-V.bar       = solve(V.bar.inv)
-A.bar       = V.bar%*%(t(X)%*%Y + diag(1/diag(V.tilde))%*%A.tilde)
-nu.bar      = nrow(Y) + nu.tilde
-S.bar       = S.tilde + t(Y)%*%Y + t(A.tilde)%*%diag(1/diag(V.tilde))%*%A.tilde - t(A.bar)%*%V.bar.inv%*%A.bar
-S.bar.inv   = solve(S.bar)
+```{r, echo=TRUE}
+###############################################
+# Posterior draws for dummy prior
+###############################################
+posterior_draws_dummy = function(S, Y, X) {
+  # Normal-inverse Wishard posterior parameters
+  V.bar.inv   = t(X)%*%X + diag(1/diag(V.tilde))
+  V.bar       = solve(V.bar.inv)
+  A.bar       = V.bar%*%(t(X)%*%Y + diag(1/diag(V.tilde))%*%A.tilde)
+  nu.bar      = nrow(Y) + nu.tilde
+  S.bar       = S.tilde + t(Y)%*%Y + t(A.tilde)%*%diag(1/diag(V.tilde))%*%A.tilde -
+                t(A.bar)%*%V.bar.inv%*%A.bar
+  S.bar.inv   = solve(S.bar)
 
-# Posterior draws 
-############################################################
-Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
-Sigma.posterior   = apply(Sigma.posterior,3,solve)
-Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
-A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
-L                 = t(chol(V.bar))
-for (s in 1:S){
-  A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%chol(Sigma.posterior[,,s])
+  # Posterior draws 
+  Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
+  Sigma.posterior   = apply(Sigma.posterior,3,solve)
+  Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
+  A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
+  L                 = t(chol(V.bar))
+  for (s in 1:S){
+    A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%chol(Sigma.posterior[,,s])
+    }
+  output            = list(A.posterior=A.posterior, Sigma.posterior=Sigma.posterior)
+  return(output)
 }
-
-# Report posterior means and sd of parameters
-A.E         = round(apply(A.posterior,1:2,mean),6)
-A.sd        = round(apply(A.posterior,1:2,sd),6)
-Sigma.E     = round(apply(Sigma.posterior,1:2,mean),6)
-Sigma.sd    = round(apply(Sigma.posterior,1:2,sd),6)
-
-A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
-Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
-
-kable(A_table, format = "html", caption = "Posterior A means and sd table",
-      col.names = paste0(1:ncol(A_table)))
-
-kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
-      col.names = paste0(1:ncol(Sigma_table)))
-
+S = 50000
+sample_dummy        = posterior_draws_dummy(S, Y, X)
+sample_dummy_A      = sample_dummy$A.posterior
+sample_dummy_Sigma  = sample_dummy$Sigma.posterior
 ```
 ## Model Proof
 1000 observations are simulated from a bi-variate Gaussian random walk process annd is used as data for the below proofs.
 
 ### Basic model
-```{r}
+```{r, echo=FALSE}
 set.seed(123456)
 N       = 2
 p       = 1
 S       = 1000
+K       = 1+p*N
 
 r1 = cumsum(rnorm(1000,0,1))
 r2 = cumsum(rnorm(1000,0,1))
 
 r = cbind(r1, r2) 
 
-Y = ts(r[2:nrow(r),], frequency=1)
+Y_p = ts(r[2:nrow(r),], frequency=1)
 
-X     = matrix(1,nrow(Y),1)
-X     = cbind(X,r[2:nrow(r)-1,])
+X_p     = matrix(1,nrow(Y_p),1)
+X_p     = cbind(X_p,r[2:nrow(r)-1,])
 
 # MLE
 ############################################################
-A.hat       = solve(t(X)%*%X)%*%t(X)%*%Y
-Sigma.hat   = t(Y-X%*%A.hat)%*%(Y-X%*%A.hat)/nrow(Y)
+A.hat       = solve(t(X_p)%*%X_p)%*%t(X_p)%*%Y_p
+Sigma.hat   = t(Y_p-X_p%*%A.hat)%*%(Y_p-X_p%*%A.hat)/nrow(Y_p)
 
 # Prior distribution
 ############################################################
@@ -712,31 +688,14 @@ V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
 S.prior     = diag(diag(Sigma.hat))
 nu.prior    = N+1
 
-# Normal-inverse Wishard posterior parameters
 ############################################################
-V.bar.inv   = t(X)%*%X + diag(1/diag(V.prior))
-V.bar       = solve(V.bar.inv)
-A.bar       = V.bar%*%(t(X)%*%Y + diag(1/diag(V.prior))%*%A.prior)
-nu.bar      = nrow(Y) + nu.prior
-S.bar       = S.prior + t(Y)%*%Y + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.bar)%*%V.bar.inv%*%A.bar
-S.bar.inv   = solve(S.bar)
-
-# Posterior draws 
-############################################################
-Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
-Sigma.posterior   = apply(Sigma.posterior,3,solve)
-Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
-A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
-L                 = t(chol(V.bar))
-for (s in 1:S){
-  A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%chol(Sigma.posterior[,,s])
-}
+sample_minnesota_proof = posterior_draws(1000, Y_p, X_p)
 
 # Report posterior means and sd of parameters
-A.E         = round(apply(A.posterior,1:2,mean),6)
-A.sd        = round(apply(A.posterior,1:2,sd),6)
-Sigma.E     = round(apply(Sigma.posterior,1:2,mean),6)
-Sigma.sd    = round(apply(Sigma.posterior,1:2,sd),6)
+A.E         = round(apply(sample_minnesota_proof$A.posterior,1:2,mean),6)
+A.sd        = round(apply(sample_minnesota_proof$A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(sample_minnesota_proof$Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(sample_minnesota_proof$Sigma.posterior,1:2,sd),6)
 
 
 kable(A.E, format = "html", caption = "Posterior mean of autoregressive",
@@ -755,9 +714,9 @@ kable(Sigma.E, format = "html", caption = "Posterior mean of covarince",
 # do this for basic and extension? Yes
 ```
 ### Extended model
-```{r}
-diag_mu <- diag(c(X[1,2]/mu, X[1,3]/mu))
-row_delta <-  matrix(c(X[1,2]/delta, X[1,3]/delta), nrow = 1)
+```{r, echo = FALSE}
+diag_mu <- diag(c(X_p[1,2]/mu, X_p[1,3]/mu))
+row_delta <-  matrix(c(X_p[1,2]/delta, X_p[1,3]/delta), nrow = 1)
 
 Y_d       = rbind(diag_mu, row_delta)
   
@@ -773,32 +732,14 @@ nu.tilde      = nrow(Y_d) + nu.prior
 S.tilde       = S.prior + t(Y_d)%*%Y_d + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.tilde)%*%V.tilde.inv%*%A.tilde
 S.tilde.inv   = solve(S.tilde)
 
-
-# Normal-inverse Wishard posterior parameters
 ############################################################
-V.bar.inv   = t(X)%*%X + diag(1/diag(V.tilde))
-V.bar       = solve(V.bar.inv)
-A.bar       = V.bar%*%(t(X)%*%Y + diag(1/diag(V.tilde))%*%A.tilde)
-nu.bar      = nrow(Y) + nu.tilde
-S.bar       = S.tilde + t(Y)%*%Y + t(A.tilde)%*%diag(1/diag(V.tilde))%*%A.tilde - t(A.bar)%*%V.bar.inv%*%A.bar
-S.bar.inv   = solve(S.bar)
-
-# Posterior draws 
-############################################################
-Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
-Sigma.posterior   = apply(Sigma.posterior,3,solve)
-Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
-A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
-L                 = t(chol(V.bar))
-for (s in 1:S){
-  A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%chol(Sigma.posterior[,,s])
-}
+sample_dummy_proof = posterior_draws_dummy(1000, Y_p, X_p)
 
 # Report posterior means and sd of parameters
-A.E         = round(apply(A.posterior,1:2,mean),6)
-A.sd        = round(apply(A.posterior,1:2,sd),6)
-Sigma.E     = round(apply(Sigma.posterior,1:2,mean),6)
-Sigma.sd    = round(apply(Sigma.posterior,1:2,sd),6)
+A.E         = round(apply(sample_dummy_proof$A.posterior,1:2,mean),6)
+A.sd        = round(apply(sample_dummy_proof$A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(sample_dummy_proof$Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(sample_dummy_proof$Sigma.posterior,1:2,sd),6)
 
 kable(A.E, format = "html", caption = "Posterior mean of autoregressive",
       col.names = paste0(1:ncol(A.E)))
@@ -807,6 +748,208 @@ kable(Sigma.E, format = "html", caption = "Posterior mean of covarince",
       col.names = paste0(1:ncol(Sigma.E)))
 
 ```
+
+# Forecasting
+## Basic model
+```{r, echo=TRUE}
+# Set up
+# Define colors
+mcxs1  = "#05386B"
+mcxs2  = "#379683"
+mcxs3  = "#5CDB95"
+mcxs4  = "#8EE4AF"
+mcxs5  = "#EDF5E1"
+
+mcxs1.rgb   = col2rgb(mcxs1)
+mcxs1.shade1= rgb(mcxs1.rgb[1],mcxs1.rgb[2],mcxs1.rgb[3], alpha=50, maxColorValue=255)
+mcxs2.rgb   = col2rgb(mcxs2)
+mcxs2.shade1= rgb(mcxs2.rgb[1],mcxs2.rgb[2],mcxs2.rgb[3], alpha=50, maxColorValue=255)
+
+############################################################
+# Point forecasts 2D plot
+forecast_plots <- function(Y, Y.h, h) {
+  
+point_forecast    = apply(Y.h[,1,],1,mean) 
+interval_forecast = apply(Y.h[,1,],1,hdi,credMass=0.90)
+range             = range(Y[,1],interval_forecast)
+
+par(mfrow=c(1,1), mar=rep(3,4),cex.axis=1)
+plot(1:(length(Y[,1])), Y[,1], type="l", axes=FALSE, 
+     xlim = c(1, nrow(Y)+h), ylim=range, 
+     xlab="", ylab="", 
+     lwd=2, col = mcxs1)
+lines(length(Y[,1]):(length(Y[,1]) + h), c(Y[nrow(Y), 1],point_forecast), type="l", 
+      xlim =nrow(Y)+h+5, ylim=range,
+      xlab="", ylab="", 
+      lwd=2, col = mcxs2)
+axis(1,c(3,23,43,63,83,101,nrow(Y), nrow(Y)+h),
+     c("1999","2003","2008","20013","2018","2023","", "2027"), 
+     col="black")
+axis(2, at=seq(from=range[1], to=range[2], length.out=5), 
+     labels=round(seq(from=range[1], to=range[2], length.out=5), 2),
+     col="black")
+end_y_value <- point_forecast[13] 
+abline(h = end_y_value, col="red", lty=2, lwd=1)
+abline(v = nrow(Y), col = "black")
+legend("topleft", legend=c("Data", "Forecast"), 
+       col=c(mcxs1, mcxs2), lty=c(1, 1), lwd=c(2, 2))
+polygon(c(length(Y[,1]):(length(Y[,1]) + h) , (length(Y[,1]):(length(Y[,1]) + h))[14:1]), 
+        c(Y[nrow(Y), 1], interval_forecast[1,], interval_forecast[2,h:1], Y[nrow(Y), 1]), 
+        col = mcxs1.shade1, border = mcxs1.shade1)
+
+
+limits.1    = range(Y.h[,1,])
+point.f     = apply(Y.h[,1,],1,mean)
+interval.f  = apply(Y.h[,1,],1,hdi,credMass=0.90)
+
+x           = seq(from=limits.1[1], to=limits.1[2], length.out=100)
+z           = matrix(NA,h,99)
+for (i in 1:h){
+  z[i,]     = hist(Y.h[i,1,], breaks=x, plot=FALSE)$density
+}
+x           = hist(Y.h[i,1,], breaks=x, plot=FALSE)$mids
+yy          = 1:h
+z           = t(z)
+
+theta = 180
+phi   = 15.5
+f4    = persp3D(x=x, y=yy, z=z, phi=phi, theta=theta, xlab="\nunmp[t+h|t]", ylab="h", zlab="\npredictive densities of unemployment rate", shade=NA, border=NA, ticktype="detailed", nticks=3,cex.lab=1, col=NA,plot=FALSE)
+perspbox (x=x, y=yy, z=z, bty="f", col.axis="black", phi=phi, theta=theta, xlab="\nunemployment[t+h|t]", ylab="h", zlab="\npredictive densities of unemployment rate", ticktype="detailed", nticks=3,cex.lab=1, col = NULL, plot = TRUE)
+polygon3D(x=c(interval.f[1,],interval.f[2,h:1]), y=c(1:h,h:1), z=rep(0,2*h), col = mcxs1.shade1, NAcol = "white", border = NA, add = TRUE, plot = TRUE)
+for (i in 1:h){
+  f4.l = trans3d(x=x, y=yy[i], z=z[,i], pmat=f4)
+  lines(f4.l, lwd=0.5, col="black")
+}
+f4.l1 = trans3d(x=point.f, y=yy, z=0, pmat=f4)
+lines(f4.l1, lwd=2, col=mcxs1)
+}
+
+```
+
+
+Simulate draws from the predictive density
+```{r}
+N       = 4
+p       = 4
+h           = 13
+S           = 50000 
+Y.h_minnesota = array(NA, c(h, 2, S))        
+
+#sample_minnesota        = posterior_draws(S, Y, X)
+#sample_minnesota_A      = sample_minnesota$A.posterior
+#sample_minnesota_Sigma  = sample_minnesota$Sigma.posterior
+
+# Report posterior means and sd of parameters
+A.E         = round(apply(sample_minnesota$A.posterior,1:2,mean),6)
+A.sd        = round(apply(sample_minnesota$A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(sample_minnesota$Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(sample_minnesota$Sigma.posterior,1:2,sd),6)
+
+A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
+Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
+
+kable(A_table, format = "html", caption = "Posterior A means and sd table",
+      col.names = paste0(1:ncol(A_table)))
+
+kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
+      col.names = paste0(1:ncol(Sigma_table)))
+
+
+for (s in 1:S){
+  A.posterior.draw= sample_minnesota_A[,,s]
+  Sigma.posterior = sample_minnesota_Sigma[,,s]
+  x.Ti          = Y[(nrow(Y)-p+1):nrow(Y),]
+  x.Ti          = x.Ti[p:1,]
+  for (i in 1:h){
+    x.T           = c(1,as.vector(t(x.Ti)))
+    Y.f           = rmvnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior)
+    x.Ti          = rbind(Y.f,x.Ti[1:(p-1),])
+    Y.h_minnesota[i,,s]     = Y.f[1:2]
+  }
+}
+
+forecast_plots(Y, Y.h_minnesota, h)
+
+#point_forecast    = apply(Y.h_minnesota[,1,],1,mean) 
+# 535.1734 554.6926 576.5822 598.5256 618.1544 635.2914 649.8251 662.4095 672.5107
+# 680.4133 686.5791 691.1974 694.1236
+# interval_forecast = apply(Y.h_minnesota[,1,],1,hdi,credMass=0.90)
+#        [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]     [,9]
+#lower 446.5610 424.3377 406.2926 400.4955 400.4391 402.8936 400.2963 393.8157 398.7862
+#upper 623.7617 690.5837 747.4941 793.6004 838.0991 875.0295 904.0784 924.9246 952.7060
+ #        [,10]    [,11]    [,12]    [,13]
+#lower 396.8369 388.3988 383.5023 380.5817
+#upper 970.5962 974.3133 983.4537 992.4253
+# range             = range(Y[,1],interval_forecast)
+# 1] 380.5817 992.4253
+
+```
+The plot of point forecast and density for 13 periods ahead, equivalent to 13 quarters or 3 years and 1 quarter from Q4 2023 to Q4 2026 shows a clear upward trend. The confidence interval is quite large. For the 3D plot of the density, we can see that the further the period ahead, the density is more dispersed since the data is become less informative as horizon increases.
+
+
+## Extended model
+```{r}
+N       = 4
+p       = 4
+h           = 13
+S           = 50000 
+Y.h_dummy          = array(NA,c(h,N,S))
+
+#sample_dummy        = posterior_draws_dummy(S, Y, X)
+#sample_dummy_A      = sample_dummy$A.posterior
+#sample_dummy_Sigma  = sample_dummy$Sigma.posterior
+
+###############################################
+# Report posterior means and sd of parameters
+A.E         = round(apply(sample_dummy$A.posterior,1:2,mean),6)
+A.sd        = round(apply(sample_dummy$A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(sample_dummy$Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(sample_dummy$Sigma.posterior,1:2,sd),6)
+
+A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
+Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
+
+kable(A_table, format = "html", caption = "Posterior A means and sd table",
+      col.names = paste0(1:ncol(A_table)))
+
+kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
+      col.names = paste0(1:ncol(Sigma_table)))
+
+
+for (s in 1:S){
+  A.posterior.draw= sample_dummy_A[,,s]
+  Sigma.posterior = sample_dummy_Sigma[,,s]
+  x.Ti          = Y[(nrow(Y)-p+1):nrow(Y),]
+  x.Ti          = x.Ti[p:1,]
+  for (i in 1:h){
+    x.T           = c(1,as.vector(t(x.Ti)))
+    Y.f           = rmvnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior)
+    x.Ti          = rbind(Y.f,x.Ti[1:(p-1),])
+    Y.h_dummy [i,,s]     = Y.f[1:2]
+  }
+}
+
+forecast_plots(Y, Y.h_dummy, h)
+
+# point_forecast    = apply(Y.h_dummy[,1,],1,mean) 
+# 535.1734 554.6926 576.5822 598.5256 618.1544 635.2914 649.8251 662.4095 672.5107
+# 680.4133 686.5791 691.1974 694.1236
+
+# 533.9509 550.9458 568.9793 587.4161 603.5305 617.9875 630.1286 640.4050 648.9519
+# 656.1777 662.5938 668.0913 672.2557
+#interval_forecast = apply(Y.h_dummy[,1,],1,hdi,credMass=0.90)
+#         [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]     [,9]
+#lower 445.8206 422.8802 400.8399 402.8190 398.1178 396.9932 394.8173 379.9268 390.7686
+#upper 620.2791 680.3776 730.5110 783.2426 818.7247 847.6111 870.1315 880.6080 910.7180
+#         [,10]    [,11]    [,12]    [,13]
+#lower 381.5115 384.6421 383.8001 387.7757
+# upper 923.0349 941.6345 949.5833 966.2250
+# range             = range(Y[,1],interval_forecast)
+# [1] 379.9268 987.2176
+```
+The plot of forecast for the extended model doesn't show any significant differences visually.
+
+
 
 
 ```{r}
