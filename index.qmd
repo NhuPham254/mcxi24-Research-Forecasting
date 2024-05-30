@@ -123,8 +123,8 @@ process_rba_data <- function(series_id, start_date, end_date) {
 
 #### check flow and stock, stock = end of quarter, flow= sum up
 
-# Unemployment rate ################## "6202.0", A84423130A trend, A84423046K seasonadj
-unmp_df <- process_abs_data("A84423046K", start_date, end_date)
+# Unemployment rate ################## "6202.0", A84423130A trend, A84423046K seasonadj, rate A84423050A
+unmp_df <- process_abs_data("A84423050A", start_date, end_date)
 
 # GDP per capita: Chain volume measures; ##### "5206.0", A2304404C seasonadj, old A2304372W
 gdp_df <- process_abs_data("A2304404C", start_date, end_date)
@@ -578,8 +578,8 @@ A \mid \Sigma &\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}
 # Data configuration
 N       = 4
 p       = 4
-mu      = 2
-delta   = 2
+mu      = 1000
+delta   = 1000
 
 avg_unmp <- mean(X[1, c(2, 6, 10, 14)])
 avg_gdp <- mean(X[1, c(3, 7, 11, 15)])
@@ -771,6 +771,7 @@ forecast_plots <- function(Y, Y.h, h) {
   
 point_forecast    = apply(Y.h[,1,],1,mean) 
 interval_forecast = apply(Y.h[,1,],1,hdi,credMass=0.90)
+interval_forecast_1 = apply(Y.h[,1,],1,hdi,credMass=0.68)
 range             = range(Y[,1],interval_forecast)
 
 par(mfrow=c(1,1), mar=rep(3,4),cex.axis=1)
@@ -783,7 +784,7 @@ lines(length(Y[,1]):(length(Y[,1]) + h), c(Y[nrow(Y), 1],point_forecast), type="
       xlab="", ylab="", 
       lwd=2, col = mcxs2)
 axis(1,c(3,23,43,63,83,101,nrow(Y), nrow(Y)+h),
-     c("1999","2003","2008","20013","2018","2023","", "2027"), 
+     c("1999","2003","2008","20013","2018","2023","", "2034"), 
      col="black")
 axis(2, at=seq(from=range[1], to=range[2], length.out=5), 
      labels=round(seq(from=range[1], to=range[2], length.out=5), 2),
@@ -791,12 +792,14 @@ axis(2, at=seq(from=range[1], to=range[2], length.out=5),
 end_y_value <- point_forecast[13] 
 abline(h = end_y_value, col="red", lty=2, lwd=1)
 abline(v = nrow(Y), col = "black")
-legend("topleft", legend=c("Data", "Forecast"), 
+legend("bottomleft", legend=c("Data", "Forecast"), 
        col=c(mcxs1, mcxs2), lty=c(1, 1), lwd=c(2, 2))
-polygon(c(length(Y[,1]):(length(Y[,1]) + h) , (length(Y[,1]):(length(Y[,1]) + h))[14:1]), 
+polygon(c(length(Y[,1]):(length(Y[,1]) + h), (length(Y[,1]):(length(Y[,1]) + h))[(h+1):1]), 
         c(Y[nrow(Y), 1], interval_forecast[1,], interval_forecast[2,h:1], Y[nrow(Y), 1]), 
         col = mcxs1.shade1, border = mcxs1.shade1)
-
+polygon(c(length(Y[,1]):(length(Y[,1]) + h), (length(Y[,1]):(length(Y[,1]) + h))[(h+1):1]), 
+        c(Y[nrow(Y), 1], interval_forecast_1[1,], interval_forecast_1[2,h:1], Y[nrow(Y), 1]), 
+        col = mcxs1.shade1, border = mcxs1.shade1)
 
 limits.1    = range(Y.h[,1,])
 point.f     = apply(Y.h[,1,],1,mean)
@@ -823,7 +826,6 @@ for (i in 1:h){
 f4.l1 = trans3d(x=point.f, y=yy, z=0, pmat=f4)
 lines(f4.l1, lwd=2, col=mcxs1)
 }
-
 ```
 
 
@@ -831,9 +833,9 @@ Simulate draws from the predictive density
 ```{r}
 N       = 4
 p       = 4
-h           = 13
+h           = 41
 S           = 50000 
-Y.h_minnesota = array(NA, c(h, 2, S))        
+     
 
 #sample_minnesota        = posterior_draws(S, Y, X)
 #sample_minnesota_A      = sample_minnesota$A.posterior
@@ -854,6 +856,7 @@ kable(A_table, format = "html", caption = "Posterior A means and sd table",
 kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
       col.names = paste0(1:ncol(Sigma_table)))
 
+Y.h_minnesota = array(NA, c(h, 2, S))   
 
 for (s in 1:S){
   A.posterior.draw= sample_minnesota_A[,,s]
@@ -867,6 +870,7 @@ for (s in 1:S){
     Y.h_minnesota[i,,s]     = Y.f[1:2]
   }
 }
+
 
 forecast_plots(Y, Y.h_minnesota, h)
 
@@ -893,7 +897,7 @@ For the 3D plot of the density, we can see that the further the period ahead, th
 ```{r}
 N       = 4
 p       = 4
-h           = 13
+h           = 41
 S           = 50000 
 Y.h_dummy          = array(NA,c(h,N,S))
 
@@ -952,9 +956,42 @@ forecast_plots(Y, Y.h_dummy, h)
 The plot of forecast for the extended model doesn't show any significant differences visually. The confidence interval narrowed insignificantly.
 
 
+The data used is up to September 2023. The subsequent unemployment rate is released by the 
+
+\begin{table}[ht]
+\begin{tabular}{llllllll}
+   \hline
+  & Oct-23 & Nov-23 & Dec-23 & Jan-24 & Feb-24 & Mar-24 & Apr-24\\
+  \hline
+ ABS & 3.8 & 3.9 & 4.0 & 4.1 & 3.7 & 3.9 & 4.1 \\ 
+  \hline
+ & &Q4-23 &&& Q1-24 && Q2-24\\ 
+  \hline
+ Forecast & &3.694583 &&& 3.868261 && 4.063661 \\ 
+   \hline
+\end{tabular}
+\end{table}
+```{r}
+# Create the data frame for the table
+data <- data.frame(
+  Month = c("Oct-23", "Nov-23", "Dec-23", "Jan-24", "Feb-24", "Mar-24", "Apr-24"),
+  ABS = c(3.8, 3.9, 4.0, 4.1, 3.7, 3.9, 4.1)
+)
+
+# Create the forecast data frame
+forecast <- data.frame(
+  Quarter = c("Q4-23", "Q1-24", "Q2-24"),
+  Forecast = c(3.694583, 3.868261, 4.063661)
+)
+
+kable(data, caption = "ABS Data", format="html")
+kable(forecast, caption = "Forecast Data", format="html") 
+```
+
 
 
 ```{r}
+Rcpp::sourceCpp ("ms.cpp")
 # Need Model
 # Need number of regime states -> AIC,BIC? No need, r=2
 # dummy obse prior+minnesota, 2021, 2016
