@@ -133,7 +133,7 @@ List sample_Markov_process (
   mat aux_xi_tmp = aux_xi;
   mat aux_xi_out = aux_xi;
 
-  const mat   prior_PR_TR = eye(M, M) + 1;
+  const mat   prior_PR_TR = 10 * eye(M, M) + 1;
 
   mat filtered    = filtering(Z, aux_PR_TR, aux_pi_0);
   mat smoothed    = smoothing(filtered, aux_PR_TR);
