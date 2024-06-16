@@ -461,9 +461,9 @@ nu.prior    = N+1
 
 ```{r, echo=TRUE}
 ###############################################
-# Posterior draws Normal-inverse Wishard
+# Posterior draws Normal-inverse Wishart
 ###############################################
-posterior_draws       = function (S, Y, X){
+posterior_draws       = function (S, Y, X, A.prior, V.prior, S.prior, nu.prior){
     # Posterior parameters
     V.bar.inv         = t(X)%*%X + diag(1/diag(V.prior))
     V.bar             = solve(V.bar.inv)
@@ -488,10 +488,10 @@ posterior_draws       = function (S, Y, X){
 }
 
 S = 50000
-sample_minnesota        = posterior_draws(S, Y, X)
+sample_minnesota        = posterior_draws(S, Y, X, A.prior, V.prior, S.prior, nu.prior)
 sample_minnesota_A      = sample_minnesota$A.posterior
 sample_minnesota_Sigma  = sample_minnesota$Sigma.posterior
-# sample_minnesota = posterior_draws(1000, Y, X)
+# sample_minnesota = posterior_draws(1000, Y, X, A.prior, V.prior, S.prior, nu.prior)
 ```
 
 #######################################################################################
@@ -599,7 +599,7 @@ X_d      = cbind(first_vector, Y_d, Y_d, Y_d, Y_d)
 
 
 ```{r}
-# Normal-inverse Wishard combination of specifying the prior 
+# Normal-inverse Wishart combination of specifying the prior 
 ############################################################
 V.tilde.inv   = t(X_d)%*%X_d + diag(1/diag(V.prior))
 V.tilde       = solve(V.tilde.inv)
@@ -627,8 +627,38 @@ p(\Sigma|Y,X) &\sim IW_{N}(\overline{S}, \overline{v})\\
 ###############################################
 # Posterior draws for dummy prior
 ###############################################
-posterior_draws_dummy = function(S, Y, X) {
-  # Normal-inverse Wishard posterior parameters
+posterior_draws_dummy = function(S, Y, X, A.prior, V.prior, S.prior, nu.prior) {
+  
+  N       = ncol(Y)
+  p       = (ncol(X) - 1)/N
+  mu      = 1000
+  delta   = 1000
+  
+  avg_unmp <- mean(X[1, c(2, 6, 10, 14)])
+  avg_gdp <- mean(X[1, c(3, 7, 11, 15)])
+  avg_wpi <- mean(X[1, c(4, 8, 12, 16)])
+  avg_cash <- mean(X[1, c(5, 9, 13, 17)])
+  
+  diag_mu <- diag(c(avg_unmp/mu, avg_gdp/mu, avg_wpi/mu, avg_cash/mu))
+  row_delta <-  matrix(c(avg_unmp/delta, avg_gdp/delta, avg_wpi/delta, avg_cash/delta), nrow = 1)
+  
+  Y_d       = rbind(diag_mu, row_delta)
+  
+  first_vector <- matrix(c(0,0,0,0, 1/delta), ncol = 1)
+  X_d      = cbind(first_vector, Y_d, Y_d, Y_d, Y_d)
+  
+  # Normal-inverse Wishart combination of specifying the prior 
+  ############################################################
+  V.tilde.inv   = t(X_d)%*%X_d + diag(1/diag(V.prior))
+  V.tilde       = solve(V.tilde.inv)
+  A.tilde       = V.tilde%*%(t(X_d)%*%Y_d + diag(1/diag(V.prior))%*%A.prior)
+  nu.tilde      = nrow(Y_d) + nu.prior
+  S.tilde       = S.prior + t(Y_d)%*%Y_d + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior -
+    t(A.tilde)%*%V.tilde.inv%*%A.tilde
+  S.tilde.inv   = solve(S.tilde)
+  
+
+  # Normal-inverse Wishart posterior parameters
   V.bar.inv   = t(X)%*%X + diag(1/diag(V.tilde))
   V.bar       = solve(V.bar.inv)
   A.bar       = V.bar%*%(t(X)%*%Y + diag(1/diag(V.tilde))%*%A.tilde)
@@ -650,7 +680,7 @@ posterior_draws_dummy = function(S, Y, X) {
   return(output)
 }
 S = 50000
-sample_dummy        = posterior_draws_dummy(S, Y, X)
+sample_dummy        = posterior_draws_dummy(S, Y, X, A.prior, V.prior, S.prior, nu.prior)
 sample_dummy_A      = sample_dummy$A.posterior
 sample_dummy_Sigma  = sample_dummy$Sigma.posterior
 ```
@@ -691,7 +721,7 @@ S.prior     = diag(diag(Sigma.hat))
 nu.prior    = N+1
 
 ############################################################
-sample_minnesota_proof = posterior_draws(1000, Y_p, X_p)
+sample_minnesota_proof = posterior_draws(1000, Y_p, X_p, A.prior, V.prior, S.prior, nu.prior)
 
 # Report posterior means and sd of parameters
 A.E         = round(apply(sample_minnesota_proof$A.posterior,1:2,mean),6)
@@ -726,7 +756,7 @@ Y_d       = rbind(diag_mu, row_delta)
 first_vector <- matrix(c(0,0, 1/delta), ncol = 1)
 X_d      = cbind(first_vector, Y_d)
 
-# Normal-inverse Wishard prior parameters
+# Normal-inverse Wishart prior parameters
 ############################################################
 V.tilde.inv     = t(X_d)%*%X_d + diag(1/diag(V.prior))
 V.tilde       = solve(V.tilde.inv)
@@ -736,7 +766,7 @@ S.tilde       = S.prior + t(Y_d)%*%Y_d + t(A.prior)%*%diag(1/diag(V.prior))%*%A.
 S.tilde.inv   = solve(S.tilde)
 
 ############################################################
-sample_dummy_proof = posterior_draws_dummy(1000, Y_p, X_p)
+sample_dummy_proof = posterior_draws_dummy(1000, Y_p, X_p, A.prior, V.prior, S.prior, nu.prior)
 
 # Report posterior means and sd of parameters
 A.E         = round(apply(sample_dummy_proof$A.posterior,1:2,mean),6)
@@ -852,7 +882,7 @@ h           = 41
 S           = 50000 
      
 
-#sample_minnesota        = posterior_draws(S, Y, X)
+#sample_minnesota        = posterior_draws(S, Y, X, A.prior, V.prior, S.prior, nu.prior)
 #sample_minnesota_A      = sample_minnesota$A.posterior
 #sample_minnesota_Sigma  = sample_minnesota$Sigma.posterior
 
@@ -917,7 +947,7 @@ h           = 41
 S           = 50000 
 Y.h_dummy          = array(NA,c(h,N,S))
 
-#sample_dummy        = posterior_draws_dummy(S, Y, X)
+#sample_dummy        = posterior_draws_dummy(S, Y, X, A.prior, V.prior, S.prior, nu.prior)
 #sample_dummy_A      = sample_dummy$A.posterior
 #sample_dummy_Sigma  = sample_dummy$Sigma.posterior
 
