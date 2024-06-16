@@ -868,6 +868,7 @@ for (s in 1:S){
   x.Ti          = x.Ti[p:1,]
   for (i in 1:h){
     x.T           = c(1,as.vector(t(x.Ti)))
+    
     Y.f           = rmvnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior)
     x.Ti          = rbind(Y.f,x.Ti[1:(p-1),])
     Y.h_minnesota[i,,s]     = Y.f[1:2]
@@ -1100,7 +1101,6 @@ Sigma.hat = t(Y - X %*% A.hat) %*% (Y - X %*% A.hat) / T
 kappa.1 = 1
 kappa.2 = 100
 A.prior = matrix(0, nrow = nrow(A.hat), ncol = ncol(A.hat))
-#A.prior[2:5, 1:4] = diag(1, nrow = 2)
 #A.prior[2:5, 1:4] = diag(1, nrow = 4)
 V.prior = diag(c(kappa.2, kappa.1 * ((1:p)^(-2)) %x% rep(1, N)))
 S.prior = diag(diag(Sigma.hat))
@@ -1182,7 +1182,6 @@ Gibbs_draws = function(S, Y, X, xi, P, pi) {
         }
         
         # Compute Z_m for the next iteration
-        #Z[, , m] = (Y_m - X_m %*% A.bar) %*% t(solve(L))
         LL = t(chol(Sigma.posterior))
         Z[, , m] <-   t((Y - X %*% A.posterior) %*% LL)
       }
@@ -1244,9 +1243,25 @@ Markov.draws$pi[c(2, 1), 1000]
 #hist(Markov.draws$Sigma.posterior2[1,1,], breaks = 100)
 #plot(Markov.draws$Sigma.posterior1[1,1,],Markov.draws$Sigma.posterior2[1,1,])
 #plot.ts(t(apply(Markov.draws$xi, 1:2, mean)))
+#apply(Markov.draws$A.posterior1, 1:2, mean)
+#round(apply(Markov.draws$A.posterior1, 1:2, mean),3)
+#round(apply(Markov.draws$A.posterior2, 1:2, mean),3)
+#plot.ts(t(apply(Markov.draws$xi, 1:2, mean)))
+#plot.ts(t(apply(Markov.draws$Sigma.posterior1, 1:2, mean)))
+#apply(Markov.draws$Sigma.posterior1, 1:2, mean)
+#round(apply(Markov.draws$Sigma.posterior1, 1:2, mean),3)
+#round(apply(Markov.draws$Sigma.posterior2, 1:2, mean),3)
+#round(apply(Markov.draws$P, 1:2, mean),3)
+#round(apply(Markov.draws$A.posterior1, 1:2, mean),3)
+# round(apply(Markov.draws$A.posterior2, 1:2, mean),3)
+#round(apply(Markov.draws$A.posterior1, 1:2, sd),3)
+#round(apply(Markov.draws$A.posterior2, 1:2, sd),3)
+
+
+#sample.int(2,1, prob=c(0.01,.99))
 ```
 
-```{r}
+```{r, eval=FALSE}
 for (s in 1:S) {
   if (Markov.draws$Sigma.posterior1[1, 1, s] < Markov.draws$Sigma.posterior2[1, 1, s]) {
     # Swap Sigma
@@ -1273,10 +1288,56 @@ for (s in 1:S) {
 }
 
 ```
+
+
+
 We can check to see if the draws are correctly put in the correct regime, with regime 1 
 being regime with higher volatility, we can plot the sigmas of two regime.
 
 
+```{r}
+
+Y.h_Markov = array(NA, c(h, 2, S))
+
+for (s in 1:S){
+  #A.posterior.draw= sample_minnesota_A[,,s]
+  #Sigma.posterior = sample_minnesota_Sigma[,,s]
+  A.posterior.draw1 = Markov.draws$A.posterior1[,,s]
+  A.posterior.draw2 = Markov.draws$A.posterior2[,,s]
+  Sigma.posterior1 = Markov.draws$Sigma.posterior1[,,s]
+  Sigma.posterior2 = Markov.draws$Sigma.posterior2[,,s]
+  
+  T = dim(Markov.draws$xi)[2]
+  
+  x.Ti          = Y[(nrow(Y)-p+1):nrow(Y),]
+  x.Ti          = x.Ti[p:1,]
+    
+  P_h = Markov.draws$P[,,s] %*% Markov.draws$xi[,T,s]  # Initializing P_h
+  
+  for (i in 1:h){
+    x.T         = c(1, as.vector(t(x.Ti)))
+    
+    if (i > 1) {  # Only update P_h if i > 1
+      P_h = Markov.draws$P[,,s] %*% P_h
+    }
+    sample_m = sample.int(2,1, prob=as.numeric(P_h))
+    
+    if (sample_m == 1) {
+      A.posterior.draw = A.posterior.draw1
+      Sigma.posterior = Sigma.posterior1
+    } else {
+      A.posterior.draw = A.posterior.draw2
+      Sigma.posterior = Sigma.posterior2
+    }
+    
+    Y.f           = rmvnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior)
+    x.Ti          = rbind(Y.f,x.Ti[1:(p-1),])
+    Y.h_Markov[i,,s]     = Y.f[1:2]
+  }
+}
+
+forecast_plots(Y, Y.h_Markov, h)
+```
 
 
 
