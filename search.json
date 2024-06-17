@@ -1,0 +1,23 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Forecasting Unemployment rate using Baysian Vars with Regime change",
+    "section": "",
+    "text": "Abstract. Research on how Baysian Vars with regime change affect the forecasting of unemployment rate\nKeywords. bsvars, regime change, forecasting, R,"
+  },
+  {
+    "objectID": "index.html#some-hints",
+    "href": "index.html#some-hints",
+    "title": "Forecasting Unemployment rate using Baysian Vars with Regime change",
+    "section": "Some Hints",
+    "text": "Some Hints\nHave a look at how to work with RStudio and GitHub at: How to use git and GitHub with R.\nThese are many different ways of how to work with references in RStudio: Preview Citations.\nTo make all the R code visible on the website change the settings in the preabmble of this document to:\nexecute:\n  echo: true"
+  },
+  {
+    "objectID": "index.html#references",
+    "href": "index.html#references",
+    "title": "Forecasting Unemployment rate using Baysian Vars with Regime change",
+    "section": "References",
+    "text": "References"
+  }
+]
