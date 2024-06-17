@@ -1192,6 +1192,12 @@ Markov.draws = Gibbs_draws(S, Y, X, xi, P, pi)
 plot.ts(t(apply(Markov.draws$xi, 1:2, mean)))
 ```
 
+We can check to see if the draws are correctly put in the correct regime, with regime 1 
+being regime with higher volatility, we can plot the sigmas of two regime.
+```{r}
+plot.ts(t(apply(Markov.draws$xi, 1:2, mean)))
+```
+
 
 ```{r, eval=FALSE}
 dim(Markov.draws$Sigma.posterior1)
@@ -1270,8 +1276,255 @@ Markov.draws <- label_switching(Markov.draws)
 plot.ts(t(apply(Markov.draws$xi, 1:2, mean)))
 ```
 
-We can check to see if the draws are correctly put in the correct regime, with regime 1 
-being regime with higher volatility, we can plot the sigmas of two regime.
+After the regimes are correctly placed, we can forecast h-step ahead
+
+```{r }
+
+Y.h_Markov = array(NA, c(h, 2, S))
+
+for (s in 1:S){
+  #A.posterior.draw= sample_minnesota_A[,,s]
+  #Sigma.posterior = sample_minnesota_Sigma[,,s]
+  A.posterior.draw1 = Markov.draws$A.posterior1[,,s]
+  A.posterior.draw2 = Markov.draws$A.posterior2[,,s]
+  Sigma.posterior1 = Markov.draws$Sigma.posterior1[,,s]
+  Sigma.posterior2 = Markov.draws$Sigma.posterior2[,,s]
+  
+  T = dim(Markov.draws$xi)[2]
+  
+  x.Ti          = Y[(nrow(Y)-p+1):nrow(Y),]
+  x.Ti          = x.Ti[p:1,]
+    
+  P_h = Markov.draws$P[,,s] %*% Markov.draws$xi[,T,s]  # Initializing P_h
+  
+  for (i in 1:h){
+    x.T         = c(1, as.vector(t(x.Ti)))
+    
+    if (i > 1) {  # Only update P_h if i > 1
+      P_h = Markov.draws$P[,,s] %*% P_h
+    }
+    sample_m = sample.int(2,1, prob=as.numeric(P_h))
+    
+    if (sample_m == 1) {
+      A.posterior.draw = A.posterior.draw1
+      Sigma.posterior = Sigma.posterior1
+    } else {
+      A.posterior.draw = A.posterior.draw2
+      Sigma.posterior = Sigma.posterior2
+    }
+    
+    Y.f           = rmvnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior)
+    x.Ti          = rbind(Y.f,x.Ti[1:(p-1),])
+    Y.h_Markov[i,,s]     = Y.f[1:2]
+  }
+}
+
+forecast_plots(Y, Y.h_Markov, h, theta = 180, phi = 15.5, xlim = c(-100, 100))
+```
+
+## Final model
+
+The final model is the combination of Minnesota prior, dummy obervation prior and 
+Markov-switching to account for heteroskedasticity.
+
+```{r}
+# Data configuration
+N       = 4
+p       = 4
+
+y       = merged_df
+y       = ts(y[,c(2,3,4,5)], start = c(1997,3), frequency = 4,
+              names=c("unmp","gdp","wpi","cashrate"))
+Y       = ts(y[5:nrow(y),], start = c(1998,3), frequency = 4)
+
+X       = matrix(1,nrow(Y),1)
+for (i in 1:p){
+  X     = cbind(X,y[5:nrow(y)-i,])
+}
+```
+
+
+```{r}
+A.hat = solve(t(X) %*% X) %*% t(X) %*% Y
+Sigma.hat = t(Y - X %*% A.hat) %*% (Y - X %*% A.hat) / T
+
+kappa.1 = 1
+kappa.2 = 100
+A.prior = matrix(0, nrow = nrow(A.hat), ncol = ncol(A.hat))
+#A.prior[2:5, 1:4] = diag(1, nrow = 4)
+V.prior = diag(c(kappa.2, kappa.1 * ((1:p)^(-2)) %x% rep(1, N)))
+S.prior = diag(diag(Sigma.hat))
+nu.prior = N + 1
+```
+
+```{r}
+S = 10000
+# Gibbs sampling function
+FinalGibbs_draws = function(S, Y, X, xi, P, pi) {
+  N = ncol(Y)
+  p = (ncol(X) - 1) / N 
+  M = 2   # Number of regimes
+  T = nrow(Y)
+  
+  mu      = 1000
+  delta   = 1000
+  
+  avg_unmp <- mean(X[1, c(2, 6, 10, 14)])
+  avg_gdp <- mean(X[1, c(3, 7, 11, 15)])
+  avg_wpi <- mean(X[1, c(4, 8, 12, 16)])
+  avg_cash <- mean(X[1, c(5, 9, 13, 17)])
+  
+  diag_mu <- diag(c(avg_unmp/mu, avg_gdp/mu, avg_wpi/mu, avg_cash/mu))
+  row_delta <-  matrix(c(avg_unmp/delta, avg_gdp/delta, avg_wpi/delta, avg_cash/delta), 
+                       nrow = 1)
+  
+  Y_d       = rbind(diag_mu, row_delta)
+  
+  first_vector <- matrix(c(0,0,0,0, 1/delta), ncol = 1)
+  X_d      = cbind(first_vector, Y_d, Y_d, Y_d, Y_d)
+  
+  # Normal-inverse Wishart prior parameters
+  ############################################################
+  V.tilde.inv   = t(X_d)%*%X_d + diag(1/diag(V.prior))
+  V.tilde       = solve(V.tilde.inv)
+  A.tilde       = V.tilde%*%(t(X_d)%*%Y_d + diag(1/diag(V.prior))%*%A.prior)
+  nu.tilde      = nrow(Y_d) + nu.prior
+  S.tilde       = S.prior + t(Y_d)%*%Y_d + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior -
+    t(A.tilde)%*%V.tilde.inv%*%A.tilde
+  S.tilde.inv   = solve(S.tilde)
+
+  Sigma.posterior.draws1 = array(NA, c(N, N, S))
+  Sigma.posterior.draws2 = array(NA, c(N, N, S))
+  A.posterior.draws1 = array(NA, c((1 + p * N), N, S))
+  A.posterior.draws2 = array(NA, c((1 + p * N), N, S))
+  xi.draws <- array(NA, dim = c(M, T, S))
+  P.draws <- array(NA, c(2, 2, S))
+  pi.draws <- matrix(NA, nrow = M, ncol = S)
+
+  P = 0.95 * diag(2) + 0.025
+  pi = c(0.5, 0.5)
+  xi = rbind(c(rep(1,50), rep(0,T-50)), c(rep(0,50), rep(1,T-50)))
+  Z = array(rnorm(T*N*M), c(N,T,M))
+
+  
+  for (s in 1:S) {
+    # Update xi, P, and pi using the sample_Markov_process function
+    gibbs_draw = sample_Markov_process(Z, xi, P, pi)
+    xi = gibbs_draw$aux_xi
+    P = gibbs_draw$aux_PR_TR
+    pi = gibbs_draw$aux_pi_0
+    
+    xi.draws[, , s] <- xi
+    P.draws[, , s] <- P
+    pi.draws[, s] <- pi
+    
+    # Loop to get regime-specific Y, X, Sigma, A
+    for (m in 1:2) {
+      Y_m =  Y[xi[m,]==1,]
+      X_m =  X[xi[m,]==1,]
+      T_m = nrow(Y_m)
+      
+      if (T_m > 0) {
+        # Posterior parameters
+        V.bar.inv = t(X_m) %*% X_m + diag(1 / diag(V.tilde))
+        V.bar = solve(V.bar.inv)
+        A.bar = V.bar %*% (t(X_m) %*% Y_m + diag(1 / diag(V.tilde)) %*% A.tilde)
+        nu.bar = T_m + nu.tilde
+        S.bar = S.tilde + t(Y_m) %*% Y_m + t(A.tilde) %*% diag(1 / diag(V.tilde)) %*% A.tilde -                 t(A.bar) %*% V.bar.inv %*% A.bar
+        S.bar.inv = solve(S.bar)
+        
+        # Posterior draws for Sigma
+        Sigma.posterior = rWishart(1, df = nu.bar, Sigma = S.bar.inv)
+        Sigma.posterior = solve(Sigma.posterior[, , 1])
+        if (m == 1) {
+          Sigma.posterior.draws1[, , s] = Sigma.posterior
+        } else {
+          Sigma.posterior.draws2[, , s] = Sigma.posterior
+        }
+        
+        # Posterior draws for A
+        L = t(chol(V.bar))
+        xx = matrix(rnorm(prod(dim(A.bar))), dim(A.bar)[1], dim(A.bar)[2])
+        
+        A.posterior <- A.bar + L %*% xx %*% chol(Sigma.posterior)
+        if (m == 1) {
+          A.posterior.draws1[, , s] = A.posterior
+        } else {
+          A.posterior.draws2[, , s] = A.posterior
+        }
+        
+        # Compute Z_m for the next iteration
+        LL = t(chol(Sigma.posterior))
+        Z[, , m] <-   t((Y - X %*% A.posterior) %*% LL)
+      }
+    }
+  }
+
+  output = list(
+    A.posterior1 = A.posterior.draws1,
+    A.posterior2 = A.posterior.draws2,
+    Sigma.posterior1 = Sigma.posterior.draws1,
+    Sigma.posterior2 = Sigma.posterior.draws2,
+    xi = xi.draws,
+    P = P.draws,
+    pi = pi.draws
+  )
+  return(output)
+}
+
+Final.draws = FinalGibbs_draws(S, Y, X, xi, P, pi)
+plot.ts(t(apply(Final.draws$xi, 1:2, mean)))
+```
+
+```{r}
+Final.draws <- label_switching(Final.draws)
+plot.ts(t(apply(Final.draws$xi, 1:2, mean)))
+```
+
+```{r}
+Y.h_Final = array(NA, c(h, 2, S))
+
+for (s in 1:S){
+  #A.posterior.draw= sample_minnesota_A[,,s]
+  #Sigma.posterior = sample_minnesota_Sigma[,,s]
+  A.posterior.draw1 = Final.draws$A.posterior1[,,s]
+  A.posterior.draw2 = Final.draws$A.posterior2[,,s]
+  Sigma.posterior1 = Final.draws$Sigma.posterior1[,,s]
+  Sigma.posterior2 = Final.draws$Sigma.posterior2[,,s]
+  
+  T = dim(Final.draws$xi)[2]
+  
+  x.Ti          = Y[(nrow(Y)-p+1):nrow(Y),]
+  x.Ti          = x.Ti[p:1,]
+    
+  P_h = Final.draws$P[,,s] %*% Final.draws$xi[,T,s]  # Initializing P_h
+  
+  for (i in 1:h){
+    x.T         = c(1, as.vector(t(x.Ti)))
+    
+    if (i > 1) {  # Only update P_h if i > 1
+      P_h = Final.draws$P[,,s] %*% P_h
+    }
+    sample_m = sample.int(2,1, prob=as.numeric(P_h))
+    
+    if (sample_m == 1) {
+      A.posterior.draw = A.posterior.draw1
+      Sigma.posterior = Sigma.posterior1
+    } else {
+      A.posterior.draw = A.posterior.draw2
+      Sigma.posterior = Sigma.posterior2
+    }
+    
+    Y.f           = rmvnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior)
+    x.Ti          = rbind(Y.f,x.Ti[1:(p-1),])
+    Y.h_Final[i,,s]     = Y.f[1:2]
+  }
+}
+
+forecast_plots(Y, Y.h_Final, h, theta = 190, phi = 10, xlim = c(-10, 20))
+```
+
+
 
 
 
