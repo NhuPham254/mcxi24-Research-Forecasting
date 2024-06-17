@@ -1471,6 +1471,7 @@ Full_draws = function(S, Y, X, xi, P, pi) {
 }
 
 Markov.draws = Gibbs_draws(S, Y, X, xi, P, pi)
+
 ```
 
 # References {.unnumbered}
