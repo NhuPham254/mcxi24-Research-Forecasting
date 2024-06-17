@@ -190,6 +190,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#basic-model-2" id="toc-basic-model-2" class="nav-link" data-scroll-target="#basic-model-2">Basic model</a></li>
   <li><a href="#extended-model-1" id="toc-extended-model-1" class="nav-link" data-scroll-target="#extended-model-1">Extended model</a></li>
+  <li><a href="#extension-2" id="toc-extension-2" class="nav-link" data-scroll-target="#extension-2">Extension 2</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
@@ -310,8 +311,8 @@ window.Quarto = {
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>            Dickey_Fuller p_value
-unmp_df            -2.544   0.350
-gdp_df             -1.823   0.650
+unmp_df            -2.545   0.350
+gdp_df             -1.826   0.649
 wpi_df             -2.265   0.467
 cashrate_df        -3.409   0.056</code></pre>
 </div>
@@ -424,9 +425,9 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 \end{align}\]</span></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Posterior draws Normal-inverse Wishard</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Posterior draws Normal-inverse Wishart</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>posterior_draws       <span class="ot">=</span> <span class="cf">function</span> (S, Y, X){</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>posterior_draws       <span class="ot">=</span> <span class="cf">function</span> (S, Y, X, A.prior, V.prior, S.prior, nu.prior){</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Posterior parameters</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    V.bar.inv         <span class="ot">=</span> <span class="fu">t</span>(X)<span class="sc">%*%</span>X <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    V.bar             <span class="ot">=</span> <span class="fu">solve</span>(V.bar.inv)</span>
@@ -451,10 +452,10 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>S <span class="ot">=</span> <span class="dv">50000</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>sample_minnesota        <span class="ot">=</span> <span class="fu">posterior_draws</span>(S, Y, X)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>sample_minnesota        <span class="ot">=</span> <span class="fu">posterior_draws</span>(S, Y, X, A.prior, V.prior, S.prior, nu.prior)</span>
 <span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>sample_minnesota_A      <span class="ot">=</span> sample_minnesota<span class="sc">$</span>A.posterior</span>
 <span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>sample_minnesota_Sigma  <span class="ot">=</span> sample_minnesota<span class="sc">$</span>Sigma.posterior</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co"># sample_minnesota = posterior_draws(1000, Y, X)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co"># sample_minnesota = posterior_draws(1000, Y, X, A.prior, V.prior, S.prior, nu.prior)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="section" class="level87">
 <p class="heading"></p>
@@ -536,32 +537,62 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Posterior draws for dummy prior</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>posterior_draws_dummy <span class="ot">=</span> <span class="cf">function</span>(S, Y, X) {</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Normal-inverse Wishard posterior parameters</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  V.bar.inv   <span class="ot">=</span> <span class="fu">t</span>(X)<span class="sc">%*%</span>X <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.tilde))</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  V.bar       <span class="ot">=</span> <span class="fu">solve</span>(V.bar.inv)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  A.bar       <span class="ot">=</span> V.bar<span class="sc">%*%</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span>Y <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.tilde))<span class="sc">%*%</span>A.tilde)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  nu.bar      <span class="ot">=</span> <span class="fu">nrow</span>(Y) <span class="sc">+</span> nu.tilde</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  S.bar       <span class="ot">=</span> S.tilde <span class="sc">+</span> <span class="fu">t</span>(Y)<span class="sc">%*%</span>Y <span class="sc">+</span> <span class="fu">t</span>(A.tilde)<span class="sc">%*%</span><span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.tilde))<span class="sc">%*%</span>A.tilde <span class="sc">-</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                <span class="fu">t</span>(A.bar)<span class="sc">%*%</span>V.bar.inv<span class="sc">%*%</span>A.bar</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  S.bar.inv   <span class="ot">=</span> <span class="fu">solve</span>(S.bar)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Posterior draws </span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior   <span class="ot">=</span> <span class="fu">rWishart</span>(S, <span class="at">df=</span>nu.bar, <span class="at">Sigma=</span>S.bar.inv)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior   <span class="ot">=</span> <span class="fu">apply</span>(Sigma.posterior,<span class="dv">3</span>,solve)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior   <span class="ot">=</span> <span class="fu">array</span>(Sigma.posterior,<span class="fu">c</span>(N,N,S))</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  A.posterior       <span class="ot">=</span> <span class="fu">array</span>(<span class="fu">rnorm</span>(<span class="fu">prod</span>(<span class="fu">c</span>(<span class="fu">dim</span>(A.bar),S))),<span class="fu">c</span>(<span class="fu">dim</span>(A.bar),S))</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  L                 <span class="ot">=</span> <span class="fu">t</span>(<span class="fu">chol</span>(V.bar))</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    A.posterior[,,s]<span class="ot">=</span> A.bar <span class="sc">+</span> L<span class="sc">%*%</span>A.posterior[,,s]<span class="sc">%*%</span><span class="fu">chol</span>(Sigma.posterior[,,s])</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  output            <span class="ot">=</span> <span class="fu">list</span>(<span class="at">A.posterior=</span>A.posterior, <span class="at">Sigma.posterior=</span>Sigma.posterior)</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(output)</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>S <span class="ot">=</span> <span class="dv">50000</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>sample_dummy        <span class="ot">=</span> <span class="fu">posterior_draws_dummy</span>(S, Y, X)</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>sample_dummy_A      <span class="ot">=</span> sample_dummy<span class="sc">$</span>A.posterior</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>sample_dummy_Sigma  <span class="ot">=</span> sample_dummy<span class="sc">$</span>Sigma.posterior</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>posterior_draws_dummy <span class="ot">=</span> <span class="cf">function</span>(S, Y, X, A.prior, V.prior, S.prior, nu.prior) {</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  N       <span class="ot">=</span> <span class="fu">ncol</span>(Y)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  p       <span class="ot">=</span> (<span class="fu">ncol</span>(X) <span class="sc">-</span> <span class="dv">1</span>)<span class="sc">/</span>N</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  mu      <span class="ot">=</span> <span class="dv">1000</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  delta   <span class="ot">=</span> <span class="dv">1000</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dim</span>(X)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  avg_unmp <span class="ot">&lt;-</span> <span class="fu">mean</span>(X[<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">6</span>, <span class="dv">10</span>, <span class="dv">14</span>)])</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  avg_gdp <span class="ot">&lt;-</span> <span class="fu">mean</span>(X[<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">11</span>, <span class="dv">15</span>)])</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  avg_wpi <span class="ot">&lt;-</span> <span class="fu">mean</span>(X[<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">12</span>, <span class="dv">16</span>)])</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  avg_cash <span class="ot">&lt;-</span> <span class="fu">mean</span>(X[<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">13</span>, <span class="dv">17</span>)])</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  diag_mu <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="fu">c</span>(avg_unmp<span class="sc">/</span>mu, avg_gdp<span class="sc">/</span>mu, avg_wpi<span class="sc">/</span>mu, avg_cash<span class="sc">/</span>mu))</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  row_delta <span class="ot">&lt;-</span>  <span class="fu">matrix</span>(<span class="fu">c</span>(avg_unmp<span class="sc">/</span>delta, avg_gdp<span class="sc">/</span>delta, avg_wpi<span class="sc">/</span>delta, avg_cash<span class="sc">/</span>delta), <span class="at">nrow =</span> <span class="dv">1</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  Y_d       <span class="ot">=</span> <span class="fu">rbind</span>(diag_mu, row_delta)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  first_vector <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>, <span class="dv">1</span><span class="sc">/</span>delta), <span class="at">ncol =</span> <span class="dv">1</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  X_d      <span class="ot">=</span> <span class="fu">cbind</span>(first_vector, Y_d, Y_d, Y_d, Y_d)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Normal-inverse Wishart combination of specifying the prior </span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="do">############################################################</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  V.tilde.inv   <span class="ot">=</span> <span class="fu">t</span>(X_d)<span class="sc">%*%</span>X_d <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  V.tilde       <span class="ot">=</span> <span class="fu">solve</span>(V.tilde.inv)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  A.tilde       <span class="ot">=</span> V.tilde<span class="sc">%*%</span>(<span class="fu">t</span>(X_d)<span class="sc">%*%</span>Y_d <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))<span class="sc">%*%</span>A.prior)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  nu.tilde      <span class="ot">=</span> <span class="fu">nrow</span>(Y_d) <span class="sc">+</span> nu.prior</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  S.tilde       <span class="ot">=</span> S.prior <span class="sc">+</span> <span class="fu">t</span>(Y_d)<span class="sc">%*%</span>Y_d <span class="sc">+</span> <span class="fu">t</span>(A.prior)<span class="sc">%*%</span><span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))<span class="sc">%*%</span>A.prior <span class="sc">-</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">t</span>(A.tilde)<span class="sc">%*%</span>V.tilde.inv<span class="sc">%*%</span>A.tilde</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  S.tilde.inv   <span class="ot">=</span> <span class="fu">solve</span>(S.tilde)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Normal-inverse Wishart posterior parameters</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  V.bar.inv   <span class="ot">=</span> <span class="fu">t</span>(X)<span class="sc">%*%</span>X <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.tilde))</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>  V.bar       <span class="ot">=</span> <span class="fu">solve</span>(V.bar.inv)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  A.bar       <span class="ot">=</span> V.bar<span class="sc">%*%</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span>Y <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.tilde))<span class="sc">%*%</span>A.tilde)</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  nu.bar      <span class="ot">=</span> <span class="fu">nrow</span>(Y) <span class="sc">+</span> nu.tilde</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  S.bar       <span class="ot">=</span> S.tilde <span class="sc">+</span> <span class="fu">t</span>(Y)<span class="sc">%*%</span>Y <span class="sc">+</span> <span class="fu">t</span>(A.tilde)<span class="sc">%*%</span><span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.tilde))<span class="sc">%*%</span>A.tilde <span class="sc">-</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>                <span class="fu">t</span>(A.bar)<span class="sc">%*%</span>V.bar.inv<span class="sc">%*%</span>A.bar</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>  S.bar.inv   <span class="ot">=</span> <span class="fu">solve</span>(S.bar)</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Posterior draws </span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior   <span class="ot">=</span> <span class="fu">rWishart</span>(S, <span class="at">df=</span>nu.bar, <span class="at">Sigma=</span>S.bar.inv)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior   <span class="ot">=</span> <span class="fu">apply</span>(Sigma.posterior,<span class="dv">3</span>,solve)</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior   <span class="ot">=</span> <span class="fu">array</span>(Sigma.posterior,<span class="fu">c</span>(N,N,S))</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>  A.posterior       <span class="ot">=</span> <span class="fu">array</span>(<span class="fu">rnorm</span>(<span class="fu">prod</span>(<span class="fu">c</span>(<span class="fu">dim</span>(A.bar),S))),<span class="fu">c</span>(<span class="fu">dim</span>(A.bar),S))</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>  L                 <span class="ot">=</span> <span class="fu">t</span>(<span class="fu">chol</span>(V.bar))</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    A.posterior[,,s]<span class="ot">=</span> A.bar <span class="sc">+</span> L<span class="sc">%*%</span>A.posterior[,,s]<span class="sc">%*%</span><span class="fu">chol</span>(Sigma.posterior[,,s])</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>  output            <span class="ot">=</span> <span class="fu">list</span>(<span class="at">A.posterior=</span>A.posterior, <span class="at">Sigma.posterior=</span>Sigma.posterior)</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(output)</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>S <span class="ot">=</span> <span class="dv">50000</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>sample_dummy        <span class="ot">=</span> <span class="fu">posterior_draws_dummy</span>(S, Y, X, A.prior, V.prior, S.prior, nu.prior)</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>sample_dummy_A      <span class="ot">=</span> sample_dummy<span class="sc">$</span>A.posterior</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>sample_dummy_Sigma  <span class="ot">=</span> sample_dummy<span class="sc">$</span>Sigma.posterior</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -629,62 +660,6 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 </section>
 <section id="extended-model" class="level3">
 <h3 class="anchored" data-anchor-id="extended-model">Extended model</h3>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<table data-quarto-postprocess="true" class="table table-sm table-striped small">
-<caption>Posterior mean of autoregressive</caption>
-<thead>
-<tr class="header">
-<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">0.076898</td>
-<td style="text-align: right;">-0.007959</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">0.994226</td>
-<td style="text-align: right;">-0.000258</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">0.001807</td>
-<td style="text-align: right;">0.995826</td>
-</tr>
-</tbody>
-</table>
-
-
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<table data-quarto-postprocess="true" class="table table-sm table-striped small">
-<caption>Posterior mean of covarince</caption>
-<thead>
-<tr class="header">
-<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">0.977324</td>
-<td style="text-align: right;">0.002316</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">0.002316</td>
-<td style="text-align: right;">1.032249</td>
-</tr>
-</tbody>
-</table>
-
-
-</div>
-</div>
-</div>
 </section>
 </section>
 </section>
@@ -708,7 +683,7 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="do">############################################################</span></span>
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Point forecasts 2D plot</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>forecast_plots <span class="ot">&lt;-</span> <span class="cf">function</span>(Y, Y.h, h) {</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>forecast_plots <span class="ot">&lt;-</span> <span class="cf">function</span>(Y, Y.h, h, <span class="at">theta =</span> <span class="dv">180</span>, <span class="at">phi =</span> <span class="fl">15.5</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>)) {</span>
 <span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>point_forecast    <span class="ot">=</span> <span class="fu">apply</span>(Y.h[,<span class="dv">1</span>,],<span class="dv">1</span>,mean) </span>
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>interval_forecast <span class="ot">=</span> <span class="fu">apply</span>(Y.h[,<span class="dv">1</span>,],<span class="dv">1</span>,hdi,<span class="at">credMass=</span><span class="fl">0.90</span>)</span>
@@ -755,18 +730,28 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 <span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>yy          <span class="ot">=</span> <span class="dv">1</span><span class="sc">:</span>h</span>
 <span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>z           <span class="ot">=</span> <span class="fu">t</span>(z)</span>
 <span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">=</span> <span class="dv">180</span></span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>phi   <span class="ot">=</span> <span class="fl">15.5</span></span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>f4    <span class="ot">=</span> <span class="fu">persp3D</span>(<span class="at">x=</span>x, <span class="at">y=</span>yy, <span class="at">z=</span>z, <span class="at">phi=</span>phi, <span class="at">theta=</span>theta, <span class="at">xlab=</span><span class="st">"</span><span class="sc">\n</span><span class="st">unmp[t+h|t]"</span>, <span class="at">ylab=</span><span class="st">"h"</span>, <span class="at">zlab=</span><span class="st">"</span><span class="sc">\n</span><span class="st">predictive densities of unemployment rate"</span>, <span class="at">shade=</span><span class="cn">NA</span>, <span class="at">border=</span><span class="cn">NA</span>, <span class="at">ticktype=</span><span class="st">"detailed"</span>, <span class="at">nticks=</span><span class="dv">3</span>,<span class="at">cex.lab=</span><span class="dv">1</span>, <span class="at">col=</span><span class="cn">NA</span>,<span class="at">plot=</span><span class="cn">FALSE</span>)</span>
-<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a><span class="fu">perspbox</span> (<span class="at">x=</span>x, <span class="at">y=</span>yy, <span class="at">z=</span>z, <span class="at">bty=</span><span class="st">"f"</span>, <span class="at">col.axis=</span><span class="st">"black"</span>, <span class="at">phi=</span>phi, <span class="at">theta=</span>theta, <span class="at">xlab=</span><span class="st">"</span><span class="sc">\n</span><span class="st">unemployment[t+h|t]"</span>, <span class="at">ylab=</span><span class="st">"h"</span>, <span class="at">zlab=</span><span class="st">"</span><span class="sc">\n</span><span class="st">predictive densities of unemployment rate"</span>, <span class="at">ticktype=</span><span class="st">"detailed"</span>, <span class="at">nticks=</span><span class="dv">3</span>,<span class="at">cex.lab=</span><span class="dv">1</span>, <span class="at">col =</span> <span class="cn">NULL</span>, <span class="at">plot =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon3D</span>(<span class="at">x=</span><span class="fu">c</span>(interval.f[<span class="dv">1</span>,],interval.f[<span class="dv">2</span>,h<span class="sc">:</span><span class="dv">1</span>]), <span class="at">y=</span><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span>h,h<span class="sc">:</span><span class="dv">1</span>), <span class="at">z=</span><span class="fu">rep</span>(<span class="dv">0</span>,<span class="dv">2</span><span class="sc">*</span>h), <span class="at">col =</span> mcxs1.shade1, <span class="at">NAcol =</span> <span class="st">"white"</span>, <span class="at">border =</span> <span class="cn">NA</span>, <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">plot =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h){</span>
-<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>  f4.l <span class="ot">=</span> <span class="fu">trans3d</span>(<span class="at">x=</span>x, <span class="at">y=</span>yy[i], <span class="at">z=</span>z[,i], <span class="at">pmat=</span>f4)</span>
-<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(f4.l, <span class="at">lwd=</span><span class="fl">0.5</span>, <span class="at">col=</span><span class="st">"black"</span>)</span>
-<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>f4.l1 <span class="ot">=</span> <span class="fu">trans3d</span>(<span class="at">x=</span>point.f, <span class="at">y=</span>yy, <span class="at">z=</span><span class="dv">0</span>, <span class="at">pmat=</span>f4)</span>
-<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(f4.l1, <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">col=</span>mcxs1)</span>
-<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>  <span class="co">#range(limits.1[1], limits.1[2], interval.f[1, ], interval.f[2, ])</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>ylim <span class="ot">&lt;-</span> <span class="fu">range</span>(yy)</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>zlim <span class="ot">&lt;-</span> <span class="fu">range</span>(z)</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>f4    <span class="ot">=</span> <span class="fu">persp3D</span>(<span class="at">x=</span>x, <span class="at">y=</span>yy, <span class="at">z=</span>z, <span class="at">phi=</span>phi, <span class="at">theta=</span>theta, <span class="at">xlab=</span><span class="st">"</span><span class="sc">\n</span><span class="st">unmp[t+h|t]"</span>, <span class="at">ylab=</span><span class="st">"h"</span>,</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>                <span class="at">zlab=</span><span class="st">"</span><span class="sc">\n</span><span class="st">predictive densities of unemployment rate"</span>, <span class="at">shade=</span><span class="cn">NA</span>, <span class="at">border=</span><span class="cn">NA</span>,</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>                <span class="at">ticktype=</span><span class="st">"detailed"</span>, <span class="at">nticks=</span><span class="dv">3</span>,<span class="at">cex.lab=</span><span class="dv">1</span>, <span class="at">col=</span><span class="cn">NA</span>, <span class="at">plot=</span><span class="cn">FALSE</span>, </span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>                <span class="at">xlim =</span> xlim)</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a><span class="fu">perspbox</span> (<span class="at">x=</span>x, <span class="at">y=</span>yy, <span class="at">z=</span>z, <span class="at">bty=</span><span class="st">"f"</span>, <span class="at">col.axis=</span><span class="st">"black"</span>, <span class="at">phi=</span>phi, <span class="at">theta=</span>theta,</span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>          <span class="at">xlab=</span><span class="st">"</span><span class="sc">\n</span><span class="st">unemployment[t+h|t]"</span>, <span class="at">ylab=</span><span class="st">"h"</span>, <span class="at">zlab=</span><span class="st">"</span><span class="sc">\n</span><span class="st">predictive densities of unemployment</span></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a><span class="st">          rate"</span>, <span class="at">ticktype=</span><span class="st">"detailed"</span>, <span class="at">nticks=</span><span class="dv">3</span>,<span class="at">cex.lab=</span><span class="dv">1</span>, <span class="at">col =</span> <span class="cn">NULL</span>, <span class="at">plot =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>          <span class="at">xlim =</span> xlim)</span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon3D</span>( <span class="at">x=</span><span class="fu">c</span>(interval.f[<span class="dv">1</span>,],interval.f[<span class="dv">2</span>,h<span class="sc">:</span><span class="dv">1</span>]), <span class="at">y=</span><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span>h,h<span class="sc">:</span><span class="dv">1</span>), <span class="at">z=</span><span class="fu">rep</span>(<span class="dv">0</span>,<span class="dv">2</span><span class="sc">*</span>h), </span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>           <span class="at">col =</span> mcxs1.shade1, <span class="at">NAcol =</span> <span class="st">"white"</span>, <span class="at">border =</span> <span class="cn">NA</span>, <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">plot =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>           <span class="at">xlim =</span> xlim)</span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h){</span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>  f4.l <span class="ot">=</span> <span class="fu">trans3d</span>(<span class="at">x=</span>x, <span class="at">y=</span>yy[i], <span class="at">z=</span>z[,i], <span class="at">pmat=</span>f4)</span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(f4.l, <span class="at">lwd=</span><span class="fl">0.5</span>, <span class="at">col=</span><span class="st">"black"</span>)</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>f4.l1 <span class="ot">=</span> <span class="fu">trans3d</span>(<span class="at">x=</span>point.f, <span class="at">y=</span>yy, <span class="at">z=</span><span class="dv">0</span>, <span class="at">pmat=</span>f4)</span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(f4.l1, <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">col=</span>mcxs1)</span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Simulate draws from the predictive density</p>
 <div class="cell">
@@ -797,80 +782,80 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0.145334</td>
-<td style="text-align: right;">0.959516</td>
-<td style="text-align: right;">-0.022576</td>
-<td style="text-align: right;">0.052840</td>
-<td style="text-align: right;">-0.162329</td>
-<td style="text-align: right;">-0.036304</td>
-<td style="text-align: right;">0.002564</td>
-<td style="text-align: right;">0.016103</td>
-<td style="text-align: right;">0.155543</td>
-<td style="text-align: right;">-0.053187</td>
-<td style="text-align: right;">0.008672</td>
-<td style="text-align: right;">0.004899</td>
-<td style="text-align: right;">0.035952</td>
-<td style="text-align: right;">0.028630</td>
-<td style="text-align: right;">0.002347</td>
-<td style="text-align: right;">0.003128</td>
-<td style="text-align: right;">-0.000610</td>
+<td style="text-align: right;">0.129096</td>
+<td style="text-align: right;">0.958734</td>
+<td style="text-align: right;">-0.023365</td>
+<td style="text-align: right;">0.056737</td>
+<td style="text-align: right;">-0.162965</td>
+<td style="text-align: right;">-0.037018</td>
+<td style="text-align: right;">0.002834</td>
+<td style="text-align: right;">0.014815</td>
+<td style="text-align: right;">0.157121</td>
+<td style="text-align: right;">-0.051699</td>
+<td style="text-align: right;">0.007576</td>
+<td style="text-align: right;">0.006393</td>
+<td style="text-align: right;">0.036105</td>
+<td style="text-align: right;">0.028995</td>
+<td style="text-align: right;">0.003053</td>
+<td style="text-align: right;">0.003599</td>
+<td style="text-align: right;">-0.001282</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">3.333037</td>
-<td style="text-align: right;">0.120030</td>
-<td style="text-align: right;">0.343785</td>
-<td style="text-align: right;">0.367374</td>
-<td style="text-align: right;">0.112201</td>
-<td style="text-align: right;">0.132034</td>
-<td style="text-align: right;">0.205375</td>
-<td style="text-align: right;">0.207176</td>
-<td style="text-align: right;">0.148226</td>
-<td style="text-align: right;">0.102936</td>
-<td style="text-align: right;">0.140795</td>
-<td style="text-align: right;">0.141248</td>
-<td style="text-align: right;">0.108658</td>
-<td style="text-align: right;">0.077750</td>
-<td style="text-align: right;">0.106323</td>
-<td style="text-align: right;">0.106168</td>
-<td style="text-align: right;">0.072467</td>
+<td style="text-align: right;">3.344716</td>
+<td style="text-align: right;">0.119434</td>
+<td style="text-align: right;">0.341654</td>
+<td style="text-align: right;">0.364457</td>
+<td style="text-align: right;">0.111203</td>
+<td style="text-align: right;">0.132291</td>
+<td style="text-align: right;">0.205227</td>
+<td style="text-align: right;">0.207768</td>
+<td style="text-align: right;">0.147614</td>
+<td style="text-align: right;">0.102817</td>
+<td style="text-align: right;">0.140751</td>
+<td style="text-align: right;">0.140929</td>
+<td style="text-align: right;">0.109034</td>
+<td style="text-align: right;">0.078007</td>
+<td style="text-align: right;">0.106289</td>
+<td style="text-align: right;">0.106055</td>
+<td style="text-align: right;">0.072916</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">0.004710</td>
-<td style="text-align: right;">0.005820</td>
-<td style="text-align: right;">0.998484</td>
-<td style="text-align: right;">-0.000410</td>
-<td style="text-align: right;">0.001258</td>
-<td style="text-align: right;">0.001030</td>
-<td style="text-align: right;">-0.000177</td>
-<td style="text-align: right;">-0.000129</td>
-<td style="text-align: right;">0.000508</td>
-<td style="text-align: right;">-0.002324</td>
-<td style="text-align: right;">-0.000050</td>
-<td style="text-align: right;">-0.000027</td>
-<td style="text-align: right;">-0.000628</td>
-<td style="text-align: right;">-0.001162</td>
-<td style="text-align: right;">0.000083</td>
+<td style="text-align: right;">0.004660</td>
+<td style="text-align: right;">0.005723</td>
+<td style="text-align: right;">0.998574</td>
+<td style="text-align: right;">-0.000514</td>
+<td style="text-align: right;">0.001195</td>
+<td style="text-align: right;">0.001216</td>
+<td style="text-align: right;">-0.000208</td>
+<td style="text-align: right;">-0.000057</td>
+<td style="text-align: right;">0.000557</td>
+<td style="text-align: right;">-0.002374</td>
+<td style="text-align: right;">-0.000049</td>
 <td style="text-align: right;">-0.000015</td>
-<td style="text-align: right;">-0.001229</td>
+<td style="text-align: right;">-0.000616</td>
+<td style="text-align: right;">-0.001196</td>
+<td style="text-align: right;">0.000044</td>
+<td style="text-align: right;">-0.000037</td>
+<td style="text-align: right;">-0.001222</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.110502</td>
-<td style="text-align: right;">0.003979</td>
-<td style="text-align: right;">0.011395</td>
-<td style="text-align: right;">0.012179</td>
-<td style="text-align: right;">0.003697</td>
-<td style="text-align: right;">0.004398</td>
-<td style="text-align: right;">0.006779</td>
-<td style="text-align: right;">0.006862</td>
-<td style="text-align: right;">0.004903</td>
-<td style="text-align: right;">0.003428</td>
-<td style="text-align: right;">0.004640</td>
-<td style="text-align: right;">0.004686</td>
-<td style="text-align: right;">0.003637</td>
-<td style="text-align: right;">0.002583</td>
-<td style="text-align: right;">0.003538</td>
-<td style="text-align: right;">0.003517</td>
-<td style="text-align: right;">0.002416</td>
+<td style="text-align: right;">0.109687</td>
+<td style="text-align: right;">0.003962</td>
+<td style="text-align: right;">0.011291</td>
+<td style="text-align: right;">0.012014</td>
+<td style="text-align: right;">0.003660</td>
+<td style="text-align: right;">0.004377</td>
+<td style="text-align: right;">0.006774</td>
+<td style="text-align: right;">0.006820</td>
+<td style="text-align: right;">0.004851</td>
+<td style="text-align: right;">0.003409</td>
+<td style="text-align: right;">0.004645</td>
+<td style="text-align: right;">0.004643</td>
+<td style="text-align: right;">0.003573</td>
+<td style="text-align: right;">0.002575</td>
+<td style="text-align: right;">0.003506</td>
+<td style="text-align: right;">0.003497</td>
+<td style="text-align: right;">0.002405</td>
 </tr>
 </tbody>
 </table>
@@ -892,28 +877,28 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0.184814</td>
-<td style="text-align: right;">-0.002195</td>
+<td style="text-align: right;">0.184862</td>
+<td style="text-align: right;">-0.002194</td>
 <td style="text-align: right;">-0.000112</td>
-<td style="text-align: right;">-0.031286</td>
+<td style="text-align: right;">-0.031134</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.026237</td>
-<td style="text-align: right;">0.000651</td>
+<td style="text-align: right;">0.026279</td>
+<td style="text-align: right;">0.000648</td>
 <td style="text-align: right;">0.000065</td>
-<td style="text-align: right;">0.016369</td>
+<td style="text-align: right;">0.016486</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">-0.002195</td>
-<td style="text-align: right;">0.000203</td>
+<td style="text-align: right;">-0.002194</td>
+<td style="text-align: right;">0.000201</td>
 <td style="text-align: right;">0.000004</td>
-<td style="text-align: right;">0.000558</td>
+<td style="text-align: right;">0.000537</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.000651</td>
-<td style="text-align: right;">0.000029</td>
+<td style="text-align: right;">0.000648</td>
+<td style="text-align: right;">0.000028</td>
 <td style="text-align: right;">0.000002</td>
-<td style="text-align: right;">0.000541</td>
+<td style="text-align: right;">0.000533</td>
 </tr>
 </tbody>
 </table>
@@ -969,80 +954,80 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0.162132</td>
-<td style="text-align: right;">0.958932</td>
-<td style="text-align: right;">-0.022731</td>
-<td style="text-align: right;">0.055034</td>
-<td style="text-align: right;">-0.161692</td>
-<td style="text-align: right;">-0.036400</td>
-<td style="text-align: right;">0.002169</td>
-<td style="text-align: right;">0.013820</td>
-<td style="text-align: right;">0.154649</td>
-<td style="text-align: right;">-0.052516</td>
-<td style="text-align: right;">0.006493</td>
-<td style="text-align: right;">0.005492</td>
-<td style="text-align: right;">0.036330</td>
-<td style="text-align: right;">0.028706</td>
-<td style="text-align: right;">0.002635</td>
-<td style="text-align: right;">0.004086</td>
-<td style="text-align: right;">-0.000651</td>
+<td style="text-align: right;">0.115926</td>
+<td style="text-align: right;">0.960286</td>
+<td style="text-align: right;">-0.022171</td>
+<td style="text-align: right;">0.055828</td>
+<td style="text-align: right;">-0.162147</td>
+<td style="text-align: right;">-0.037312</td>
+<td style="text-align: right;">0.003495</td>
+<td style="text-align: right;">0.014091</td>
+<td style="text-align: right;">0.156084</td>
+<td style="text-align: right;">-0.051559</td>
+<td style="text-align: right;">0.007850</td>
+<td style="text-align: right;">0.006557</td>
+<td style="text-align: right;">0.035953</td>
+<td style="text-align: right;">0.028374</td>
+<td style="text-align: right;">0.002877</td>
+<td style="text-align: right;">0.003091</td>
+<td style="text-align: right;">-0.001119</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">3.228534</td>
-<td style="text-align: right;">0.117174</td>
-<td style="text-align: right;">0.331846</td>
-<td style="text-align: right;">0.356220</td>
-<td style="text-align: right;">0.107967</td>
-<td style="text-align: right;">0.129583</td>
-<td style="text-align: right;">0.199029</td>
-<td style="text-align: right;">0.202394</td>
-<td style="text-align: right;">0.144078</td>
-<td style="text-align: right;">0.100626</td>
-<td style="text-align: right;">0.136462</td>
-<td style="text-align: right;">0.137954</td>
-<td style="text-align: right;">0.107050</td>
-<td style="text-align: right;">0.075313</td>
-<td style="text-align: right;">0.103439</td>
-<td style="text-align: right;">0.103901</td>
-<td style="text-align: right;">0.071215</td>
+<td style="text-align: right;">3.275994</td>
+<td style="text-align: right;">0.116849</td>
+<td style="text-align: right;">0.335168</td>
+<td style="text-align: right;">0.357329</td>
+<td style="text-align: right;">0.108210</td>
+<td style="text-align: right;">0.129094</td>
+<td style="text-align: right;">0.200902</td>
+<td style="text-align: right;">0.202319</td>
+<td style="text-align: right;">0.143380</td>
+<td style="text-align: right;">0.100559</td>
+<td style="text-align: right;">0.137834</td>
+<td style="text-align: right;">0.138374</td>
+<td style="text-align: right;">0.106336</td>
+<td style="text-align: right;">0.076114</td>
+<td style="text-align: right;">0.103254</td>
+<td style="text-align: right;">0.103780</td>
+<td style="text-align: right;">0.071334</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">0.005333</td>
-<td style="text-align: right;">0.005836</td>
-<td style="text-align: right;">0.998448</td>
-<td style="text-align: right;">-0.000433</td>
-<td style="text-align: right;">0.001240</td>
-<td style="text-align: right;">0.001031</td>
-<td style="text-align: right;">-0.000216</td>
-<td style="text-align: right;">-0.000071</td>
-<td style="text-align: right;">0.000543</td>
-<td style="text-align: right;">-0.002358</td>
-<td style="text-align: right;">0.000024</td>
-<td style="text-align: right;">-0.000055</td>
-<td style="text-align: right;">-0.000665</td>
-<td style="text-align: right;">-0.001146</td>
-<td style="text-align: right;">0.000038</td>
-<td style="text-align: right;">-0.000048</td>
-<td style="text-align: right;">-0.001216</td>
+<td style="text-align: right;">0.004895</td>
+<td style="text-align: right;">0.005701</td>
+<td style="text-align: right;">0.998517</td>
+<td style="text-align: right;">-0.000496</td>
+<td style="text-align: right;">0.001191</td>
+<td style="text-align: right;">0.001210</td>
+<td style="text-align: right;">-0.000214</td>
+<td style="text-align: right;">-0.000045</td>
+<td style="text-align: right;">0.000580</td>
+<td style="text-align: right;">-0.002378</td>
+<td style="text-align: right;">-0.000008</td>
+<td style="text-align: right;">-0.000057</td>
+<td style="text-align: right;">-0.000622</td>
+<td style="text-align: right;">-0.001180</td>
+<td style="text-align: right;">0.000046</td>
+<td style="text-align: right;">-0.000018</td>
+<td style="text-align: right;">-0.001231</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.107292</td>
-<td style="text-align: right;">0.003858</td>
-<td style="text-align: right;">0.010977</td>
-<td style="text-align: right;">0.011781</td>
-<td style="text-align: right;">0.003594</td>
-<td style="text-align: right;">0.004279</td>
-<td style="text-align: right;">0.006601</td>
-<td style="text-align: right;">0.006705</td>
-<td style="text-align: right;">0.004788</td>
-<td style="text-align: right;">0.003307</td>
-<td style="text-align: right;">0.004527</td>
-<td style="text-align: right;">0.004553</td>
-<td style="text-align: right;">0.003513</td>
-<td style="text-align: right;">0.002511</td>
-<td style="text-align: right;">0.003439</td>
-<td style="text-align: right;">0.003444</td>
-<td style="text-align: right;">0.002358</td>
+<td style="text-align: right;">0.107518</td>
+<td style="text-align: right;">0.003856</td>
+<td style="text-align: right;">0.011049</td>
+<td style="text-align: right;">0.011727</td>
+<td style="text-align: right;">0.003546</td>
+<td style="text-align: right;">0.004281</td>
+<td style="text-align: right;">0.006580</td>
+<td style="text-align: right;">0.006677</td>
+<td style="text-align: right;">0.004737</td>
+<td style="text-align: right;">0.003309</td>
+<td style="text-align: right;">0.004513</td>
+<td style="text-align: right;">0.004514</td>
+<td style="text-align: right;">0.003508</td>
+<td style="text-align: right;">0.002501</td>
+<td style="text-align: right;">0.003412</td>
+<td style="text-align: right;">0.003432</td>
+<td style="text-align: right;">0.002348</td>
 </tr>
 </tbody>
 </table>
@@ -1064,28 +1049,28 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0.175703</td>
-<td style="text-align: right;">-0.002086</td>
-<td style="text-align: right;">-0.000106</td>
-<td style="text-align: right;">-0.029583</td>
+<td style="text-align: right;">0.176069</td>
+<td style="text-align: right;">-0.002084</td>
+<td style="text-align: right;">-0.000107</td>
+<td style="text-align: right;">-0.029468</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.024264</td>
-<td style="text-align: right;">0.000603</td>
+<td style="text-align: right;">0.024486</td>
+<td style="text-align: right;">0.000601</td>
 <td style="text-align: right;">0.000060</td>
-<td style="text-align: right;">0.015261</td>
+<td style="text-align: right;">0.015250</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">-0.002086</td>
-<td style="text-align: right;">0.000193</td>
+<td style="text-align: right;">-0.002084</td>
+<td style="text-align: right;">0.000191</td>
 <td style="text-align: right;">0.000004</td>
-<td style="text-align: right;">0.000529</td>
+<td style="text-align: right;">0.000509</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.000603</td>
-<td style="text-align: right;">0.000027</td>
+<td style="text-align: right;">0.000601</td>
+<td style="text-align: right;">0.000026</td>
 <td style="text-align: right;">0.000002</td>
-<td style="text-align: right;">0.000498</td>
+<td style="text-align: right;">0.000497</td>
 </tr>
 </tbody>
 </table>
@@ -1186,41 +1171,71 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 </div>
 </div>
 </div>
+</section>
+<section id="extension-2" class="level2">
+<h2 class="anchored" data-anchor-id="extension-2">Extension 2</h2>
+<p>With 2 regime states, we would have <span class="math inline">\(Y_m\)</span> and <span class="math inline">\(X_m\)</span></p>
+<p>The full conditional joint posterior have the following form <span class="math display">\[\begin{align}
+p(A|Y,X,\Sigma) &amp;\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\
+p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
+\\
+\overline{V_m} &amp;= (X'X + \underline{V}^{-1})^{-1} \\
+\overline{A_m} &amp;= \overline{V_m}(X_m'Y_m+\underline{V}^{-1}\underline{A}) \\
+\overline{v} &amp;= T_m + \underline{v} \\
+\overline{S_m} &amp;= \underline{S}+Y_m'Y_m+\underline{A}'\underline{V}^{-1}\underline{A}-\overline{A_m}'
+\overline{V_m}^{-1}\overline{A_m} \\
+\end{align}\]</span></p>
+<p>Markov Switching Initial probability of regimes <span class="math display">\[\begin{align}
+\begin{bmatrix}
+p_{1} &amp; p_{2}\\
+\end{bmatrix}
+\end{align}\]</span></p>
+<p>Probability transition matrix <span class="math display">\[\begin{align}
+\begin{bmatrix}
+p_{11} &amp; p_{12}\\
+p_{21} &amp; p_{22}\\
+\end{bmatrix}
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\xi_{t} = \begin{bmatrix}
+1\\
+0\\
+\end{bmatrix}, if s_t = 1
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\xi_{t} = \begin{bmatrix}
+0\\
+1\\
+\end{bmatrix}, if s_t = 2
+\end{align}\]</span> The posterior draws are done with Gibb sampling.</p>
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>
-&gt; xi = diag(2)[, sample(1:2, 100, replace = TRUE)]
-
-&gt; count_regime_transitions(xi)
-     [,1] [,2]
-[1,]   36   23
-[2,]   23   17
-
-&gt; Z = array(rnorm(3 * 200 * 2), c(2, 200, 2))
-
-&gt; Z[, 1:100, 1] = Z[, 1:100, 1] * 2
-
-&gt; Z[, 101:200, 2] = Z[, 101:200, 2] * 2
-
-&gt; xi = rbind(c(rep(1, 50), rep(0, 150)), c(rep(0, 50), 
-+     rep(1, 150)))
-
-&gt; P = 0.95 * diag(2) + 0.025
-
-&gt; pi = c(0.5, 0.5)
-
-&gt; gibbs_draw = sample_Markov_process(Z, xi, P, pi)
-
-&gt; plot.ts(t(gibbs_draw$aux_xi))</code></pre>
-</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can check to see if the draws are correctly put in the correct regime, with regime 1 being regime with higher volatility, we can plot the sigmas of two regime.</p>
 </section>
 </section>
 <section id="references" class="level1 unnumbered">
