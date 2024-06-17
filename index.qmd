@@ -817,23 +817,11 @@ x           = hist(Y.h[i,1,], breaks=x, plot=FALSE)$mids
 yy          = 1:h
 z           = t(z)
 
-theta = 190
+theta = 180
 phi   = 15.5
-xlim <- c(-100,100)
-  #range(limits.1[1], limits.1[2], interval.f[1, ], interval.f[2, ])
-ylim <- range(yy)
-zlim <- range(z)
-f4    = persp3D(x=x, y=yy, z=z, phi=phi, theta=theta, xlab="\nunmp[t+h|t]", ylab="h",
-                zlab="\npredictive densities of unemployment rate", shade=NA, border=NA,
-                ticktype="detailed", nticks=3,cex.lab=1, col=NA, plot=FALSE, 
-                xlim = xlim)
-perspbox (x=x, y=yy, z=z, bty="f", col.axis="black", phi=phi, theta=theta,
-          xlab="\nunemployment[t+h|t]", ylab="h", zlab="\npredictive densities of unemployment
-          rate", ticktype="detailed", nticks=3,cex.lab=1, col = NULL, plot = TRUE, 
-          xlim = xlim)
-polygon3D( x=c(interval.f[1,],interval.f[2,h:1]), y=c(1:h,h:1), z=rep(0,2*h), 
-           col = mcxs1.shade1, NAcol = "white", border = NA, add = TRUE, plot = TRUE, 
-           xlim = xlim)
+f4    = persp3D(x=x, y=yy, z=z, phi=phi, theta=theta, xlab="\nunmp[t+h|t]", ylab="h", zlab="\npredictive densities of unemployment rate", shade=NA, border=NA, ticktype="detailed", nticks=3,cex.lab=1, col=NA,plot=FALSE)
+perspbox (x=x, y=yy, z=z, bty="f", col.axis="black", phi=phi, theta=theta, xlab="\nunemployment[t+h|t]", ylab="h", zlab="\npredictive densities of unemployment rate", ticktype="detailed", nticks=3,cex.lab=1, col = NULL, plot = TRUE)
+polygon3D(x=c(interval.f[1,],interval.f[2,h:1]), y=c(1:h,h:1), z=rep(0,2*h), col = mcxs1.shade1, NAcol = "white", border = NA, add = TRUE, plot = TRUE)
 for (i in 1:h){
   f4.l = trans3d(x=x, y=yy[i], z=z[,i], pmat=f4)
   lines(f4.l, lwd=0.5, col="black")
@@ -880,7 +868,6 @@ for (s in 1:S){
   x.Ti          = x.Ti[p:1,]
   for (i in 1:h){
     x.T           = c(1,as.vector(t(x.Ti)))
-    
     Y.f           = rmvnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior)
     x.Ti          = rbind(Y.f,x.Ti[1:(p-1),])
     Y.h_minnesota[i,,s]     = Y.f[1:2]
@@ -1036,6 +1023,59 @@ p_{21} & p_{22}\\
 The posterior draws are done with Gibb sampling. 
 
 ```{r}
+
+# Need Model
+# Need number of regime states -> AIC,BIC? No need, r=2
+# dummy obse prior+minnesota, 2021, 2016
+
+# state 2
+# Need lag
+# To estimate S, How do i want to model St
+# Mackov switching or assume S2
+
+
+# Find number of regime states
+# mod.mswm <- msmFit(mod,k=2,p=0,sw=c(TRUE,TRUE),control=list(parallel=TRUE))
+
+```
+
+
+```{r, eval=FALSE}
+xi = diag(2)[,sample(1:2,100,replace=TRUE)]
+
+count_regime_transitions(xi)
+
+Z = array(rnorm(3 * 101 * 2), c(2,101,2))
+Z[,1:50,1] = Z[,1:50,1] * 2
+Z[,51:101,2] = Z[,51:101,2] * 2
+
+#Z = array(rnorm(3 * 404 * 2), c(2,404,2))
+#Z[,1:202,1] = Z[,1:202,1] * 2
+#Z[,203:404,2] = Z[,203:404,2] * 2
+# xi = rbind(c(rep(1,202), rep(0,202)), c(rep(0,202), rep(1,202)))
+
+# xi = rbind(c(rep(1,50), rep(0,150)), c(rep(0,50), rep(1,150)))
+
+xi = rbind(c(rep(1,50), rep(0,51)), c(rep(0,50), rep(1,51)))
+P = 0.95 * diag(2) + 0.025
+pi = c(0.5, 0.5)
+
+gibbs_draw = sample_Markov_process(Z, xi, P, pi)
+
+# intital pi
+#gibbs_draw$aux_pi_0
+# Probability transition matrix between states
+#gibbs_draw$aux_PR_TR # probability transition matrix between states
+# xi matrix
+#gibbs_draw$aux_xi
+
+aux_xi <- gibbs_draw$aux_xi
+
+plot.ts(t(gibbs_draw$aux_xi))
+```
+
+
+```{r}
 # Data configuration
 N       = 4
 p       = 4
@@ -1060,13 +1100,14 @@ Sigma.hat = t(Y - X %*% A.hat) %*% (Y - X %*% A.hat) / T
 kappa.1 = 1
 kappa.2 = 100
 A.prior = matrix(0, nrow = nrow(A.hat), ncol = ncol(A.hat))
+#A.prior[2:5, 1:4] = diag(1, nrow = 2)
 #A.prior[2:5, 1:4] = diag(1, nrow = 4)
 V.prior = diag(c(kappa.2, kappa.1 * ((1:p)^(-2)) %x% rep(1, N)))
 S.prior = diag(diag(Sigma.hat))
 nu.prior = N + 1
 ```
 
-```{r, echo=FALSE, results='hide'}
+```{r, echo=FALSE}
 Rcpp::sourceCpp ("ms.cpp")
 ```
 
@@ -1141,6 +1182,7 @@ Gibbs_draws = function(S, Y, X, xi, P, pi) {
         }
         
         # Compute Z_m for the next iteration
+        #Z[, , m] = (Y_m - X_m %*% A.bar) %*% t(solve(L))
         LL = t(chol(Sigma.posterior))
         Z[, , m] <-   t((Y - X %*% A.posterior) %*% LL)
       }
@@ -1202,25 +1244,9 @@ Markov.draws$pi[c(2, 1), 1000]
 #hist(Markov.draws$Sigma.posterior2[1,1,], breaks = 100)
 #plot(Markov.draws$Sigma.posterior1[1,1,],Markov.draws$Sigma.posterior2[1,1,])
 #plot.ts(t(apply(Markov.draws$xi, 1:2, mean)))
-#apply(Markov.draws$A.posterior1, 1:2, mean)
-#round(apply(Markov.draws$A.posterior1, 1:2, mean),3)
-#round(apply(Markov.draws$A.posterior2, 1:2, mean),3)
-#plot.ts(t(apply(Markov.draws$xi, 1:2, mean)))
-#plot.ts(t(apply(Markov.draws$Sigma.posterior1, 1:2, mean)))
-#apply(Markov.draws$Sigma.posterior1, 1:2, mean)
-#round(apply(Markov.draws$Sigma.posterior1, 1:2, mean),3)
-#round(apply(Markov.draws$Sigma.posterior2, 1:2, mean),3)
-#round(apply(Markov.draws$P, 1:2, mean),3)
-#round(apply(Markov.draws$A.posterior1, 1:2, mean),3)
-# round(apply(Markov.draws$A.posterior2, 1:2, mean),3)
-#round(apply(Markov.draws$A.posterior1, 1:2, sd),3)
-#round(apply(Markov.draws$A.posterior2, 1:2, sd),3)
-
-
-#sample.int(2,1, prob=c(0.01,.99))
 ```
 
-```{r, eval=FALSE}
+```{r}
 for (s in 1:S) {
   if (Markov.draws$Sigma.posterior1[1, 1, s] < Markov.draws$Sigma.posterior2[1, 1, s]) {
     # Swap Sigma
@@ -1247,84 +1273,13 @@ for (s in 1:S) {
 }
 
 ```
-
-
-
 We can check to see if the draws are correctly put in the correct regime, with regime 1 
 being regime with higher volatility, we can plot the sigmas of two regime.
 
-After the regimes are correctly placed, we can forecast h-step ahead
-
-```{r }
-
-Y.h_Markov = array(NA, c(h, 2, S))
-
-for (s in 1:S){
-  #A.posterior.draw= sample_minnesota_A[,,s]
-  #Sigma.posterior = sample_minnesota_Sigma[,,s]
-  A.posterior.draw1 = Markov.draws$A.posterior1[,,s]
-  A.posterior.draw2 = Markov.draws$A.posterior2[,,s]
-  Sigma.posterior1 = Markov.draws$Sigma.posterior1[,,s]
-  Sigma.posterior2 = Markov.draws$Sigma.posterior2[,,s]
-  
-  T = dim(Markov.draws$xi)[2]
-  
-  x.Ti          = Y[(nrow(Y)-p+1):nrow(Y),]
-  x.Ti          = x.Ti[p:1,]
-    
-  P_h = Markov.draws$P[,,s] %*% Markov.draws$xi[,T,s]  # Initializing P_h
-  
-  for (i in 1:h){
-    x.T         = c(1, as.vector(t(x.Ti)))
-    
-    if (i > 1) {  # Only update P_h if i > 1
-      P_h = Markov.draws$P[,,s] %*% P_h
-    }
-    sample_m = sample.int(2,1, prob=as.numeric(P_h))
-    
-    if (sample_m == 1) {
-      A.posterior.draw = A.posterior.draw1
-      Sigma.posterior = Sigma.posterior1
-    } else {
-      A.posterior.draw = A.posterior.draw2
-      Sigma.posterior = Sigma.posterior2
-    }
-    
-    Y.f           = rmvnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior)
-    x.Ti          = rbind(Y.f,x.Ti[1:(p-1),])
-    Y.h_Markov[i,,s]     = Y.f[1:2]
-  }
-}
-
-forecast_plots(Y, Y.h_Markov, h)
-```
 
 
-## Final model
-
-The final model is the combination of Minnesota prior, dummy obervation prior and 
-Markov-switching to account for heteroskedasticity.
-
-```{r}
-# Data configuration
-N       = 4
-p       = 4
-
-y       = merged_df
-y       = ts(y[,c(2,3,4,5)], start = c(1997,3), frequency = 4,
-              names=c("unmp","gdp","wpi","cashrate"))
-Y       = ts(y[5:nrow(y),], start = c(1998,3), frequency = 4)
-
-X       = matrix(1,nrow(Y),1)
-for (i in 1:p){
-  X     = cbind(X,y[5:nrow(y)-i,])
-}
-```
 
 
-```{r}
-A.hat = solve(t(X) %*% X) %*% t(X) %*% Y
-Sigma.hat = t(Y - X %*% A.hat) %*% (Y - X %*% A.hat) / T
 
 kappa.1 = 1
 kappa.2 = 100
