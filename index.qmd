@@ -1082,9 +1082,7 @@ p       = 4
 
 y       = merged_df
 y       = ts(y[,c(2,3,4,5)], start = c(1997,3), frequency = 4,
-              names=c("unmp","gdp","wpi","cashrate"))
-#y       = ts(y[,c(2,3)], start = c(1997,3), frequency = 4,
-#             names=c("unmp","gdp"))
+             names=c("unmp","gdp","wpi","cashrate"))
 Y       = ts(y[5:nrow(y),], start = c(1998,3), frequency = 4)
 
 X       = matrix(1,nrow(Y),1)
@@ -1100,8 +1098,7 @@ Sigma.hat = t(Y - X %*% A.hat) %*% (Y - X %*% A.hat) / T
 kappa.1 = 1
 kappa.2 = 100
 A.prior = matrix(0, nrow = nrow(A.hat), ncol = ncol(A.hat))
-#A.prior[2:5, 1:4] = diag(1, nrow = 2)
-#A.prior[2:5, 1:4] = diag(1, nrow = 4)
+A.prior[2:5, 1:4] = diag(1, nrow = 4)
 V.prior = diag(c(kappa.2, kappa.1 * ((1:p)^(-2)) %x% rep(1, N)))
 S.prior = diag(diag(Sigma.hat))
 nu.prior = N + 1
@@ -1113,7 +1110,7 @@ Rcpp::sourceCpp ("ms.cpp")
 
 
 ```{r}
-S = 10000
+S = 1000
 # Gibbs sampling function
 Gibbs_draws = function(S, Y, X, xi, P, pi) {
   N = ncol(Y)
