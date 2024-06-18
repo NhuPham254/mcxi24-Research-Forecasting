@@ -20,20 +20,16 @@ The objective of this research project is to develop a Bayesian Vector Autoregre
 The question to be addressed in this research is: Can a Bayesian VAR model with regime changes accurately capture shifts in the relationships between unemployment rate and other macroeconomic variables for improved forecasting performance?
 
 # Motivation
-Understanding the impact of economic regime changes on the unemployment rate dynamics holds substantial importance in grasping the complexities of the labour market. The labour market is highly susceptible to various shocks and policy interventions, making accurate forecasting of the unemployment rate crucial for informed decision-making. By employing a Bayesian Vector Autoregression (BVAR) model that allows the parameters to vary across different economic regimes, we can gain a nuanced understanding of how the unemployment rate responds to diverse economic conditions and the efficacy of policies. This research enhances forecasting accuracy and offers valuable insights into the underlying drivers of unemployment fluctuations. By better understanding these dynamics, policymakers can make more informed decisions to counter economic instability.
+Understanding the impact of economic regime changes on the unemployment rate dynamics holds substantial importance in grasping the complexities of the labour market. The labour market is highly susceptible to various shocks and policy interventions, making accurate forecasting of the unemployment rate is crucial for informed decision-making. By employing a Bayesian Vector Autoregression (BVAR) model that allows the parameters to vary across different economic regimes, we can gain a nuanced understanding of how the unemployment rate responds to diverse economic conditions and the efficacy of policies. This research enhances forecasting accuracy and offers valuable insights into the underlying drivers of unemployment fluctuations. By better understanding these dynamics, policymakers can make more informed decisions to counter economic instability.
 
 
 # Data properties
 
 For the investigation of the problem at hand, the selection of variables includes a comprehensive set of economic indicators and demographic factors that are crucial for understanding labour market dynamics and their impact on unemployment rates. 
 
-For instance, GDP growth provides a broad measure of economic activity, serving as an indicator of overall labour market. Consumer price index, wage price index and interest rate reflect macroeconomic conditions and monetary policy, influencing consumer spending, business investment, and hiring decisions, thereby affecting unemployment trends. Government spending impacts aggregate demand and employment levels, while demographic factors such as population growth rate, average age of the workforce, and level of highest educational attainment offer insights into labour force participation and composition. For the purpose of this research, the variables are GDP, wage price index and inflation.
+For instance, GDP growth provides a broad measure of economic activity, serving as an indicator of overall labour market. Consumer price index, wage price index and interest rate reflect macroeconomic conditions and monetary policy, influencing consumer spending, business investment, and hiring decisions, thereby affecting unemployment trends. Government spending impacts aggregate demand and employment levels, while demographic factors such as population growth rate, average age of the workforce, and level of highest educational attainment offer insights into labour force participation and composition. For the purpose of this research, the variables chosen are GDP, wage price index and inflation.
 
-Each variable's form/transformation will depend on its specific characteristics and the nature of its relationship with unemployment. For instance, variables like GDP may be included in their original form, while others, such as wpi might need to be computed from the index data. 
-
-It's important to note that all data will be quarterly since the interest forecasting for unemployment will be conducted at a quarterly frequency. Quarterly frequency is suitable for capturing the diverse movements influencing unemployment, including short-term shocks, long-term trends, and policy changes, providing a balanced perspective.
-
-
+Each variable's form/transformation will depend on its specific characteristics and the nature of its relationship with unemployment. It's important to note that all data will be quarterly since the interest forecasting for unemployment will be conducted at a quarterly frequency. Quarterly frequency is suitable for capturing the diverse movements influencing unemployment, including short-term shocks, long-term trends, and policy changes, providing a balanced perspective.
 
 \begin{align*}
 & unmp_{t} & : & \text{Unemployment rate} \\
@@ -176,6 +172,8 @@ for (df_name in log_dataframes) {
 
 ```
 
+
+
 To stabilize the variance, log tranformation is performed on all variables except 
 unemployment rate.
 
@@ -197,12 +195,12 @@ for (df_name in names(dataframes)) {
        main = dataframes[[df_name]])
 }
 ```
-<div id="figure1" style="text-align: center; color: #696969;">
-###### Figure 1: Transformed Time series plots
+<div id="figure2" style="text-align: center; color: #696969;">
+###### Figure 2: Transformed Time series plots
 </div>
 
 
-From the plot of the variables, some show stationary and some non-stationary, which can create some challenges in general analysis . Therefore, the ACF test is performed to identify patterns and trend.
+From the plot of the variables, some variables show stationary and some variables show non-stationary, which can create some challenges in general analysis . Therefore, the ACF test is performed to identify patterns and trend.
 
 
 ```{r,echo=FALSE, fig.width=8, fig.height=6}
@@ -216,8 +214,8 @@ for (df_name in names(dataframes)) {
                                                                dataframes[[df_name]]))
 }
 ```
-<div id="figure2" style="text-align: center; color: #696969;">
-###### Figure 2: ACF plots
+<div id="figure3" style="text-align: center; color: #696969;">
+###### Figure 3: ACF plots
 </div>
 
 The ACF plots show the variables have persistence or dependence in the data as the they are slowly decaying, indicates that there is a strong correlation between each variable 
@@ -234,15 +232,15 @@ for (df_name in names(dataframes)) {
                                                                dataframes[[df_name]]))
 }
 ```
-<div id="figure3" style="text-align: center; color: #696969;">
-###### Figure 3: PACF plots
+<div id="figure4" style="text-align: center; color: #696969;">
+###### Figure 4: PACF plots
 </div>
 
 The PACF plots show high autocorrelation at lag 1, and have clear cut offs.
 
 The ADF is performed to further determine the stationary properties of the data.
-Null hypothesis: a unit root is present
-Alternative hypothesis: stationary
+Null hypothesis: a unit root is present.
+Alternative hypothesis: stationary.
 ```{r}
 # Perform ADF test for each variable
 dataframes <- list(unmp_df = "Unemployment rate",
@@ -272,10 +270,9 @@ adf <- round(adf, 3)
 print(adf)
 ```
 
+Based on the results of the ADF tests, all the variables exhibit statistical evidence suggesting that they are non-stationary, with p-value > 0.05, thus failing to reject the null hypothesis. For many time series models, differencing may be necessary to achieve stationarity. However, the baseline model will incorporate Minnesota prior which is robust to non-stationary data.
 
 # General Model
-
-## Hypothesis
 
 Var(p) model
 \begin{aligned}
@@ -507,10 +504,10 @@ Sigma.sd    = round(apply(sample_minnesota$Sigma.posterior,1:2,sd),6)
 A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
 Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
 
-kable(A_table, format = "html", caption = "Posterior A means and sd table",
+kable(A_table, format = "html", caption = "Posterior A means and standard deviations table",
       col.names = paste0(1:ncol(A_table)))
 
-kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
+kable(Sigma_table, format = "html", caption = "Posterior Sigma means and standard deviations table",
       col.names = paste0(1:ncol(Sigma_table)))
 
 ```
@@ -620,7 +617,7 @@ A \mid \Sigma &\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}
 \end{align*}
 
 ## The full conditional joint posterior
-The full conditional joint posterior have the following form
+The full conditional joint posterior, incorporating the new priors, have the following form
 
 \begin{align}
 p(A|Y,X,\Sigma) &\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\ 
@@ -706,10 +703,10 @@ Sigma.sd    = round(apply(sample_dummy$Sigma.posterior,1:2,sd),6)
 A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
 Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
 
-kable(A_table, format = "html", caption = "Posterior A means and sd table",
+kable(A_table, format = "html", caption = "Posterior A means and standard deviations table",
       col.names = paste0(1:ncol(A_table)))
 
-kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
+kable(Sigma_table, format = "html", caption = "Posterior Sigma means and standard deviations table",
       col.names = paste0(1:ncol(Sigma_table)))
 ```
 
@@ -736,24 +733,35 @@ hist(sample_dummy$Sigma.posterior[1,1,], xlab = "Sigma posterior draws",
      col = mcxs2, main = '')
 ```
       
-## Baseline Model Extension 2 - Regime change
-With 2 regime states, we would have $Y_m$ and $X_m$
+# Baseline Model Extension 2 - Regime change
+The general idea of regime change is that the model would have different characteristics for by two distinct regimes. For example, recession with high volatility vs expansion with lower volatility. 
+
+The model with 2 regime states aims to capture the different dynamics of the variables under these two states. The prior is the same with Baseline model
+
+\begin{align*}
+p(A, \Sigma) = p(A \mid \Sigma) \cdot p(\Sigma) \\
+A \mid \Sigma \sim \text{MN}_{K \times N} (\underline{A}, \Sigma, \underline{V}) \\
+\Sigma \sim  \text{IW}_{N} (\underline{S}, \underline{v})\\
+\end{align*}
+
+However, with 2 regime states, we would have $Y_m$ and $X_m$ when sampling posterior draws from the prior.
 
 The full conditional joint posterior have the following form
 \begin{align}
-p(A|Y,X,\Sigma) &\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\ 
-p(\Sigma|Y,X) &\sim IW_{N}(\overline{S}, \overline{v})\\
+p(A_m|Y_m,X_m,\Sigma_m, \xi, P, \pi) &\sim MN_{K \times N}(\overline{A_m}, \Sigma_m,\overline{V_m} ) \\ 
+p(\Sigma_m|Y_m,X_m, \xi, P, \pi) &\sim IW_{N}(\overline{S_m}, \overline{v_m})\\
 \\
-\overline{V_m} &= (X'X + \underline{V}^{-1})^{-1} \\
+\overline{V_m} &= (X_m'X_m + \underline{V}^{-1})^{-1} \\
 \overline{A_m} &= \overline{V_m}(X_m'Y_m+\underline{V}^{-1}\underline{A}) \\
-\overline{v} &= T_m + \underline{v} \\ 
+\overline{v_m} &= T_m + \underline{v} \\ 
 \overline{S_m} &= \underline{S}+Y_m'Y_m+\underline{A}'\underline{V}^{-1}\underline{A}-\overline{A_m}'
 \overline{V_m}^{-1}\overline{A_m} \\
 \end{align}
 
 ## Markov Switching 
+The regime-change mechanism assumes that the regime can change over time. At each period, the regime can either stay the same or switch to the other regime.
 
-Initial probability of regimes
+Probability of regimes
 \begin{align}
 \begin{bmatrix}
 p_{1} & p_{2}\\
@@ -768,18 +776,26 @@ p_{21} & p_{22}\\
 \end{bmatrix}
 \end{align}
 
+$p_{11}$: the probability of staying in regime 1 in the next period.
+
+$p_{12}$: the probability of switching from regime 1 to regime 2 in the next period.
+
+$p_{21}$: the probability of switching from regime 2 to regime 1 in the next period.
+
+$p_{22}$: the probability of staying in regime 2 in the next period.
+
 \begin{align}
 \xi_{t} = \begin{bmatrix}
 1\\
 0\\
-\end{bmatrix}, if s_t = 1
+\end{bmatrix}, if  s_t = 1
 \end{align}
 
 \begin{align}
 \xi_{t} = \begin{bmatrix}
 0\\
 1\\
-\end{bmatrix}, if s_t = 2
+\end{bmatrix}, if  s_t = 2
 \end{align}
 
 ```{r}
@@ -820,6 +836,18 @@ invisible({
   unlink(tmp_file)  # Remove the temporary file
 })  
 ```
+
+The sampling process involves:
+
+- Sets up arrays to store posterior draws for parameters $A$, $\Sigma$, regime assignments $\xi$, regime probabilities $\pi$, transition probabilities $P$.
+
+- Initializes values for $\xi$, $\pi$, $P$.
+
+- Gibbs sampler method generate random draws, iterates through each sampling s.
+
+- For each iteration, subsets the data Y and X based on the current regime assignment $\xi$, obtain posterior parameters, and draw posterior samples.
+
+- Update Z (the residuals), for the next iteration.
 
 The posterior draws are obtain with the following code
 ```{r, echo=TRUE}
@@ -949,7 +977,7 @@ Markov.draws = Gibbs_draws(S = 50000, Y, X, xi, P, pi)
 before <- ts(t(apply(Markov.draws$xi, 1:2, mean)), start = c(1998,3), frequency = 4)
 ```
 
-To examine how the regime draws are distributed between the two states, we visualize the switching variable $\xi$. Initially, the plot suggests that the regime assignments appear arbitrary. To address this issue, a label switching procedure is implemented to ensure consitency in how the two regimes are identified, in this case regime 1 is identified as the state with higher volatility. Following the label switching, the distinction between the two regimes becomes more evident. The drawn regimes indicate that regime 1 corresponds to the period around 2020, which aligns with the Covid-19 pandemic. This finding is intuitive as the Covid-19 pandemic significantly impacted the economy at large, including unemployment rates. Regime 2, on the other hand, represents other periods.
+To examine how the regime draws are distributed between the two states, we visualize the switching variable $\xi$. Initially, the plot suggests that the regime assignments appear arbitrary. To address this issue, a label switching procedure is implemented to ensure consitency in how the two regimes are identified, in this case regime 1 is identified as the state with higher volatility. For each iteration s, we evaluate the $\Sigma$ and switch the one with higher volatility to regime 1, updating the corresponding $A$, $\xi$, $\pi$, $P$. Following the label switching, the distinction between the two regimes becomes more evident. The drawn regimes indicate that regime 1 corresponds to the period around 2020, which aligns with the Covid-19 pandemic. This finding is intuitive as the Covid-19 pandemic significantly impacted the economy at large, including unemployment rates. Regime 2, on the other hand, represents other periods.
 
 
 ```{r, fig.width=8, fig.height=6}
@@ -985,14 +1013,14 @@ Sigma1_table <- data.frame(rbind(t(Sigma1.E)[1,],t(Sigma1.sd)[1,],t(Sigma1.E)[2,
 A2_table <- data.frame(rbind(t(A2.E)[1,],t(A2.sd)[1,],t(A2.E)[2,],t(A2.sd)[2,]))
 Sigma2_table <- data.frame(rbind(t(Sigma2.E)[1,],t(Sigma2.sd)[1,],t(Sigma2.E)[2,],t(Sigma2.sd)[2,]))
 
-kable(A1_table, format = "html", caption = "Regime 1 Posterior A means and sd table",
+kable(A1_table, format = "html", caption = "Regime 1 Posterior A means and standard deviations table",
       col.names = paste0(1:ncol(A1_table)))
-kable(A2_table, format = "html", caption = "Regime 2 Posterior A means and sd table",
-      col.names = paste0(1:ncol(A2_table)))
-
-kable(Sigma1_table, format = "html", caption = "Regime 1 Posterior Sigma means and sd table",
+kable(Sigma1_table, format = "html", caption = "Regime 1 Posterior Sigma means and standard deviations table",
       col.names = paste0(1:ncol(Sigma1_table)))
-kable(Sigma2_table, format = "html", caption = "Regime 2 Posterior Sigma means and sd table",
+
+kable(A2_table, format = "html", caption = "Regime 2 Posterior A means and standard deviations table",
+      col.names = paste0(1:ncol(A2_table)))
+kable(Sigma2_table, format = "html", caption = "Regime 2 Posterior Sigma means and standard deviations table",
       col.names = paste0(1:ncol(Sigma2_table)))
 ```
 The trace plots and histograms posterior draws on A and $\Sigma$ shows that unemployment rate has strong positive correlation with its first lag. The sigma plots shows that regime 1 has higher volatility than regime 2, which is expected considering label switching set up.
@@ -1037,20 +1065,20 @@ Prior distribution of a combination of Minnesota and dummy observation prior
 A \mid \Sigma &\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}) \\
 \Sigma &\sim  \text{IW}_{N} (\widetilde{S}, \widetilde{v})\\
 \\
-\widetilde{A} &= \widetilde{V}(X_m^{+'}Y_m^{+}+\underline{V}^{-1}\underline{A}) \\
-\widetilde{V} &= (X_m^{+'}X_m^{+} + \underline{V}^{-1})^{-1} \\
+\widetilde{A} &= \widetilde{V}(X^{+'}Y^{+}+\underline{V}^{-1}\underline{A}) \\
+\widetilde{V} &= (X^{+'}X^{+} + \underline{V}^{-1})^{-1} \\
 \widetilde{v} &= T^{+} + \underline{v} \\ 
-\widetilde{S} &= \underline{S}+Y_m^{+'}Y_m^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\widetilde{A}'\widetilde{V}^{-1}\widetilde{A} \\
+\widetilde{S} &= \underline{S}+Y^{+'}Y^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\widetilde{A}'\widetilde{V}^{-1}\widetilde{A} \\
 \end{align*}
 
-The full conditional joint posterior have the following form
+After setting up the prior, the full conditional joint posterior will generate regime-specific posterior draws
 \begin{align}
-p(A|Y,X,\Sigma) &\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\ 
-p(\Sigma|Y,X) &\sim IW_{N}(\overline{S}, \overline{v})\\
+p(A_m|Y_m,X_m,\Sigma_m, \xi, P, \pi) &\sim MN_{K \times N}(\overline{A_m}, \Sigma_m,\overline{V_m} ) \\ 
+p(\Sigma_m|Y_m,X_m, \xi, P, \pi) &\sim IW_{N}(\overline{S_m}, \overline{v_m})\\
 \\
 \overline{V_m} &= (X_m'X_m + \widetilde{V}^{-1})^{-1} \\
 \overline{A_m} &= \overline{V_m}(X_m'Y_m+\widetilde{V}^{-1}\widetilde{A}) \\
-\overline{v} &= T_m + \widetilde{v} \\ 
+\overline{v_m} &= T_m + \widetilde{v} \\ 
 \overline{S_m} &= \widetilde{S}+Y_m'Y_m+\widetilde{A}'\widetilde{V}^{-1}\widetilde{A}-\overline{A_m}'
 \overline{V_m}^{-1}\overline{A_m} \\
 \end{align}
@@ -1206,7 +1234,7 @@ Final.draws <- label_switching(Final.draws)
 after_f <- ts(t(apply(Final.draws$xi, 1:2, mean)), start = c(1998,3), frequency = 4)
 ```
 
-Similarly to the Regime change on the baseline model, the Bayesian Vars with dummy observation prior and regime change also indicate that regime 1 corresponds to the period around 2020, which aligns with the Covid-19 pandemic.
+Similarly to the regime change observed in the baseline model, the Bayesian VARs with dummy observation priors also show that regime 1 corresponds to the period around 2020, which coincides with the Covid-19 pandemic.
 
 ```{r, fig.width=8, fig.height=6}
 par(mfrow = c(1, 2))
@@ -1231,17 +1259,17 @@ Sigma1_table <- data.frame(rbind(t(Sigma1.E)[1,],t(Sigma1.sd)[1,],t(Sigma1.E)[2,
 A2_table <- data.frame(rbind(t(A2.E)[1,],t(A2.sd)[1,],t(A2.E)[2,],t(A2.sd)[2,]))
 Sigma2_table <- data.frame(rbind(t(Sigma2.E)[1,],t(Sigma2.sd)[1,],t(Sigma2.E)[2,],t(Sigma2.sd)[2,]))
 
-kable(A1_table, format = "html", caption = "Regime 1 Posterior A means and sd table",
+kable(A1_table, format = "html", caption = "Regime 1 Posterior A means and standard deviations table",
       col.names = paste0(1:ncol(A1_table)))
-kable(A2_table, format = "html", caption = "Regime 2 Posterior A means and sd table",
-      col.names = paste0(1:ncol(A2_table)))
-
-kable(Sigma1_table, format = "html", caption = "Regime 1 Posterior Sigma means and sd table",
+kable(Sigma1_table, format = "html", caption = "Regime 1 Posterior Sigma means and standard deviations table",
       col.names = paste0(1:ncol(Sigma1_table)))
-kable(Sigma2_table, format = "html", caption = "Regime 2 Posterior Sigma means and sd table",
+
+kable(A2_table, format = "html", caption = "Regime 2 Posterior A means and standard deviations table",
+      col.names = paste0(1:ncol(A2_table)))
+kable(Sigma2_table, format = "html", caption = "Regime 2 Posterior Sigma means and standard deviations table",
       col.names = paste0(1:ncol(Sigma2_table)))
 ```
-The trace plots and histograms posterior draws on A and $\Sigma$ shows that unemployment rate has strong positive correlation with its first lag. The $\Sigma$ plots still illustrate that regime 1 has higher volatility as expected, also the volatility for bothe regimes are lower than that of regime change on baseline model.
+The trace plots and histograms posterior draws on A and $\Sigma$ shows that unemployment rate has strong positive correlation with its first lag. The $\Sigma$ plots still illustrate that regime 1 has higher volatility as expected, also the volatility for both regimes are lower than that of regime change on baseline model.
 
 ```{r, fig.height=6}
 mcxs1  = "#05386B"
@@ -1337,24 +1365,20 @@ forecast_plots <- function(Y, Y.h, h, theta, phi, xlim) {
   yy          = 1:h
   z           = t(z)
   
-  # Adjust xlim, ylim, zlim based on h
-  xlim <- c(limits.1[1], limits.1[2])
-  ylim <- c(1, h)
-  zlim <- range(z)
   
   f4 <- persp3D(x=x, y=yy, z=z, phi=phi, theta=theta, xlab="\nunmp[t+h|t]", ylab="h",
                 zlab="\npredictive densities of unemployment rate", shade=NA, border=NA,
                 ticktype="detailed", nticks=3,cex.lab=1, col=NA, plot=FALSE, 
-                xlim = xlim, ylim = ylim, zlim = zlim)
+                xlim = xlim)
   
   perspbox(x=x, y=yy, z=z, bty="f", col.axis="black", phi=phi, theta=theta,
            xlab="\nunemployment[t+h|t]", ylab="h", zlab="\npredictive densities of unemployment rate",
            ticktype="detailed", nticks=3, cex.lab=1, col = NULL, plot = TRUE, 
-           xlim = xlim, ylim = ylim, zlim = zlim)
+           xlim = xlim)
   
   polygon3D(x = c(interval.f[1,], interval.f[2,h:1]), y = c(1:h, h:1), z = rep(0, 2*h), 
             col = mcxs1.shade1, NAcol = "white", border = NA, add = TRUE, plot = TRUE, 
-            xlim = xlim, ylim = ylim, zlim = zlim)
+            xlim = xlim)
   
   for (i in 1:h){
     f4.l <- trans3d(x = x, y = yy[i], z = z[,i], pmat = f4)
@@ -1474,77 +1498,48 @@ Y.h_Markov = Markov_forecast(S = 50000, sample = Markov.draws, Y, p, h = 21)
 forecast_plots(Y, Y.h_Markov, h = 21, theta = 190, phi = 10, xlim = c(-50, 50))
 ```
 
-The point forecast have similar positive trend to the mean and slight downward trend for the last few horizons. The 3D density intervals show that the peak of the intervals are lower.
+The point forecasts exhibit a positive trend towards the mean with a slight downward trend observed in the last few forecast horizons. When examining the 3D density intervals, it becomes apparent that the intervals remain relatively stable across all horizons, which can likely be attributed to the regime change effect. Therefore, regime change helps maintain stable forecast uncertainty levels throughout different forecast horizons.
 
 ## Model with Minnesota prior, dummy observation prior and regime change
 
-Similarly to the baseline model, the prior will be a combination of Minnesota and dummy observation prior. Then the Markov-switching Gibb-sampling is done with these new priors to obtain posterior draws
-
+The prior is be a combination of Minnesota and dummy observation prior. The Markov-switching Gibb-sampling is done with these new priors to obtain the posterior draws.
 
 ```{r}
 Y.h_Final = Markov_forecast(S = 50000, sample = Final.draws, Y, p, h = 21)
 forecast_plots(Y, Y.h_Final, h = 21, theta = 190, phi = 10, xlim = c(-10, 20))
 ```
-The forecast shows positive upward trend, converging to the mean, the downward trend for the last horizons is less evident.
+The forecast shows positive upward trend, converging to the mean, the downward trend for the last horizons is less evident. The plot shows higher density intervals in the last few horizons, indicating increased forecast uncertainty.
+This can be due to dummy observation prior's intention to guide the model towards specific trends or patterns, which result in the model to react differently. For example, in the last few horizons, the dummy observation prior might reinforce the influence of the regime change, leading to higher uncertainty in the forecasts. This suggests that the model is more responsive to economic conditions and less confident in its predictions as it approaches the end of the forecast period.
 
 The below is an interactive density intervals for easier inspection.
 ```{r}
-plots_3d <- function(Y.h, h, xlim) {
-  mcxs1  = "#05386B"
-  mcxs4  = "#8EE4AF"
-  mcxs5  = "#EDF5E1"
-  
-  par(mfrow=c(1,2), mar=c(2,2,1,1))
-  
-  # Forecasting
-  limits.1    <- range(Y.h[,1,])
-  point.f     <- apply(Y.h[,1,], 1, mean)
-  interval.f  <- apply(Y.h[,1,], 1, hdi, credMass=0.90)
-  theta       <- 180
-  phi         <- 15.5
-  
-  x           <- seq(from=limits.1[1], to=limits.1[2], length.out=10)
-  z           <- matrix(NA, h, 9)
-  for (i in 1:h){
-    z[i,]     <- hist(Y.h[i,1,], breaks=x, plot=FALSE)$density
-  }
-  x           <- hist(Y.h[i,1,], breaks=x, plot=FALSE)$mids
-  yy          <- 1:h
-  
-  # Plot using plot_ly
-  plot_ly(y = yy, x = x, z = z) %>%
-    layout(scene = list(xaxis = list(title = "Unemployment rate"),
-                        yaxis = list(title = "h-step forecast"),
-                        zaxis = list(title = "density")),
-           title = "Unemployment rate forecast densities") %>%
-    add_surface(colors = c(mcxs1, mcxs4, mcxs5))
-  
-  # Forecasting on extended model
-  limits.2    <- range(Y.h[,2,])
-  point.f     <- apply(Y.h[,2,], 1, mean)
-  interval.f  <- apply(Y.h[,2,], 1, hdi, credMass=0.90)
-  theta       <- 180
-  phi         <- 15.5
-  
-  x           <- seq(from=limits.2[1], to=limits.2[2], length.out=10)
-  z           <- matrix(NA, h, 9)
-  for (i in 1:h){
-    z[i,]     <- hist(Y.h[i,2,], breaks=x, plot=FALSE)$density
-  }
-  x           <- hist(Y.h[i,2,], breaks=x, plot=FALSE)$mids
-  yy          <- 1:h
-  
-  # Plot using plot_ly
-  plot_ly(y = yy, x = x, z = z) %>%
-    layout(scene = list(xaxis = list(title = "Unemployment rate"),
-                        yaxis = list(title = "h-step forecast"),
-                        zaxis = list(title = "density")),
-           title = "Unemployment rate forecast densities") %>%
-    add_surface(colors = c(mcxs1, "magenta2", mcxs5))
-}
+h=21
+mcxs1  = "#05386B"
+mcxs4  = "#8EE4AF"
+mcxs5  = "#EDF5E1"
 
-# Example usage
-plots_3d(Y.h_Final, h = 21)
+limits.1        = range(Y.h_Final[,1,])
+point.f         = apply(Y.h_Final[,1,],1,mean)
+interval.f      = apply(Y.h_Final[,1,],1,hdi,credMass=0.90)
+theta = 180
+phi   = 15.5
+
+x           = seq(from=limits.1[1], to=limits.1[2], length.out=10)
+z           = matrix(NA,h,9)
+for (i in 1:h){
+  z[i,]     = hist(Y.h_Final[i,1,], breaks=x, plot=FALSE)$density
+}
+x          = hist(Y.h_Final[i,1,], breaks=x, plot=FALSE)$mids
+yy          = 1:h
+
+# plot using plot_ly
+plot_ly(y = yy, x = x, z=z) %>%
+
+  layout(scene=list(xaxis=list(title="Unemployment rate"),
+                    yaxis=list(title="h-step forecast"),
+                    zaxis=list(title="density")),
+         title = "Unemployment rate forecast densities") %>%
+  add_surface(colors = c(mcxs1,"magenta2",mcxs5))
 
 ```
 
@@ -1553,9 +1548,9 @@ The research project presents 4 models for forecasting unemployment rate in Aust
 
 The dummy observation prior extension seems to have minimal effect on the forecast of unemployment rate, the confidence intervals narrow insignificantly.
 
-The regime change on both baseline model and final model show similar forecasting trend. Though the full model does have the smaller confidence intervals, indicating more informative model.
+The regime change on both baseline model and final model show similar forecasting trend. Though the full model does have the smaller confidence intervals, indicating a more informative model.
 
-Generally, the trivial effect of the dummy observation prior can be due to the dominance of Minnesota prior. Therefore, adding a small number of dummy observations, specifically 5 observations may not significantly alter the posterior distribution. For the regime change, as observed from the regimes distribution, regime 1 is mainly the period correspond to Covid-19, the COVID-19 period was highly volatile and significantly different from other periods. Thus, it could dominate the overall model dynamics, making it difficult for regime 2 to show its influence, since it covers a much longer period with relatively lower volatile data. Furthermore, the high volatility of Covid-19 might be leading to large uncertainty in the estimates for regime 1, causing the model to be less sensitive to changes or differences between regimes. 
+Generally, the trivial effect of the dummy observation prior can be due to the dominance of Minnesota prior. Furthermore, adding a small number of dummy observations, specifically 5 observations may not significantly alter the posterior distribution. For the regime change, as observed from the regimes distribution, regime 1 is mainly the period correspond to Covid-19, the Covid-19 period was highly volatile and significantly different from other periods. Thus, it could dominate the overall model dynamics, making it difficult for regime 2 to show its influence, since it covers a much longer period with relatively lower volatile data. Furthermore, the high volatility of Covid-19 might be leading to large uncertainty in the estimates for regime 1, causing the model to be less sensitive to changes or differences between regimes. 
 
 To enhance the effect of regime changes in the model, we can use higher frequency data. Transitioning from quarterly to monthly or daily data by interpolation would increase the number of observations, allowing for a more granular capture of economic dynamics and short-term fluctuations. This is particularly useful for inspecting the timing of regime changes more precisely. Additionally, increasing the number of regimes from two to three could allow the model to capture more nuanced economic conditions. For instance, the three-regime model could differentiate between normal economic conditions, periods of moderate volatility, and severe events like the COVID-19 pandemic. These changes would potentially enable a more accurate representation of the underlying economic processes and improve the model's forecasting capabilities of regime changes.
 
