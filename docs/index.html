@@ -8,7 +8,7 @@
 
 <meta name="author" content="Nhu Minh Pham">
 
-<title>Macroeconometrics Research Report - Forecasting Unemployment rate n Australia using Bayesian VARs with Regime change</title>
+<title>Macroeconometrics Research Report - Forecasting Unemployment rate in Australia using Bayesian VARs with Regime change</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -171,38 +171,39 @@ window.Quarto = {
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
   <li><a href="#motivation" id="toc-motivation" class="nav-link" data-scroll-target="#motivation">Motivation</a></li>
-  <li><a href="#data-properties" id="toc-data-properties" class="nav-link" data-scroll-target="#data-properties">Data properties</a></li>
+  <li><a href="#data-properties" id="toc-data-properties" class="nav-link" data-scroll-target="#data-properties">Data properties</a>
+  <ul class="collapse">
   <li><a href="#data-visualisation" id="toc-data-visualisation" class="nav-link" data-scroll-target="#data-visualisation">Data Visualisation</a></li>
-  <li><a href="#model" id="toc-model" class="nav-link" data-scroll-target="#model">Model</a>
+  </ul></li>
+  <li><a href="#general-model" id="toc-general-model" class="nav-link" data-scroll-target="#general-model">General Model</a>
   <ul class="collapse">
-  <li><a href="#hypothesis" id="toc-hypothesis" class="nav-link" data-scroll-target="#hypothesis">Hypothesis</a>
-  <ul class="collapse">
+  <li><a href="#hypothesis" id="toc-hypothesis" class="nav-link" data-scroll-target="#hypothesis">Hypothesis</a></li>
   <li><a href="#matrix-form" id="toc-matrix-form" class="nav-link" data-scroll-target="#matrix-form">Matrix form</a></li>
   </ul></li>
-  </ul></li>
-  <li><a href="#basic-model" id="toc-basic-model" class="nav-link" data-scroll-target="#basic-model">Basic Model</a>
+  <li><a href="#baseline-model-with-minnesota-prior" id="toc-baseline-model-with-minnesota-prior" class="nav-link" data-scroll-target="#baseline-model-with-minnesota-prior">Baseline Model with Minnesota prior</a>
   <ul class="collapse">
-  <li><a href="#minnesota-prior-distribution" id="toc-minnesota-prior-distribution" class="nav-link" data-scroll-target="#minnesota-prior-distribution">Minnesota Prior distribution</a>
-  <ul class="collapse">
+  <li><a href="#minnesota-prior-distribution" id="toc-minnesota-prior-distribution" class="nav-link" data-scroll-target="#minnesota-prior-distribution">Minnesota Prior distribution</a></li>
   <li><a href="#the-joint-posterior-distribution" id="toc-the-joint-posterior-distribution" class="nav-link" data-scroll-target="#the-joint-posterior-distribution">The joint posterior distribution</a></li>
   </ul></li>
-  </ul></li>
-  <li><a href="#extension-1-dummy-observation-prior" id="toc-extension-1-dummy-observation-prior" class="nav-link" data-scroll-target="#extension-1-dummy-observation-prior">Extension 1: Dummy observation prior</a>
+  <li><a href="#baseline-model-extension-1-dummy-observation-prior" id="toc-baseline-model-extension-1-dummy-observation-prior" class="nav-link" data-scroll-target="#baseline-model-extension-1-dummy-observation-prior">Baseline Model Extension 1: Dummy observation prior</a>
   <ul class="collapse">
   <li><a href="#minnesota-and-dummy-observation-prior-distribution" id="toc-minnesota-and-dummy-observation-prior-distribution" class="nav-link" data-scroll-target="#minnesota-and-dummy-observation-prior-distribution">Minnesota and dummy observation prior distribution</a></li>
-  <li><a href="#extension-2---regime-change" id="toc-extension-2---regime-change" class="nav-link" data-scroll-target="#extension-2---regime-change">Extension 2 - Regime change</a></li>
-  <li><a href="#final-model" id="toc-final-model" class="nav-link" data-scroll-target="#final-model">Final model</a></li>
+  <li><a href="#the-full-conditional-joint-posterior" id="toc-the-full-conditional-joint-posterior" class="nav-link" data-scroll-target="#the-full-conditional-joint-posterior">The full conditional joint posterior</a></li>
+  <li><a href="#baseline-model-extension-2---regime-change" id="toc-baseline-model-extension-2---regime-change" class="nav-link" data-scroll-target="#baseline-model-extension-2---regime-change">Baseline Model Extension 2 - Regime change</a></li>
+  <li><a href="#markov-switching" id="toc-markov-switching" class="nav-link" data-scroll-target="#markov-switching">Markov Switching</a></li>
   </ul></li>
+  <li><a href="#model-with-minnesota-prior-dummy-observation-prior-and-regime-change" id="toc-model-with-minnesota-prior-dummy-observation-prior-and-regime-change" class="nav-link" data-scroll-target="#model-with-minnesota-prior-dummy-observation-prior-and-regime-change">Model with Minnesota prior, dummy observation prior and regime change</a></li>
   <li><a href="#forecasting" id="toc-forecasting" class="nav-link" data-scroll-target="#forecasting">Forecasting</a>
   <ul class="collapse">
-  <li><a href="#basic-model-1" id="toc-basic-model-1" class="nav-link" data-scroll-target="#basic-model-1">Basic model</a></li>
-  <li><a href="#extension-1" id="toc-extension-1" class="nav-link" data-scroll-target="#extension-1">Extension 1</a></li>
-  <li><a href="#extension-2" id="toc-extension-2" class="nav-link" data-scroll-target="#extension-2">Extension 2</a></li>
-  <li><a href="#final-model-1" id="toc-final-model-1" class="nav-link" data-scroll-target="#final-model-1">Final model</a></li>
+  <li><a href="#baseline-model" id="toc-baseline-model" class="nav-link" data-scroll-target="#baseline-model">Baseline model</a></li>
+  <li><a href="#baseline-model-extension-1---dummy-observation-prior" id="toc-baseline-model-extension-1---dummy-observation-prior" class="nav-link" data-scroll-target="#baseline-model-extension-1---dummy-observation-prior">Baseline Model Extension 1 - Dummy observation prior</a></li>
+  <li><a href="#baseline-model-extension-2---regime-change-1" id="toc-baseline-model-extension-2---regime-change-1" class="nav-link" data-scroll-target="#baseline-model-extension-2---regime-change-1">Baseline Model Extension 2 - Regime change</a></li>
+  <li><a href="#model-with-minnesota-prior-dummy-observation-prior-and-regime-change-1" id="toc-model-with-minnesota-prior-dummy-observation-prior-and-regime-change-1" class="nav-link" data-scroll-target="#model-with-minnesota-prior-dummy-observation-prior-and-regime-change-1">Model with Minnesota prior, dummy observation prior and regime change</a></li>
   </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   <li><a href="#model-proof" id="toc-model-proof" class="nav-link" data-scroll-target="#model-proof">Model Proof</a>
   <ul class="collapse">
-  <li><a href="#basic-model-2" id="toc-basic-model-2" class="nav-link" data-scroll-target="#basic-model-2">Basic model</a></li>
+  <li><a href="#basic-model" id="toc-basic-model" class="nav-link" data-scroll-target="#basic-model">Basic model</a></li>
   <li><a href="#extended-model" id="toc-extended-model" class="nav-link" data-scroll-target="#extended-model">Extended model</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
@@ -214,7 +215,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Forecasting Unemployment rate n Australia using Bayesian VARs with Regime change</h1>
+<h1 class="title">Forecasting Unemployment rate in Australia using Bayesian VARs with Regime change</h1>
 </div>
 
 
@@ -262,9 +263,8 @@ window.Quarto = {
 &amp; wpi_{t} &amp; : &amp; \text{Wage price index} \\            
 &amp; cashrate_{t} &amp; : &amp; \text{Cash rate} \\
 \end{align*}\]</span></p>
-</section>
-<section id="data-visualisation" class="level1">
-<h1>Data Visualisation</h1>
+<section id="data-visualisation" class="level2">
+<h2 class="anchored" data-anchor-id="data-visualisation">Data Visualisation</h2>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -336,8 +336,9 @@ cashrate_df        -3.409   0.056</code></pre>
 </div>
 </div>
 </section>
-<section id="model" class="level1">
-<h1>Model</h1>
+</section>
+<section id="general-model" class="level1">
+<h1>General Model</h1>
 <section id="hypothesis" class="level2">
 <h2 class="anchored" data-anchor-id="hypothesis">Hypothesis</h2>
 Var(p) model
@@ -352,8 +353,9 @@ Probability of transitioning from one state to another
 <span class="math display">\[\begin{aligned}
 P(S_t = j | S_{t-1} = i) &amp;= \pi_{ij}
 \end{aligned}\]</span>
-<section id="matrix-form" class="level3">
-<h3 class="anchored" data-anchor-id="matrix-form">Matrix form</h3>
+</section>
+<section id="matrix-form" class="level2">
+<h2 class="anchored" data-anchor-id="matrix-form">Matrix form</h2>
 <p><span class="math display">\[\begin{align*}
 \mathbf{Y}_t = \boldsymbol{\beta}_{S_t} \mathbf{X}_t + \boldsymbol{E}_t
 \end{align*}\]</span></p>
@@ -366,9 +368,8 @@ P(S_t = j | S_{t-1} = i) &amp;= \pi_{ij}
 <p>The model’s equations include time-varying parameters, such as the coefficients of lagged variables, which adapt to changing economic conditions.</p>
 </section>
 </section>
-</section>
-<section id="basic-model" class="level1">
-<h1>Basic Model</h1>
+<section id="baseline-model-with-minnesota-prior" class="level1">
+<h1>Baseline Model with Minnesota prior</h1>
 <p>The model follows the Normal Inverse Wishart distribution.</p>
 <p>Likelihood function kernel <span class="math display">\[\begin{align}
 L(A,\Sigma|Y,X) \propto det(\Sigma)^{-\frac{T}{2}}exp\{-\frac{1}{2}tr[\Sigma^{-1}(Y-XA)'(Y-XA)]\}
@@ -418,8 +419,9 @@ k_2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \cdots
 \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; 0 \\
 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{16}      
 \end{bmatrix}\]</span>
-<section id="the-joint-posterior-distribution" class="level3">
-<h3 class="anchored" data-anchor-id="the-joint-posterior-distribution">The joint posterior distribution</h3>
+</section>
+<section id="the-joint-posterior-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="the-joint-posterior-distribution">The joint posterior distribution</h2>
 <p><span class="math display">\[\begin{align*}
 p(A,\Sigma|Y,X) &amp;\propto L(A,\Sigma|Y,X)p(A,\Sigma) \\
 &amp;= L(A,\Sigma|Y,X)p(A|\Sigma)p(\Sigma)
@@ -474,14 +476,176 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 <span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>sample_minnesota_A      <span class="ot">=</span> sample_minnesota<span class="sc">$</span>A.posterior</span>
 <span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>sample_minnesota_Sigma  <span class="ot">=</span> sample_minnesota<span class="sc">$</span>Sigma.posterior</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Posterior A means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">6</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">7</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">9</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">10</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">11</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">12</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">13</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">14</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">15</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">16</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">17</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.136077</td>
+<td style="text-align: right;">0.960000</td>
+<td style="text-align: right;">-0.021506</td>
+<td style="text-align: right;">0.053533</td>
+<td style="text-align: right;">-0.162047</td>
+<td style="text-align: right;">-0.037728</td>
+<td style="text-align: right;">0.003492</td>
+<td style="text-align: right;">0.014125</td>
+<td style="text-align: right;">0.154908</td>
+<td style="text-align: right;">-0.051878</td>
+<td style="text-align: right;">0.006933</td>
+<td style="text-align: right;">0.006051</td>
+<td style="text-align: right;">0.036237</td>
+<td style="text-align: right;">0.028663</td>
+<td style="text-align: right;">0.002400</td>
+<td style="text-align: right;">0.004038</td>
+<td style="text-align: right;">-0.000543</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3.317267</td>
+<td style="text-align: right;">0.119860</td>
+<td style="text-align: right;">0.342575</td>
+<td style="text-align: right;">0.366206</td>
+<td style="text-align: right;">0.111462</td>
+<td style="text-align: right;">0.132343</td>
+<td style="text-align: right;">0.205321</td>
+<td style="text-align: right;">0.207407</td>
+<td style="text-align: right;">0.147811</td>
+<td style="text-align: right;">0.102596</td>
+<td style="text-align: right;">0.140604</td>
+<td style="text-align: right;">0.141155</td>
+<td style="text-align: right;">0.107893</td>
+<td style="text-align: right;">0.078081</td>
+<td style="text-align: right;">0.106231</td>
+<td style="text-align: right;">0.106277</td>
+<td style="text-align: right;">0.072322</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.005136</td>
+<td style="text-align: right;">0.005730</td>
+<td style="text-align: right;">0.998521</td>
+<td style="text-align: right;">-0.000516</td>
+<td style="text-align: right;">0.001196</td>
+<td style="text-align: right;">0.001224</td>
+<td style="text-align: right;">-0.000218</td>
+<td style="text-align: right;">-0.000099</td>
+<td style="text-align: right;">0.000603</td>
+<td style="text-align: right;">-0.002387</td>
+<td style="text-align: right;">-0.000018</td>
+<td style="text-align: right;">-0.000020</td>
+<td style="text-align: right;">-0.000633</td>
+<td style="text-align: right;">-0.001204</td>
+<td style="text-align: right;">0.000047</td>
+<td style="text-align: right;">-0.000021</td>
+<td style="text-align: right;">-0.001251</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.109550</td>
+<td style="text-align: right;">0.003935</td>
+<td style="text-align: right;">0.011301</td>
+<td style="text-align: right;">0.012069</td>
+<td style="text-align: right;">0.003672</td>
+<td style="text-align: right;">0.004373</td>
+<td style="text-align: right;">0.006761</td>
+<td style="text-align: right;">0.006855</td>
+<td style="text-align: right;">0.004867</td>
+<td style="text-align: right;">0.003395</td>
+<td style="text-align: right;">0.004615</td>
+<td style="text-align: right;">0.004639</td>
+<td style="text-align: right;">0.003564</td>
+<td style="text-align: right;">0.002553</td>
+<td style="text-align: right;">0.003507</td>
+<td style="text-align: right;">0.003504</td>
+<td style="text-align: right;">0.002386</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Posterior Sigma means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.184892</td>
+<td style="text-align: right;">-0.002195</td>
+<td style="text-align: right;">-0.000112</td>
+<td style="text-align: right;">-0.031063</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.026188</td>
+<td style="text-align: right;">0.000644</td>
+<td style="text-align: right;">0.000065</td>
+<td style="text-align: right;">0.016407</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-0.002195</td>
+<td style="text-align: right;">0.000201</td>
+<td style="text-align: right;">0.000004</td>
+<td style="text-align: right;">0.000537</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.000644</td>
+<td style="text-align: right;">0.000029</td>
+<td style="text-align: right;">0.000002</td>
+<td style="text-align: right;">0.000531</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+<p>The trace plots and histograms posterior draws on A and <span class="math inline">\(\Sigma\)</span> shows that unemployment rate has strong positive correlation with its first lag, this is expected from observing the data properties.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 <section id="section" class="level87">
 <p class="heading"></p>
 </section>
 </section>
 </section>
-</section>
-<section id="extension-1-dummy-observation-prior" class="level1">
-<h1>Extension 1: Dummy observation prior</h1>
+<section id="baseline-model-extension-1-dummy-observation-prior" class="level1">
+<h1>Baseline Model Extension 1: Dummy observation prior</h1>
 <p>Cointegration is when the non-stationary variables have an equilibrium long term relationship or a common trend. The model is extended to incorporate dummy-observation-prior, aiming to account for the potential cointegration amongst the variables, capturing the underlying economic relationships and dynamics.</p>
 <p>This approach allows us to leverage both the observed data and additional information about the structural relationships among variables, leading to more accurate parameter estimation and potentially improved forecasting performance.</p>
 <p>Dummy observation prior also known as known as “sum-of-coefficients” proposed by Doan, Litterman, and Sims (1984) required a set of artificial observations for each variable.</p>
@@ -541,7 +705,11 @@ A \mid \Sigma &amp;\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetild
 \widetilde{v} &amp;= T^{+} + \underline{v} \\
 \widetilde{S} &amp;= \underline{S}+Y^{+'}Y^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\widetilde{A}'\widetilde{V}^{-1}\widetilde{A} \\
 \end{align*}\]</span></p>
-<p>The full conditional joint posterior have the following form <span class="math display">\[\begin{align}
+</section>
+<section id="the-full-conditional-joint-posterior" class="level2">
+<h2 class="anchored" data-anchor-id="the-full-conditional-joint-posterior">The full conditional joint posterior</h2>
+<p>The full conditional joint posterior have the following form</p>
+<p><span class="math display">\[\begin{align}
 p(A|Y,X,\Sigma) &amp;\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\
 p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 \\
@@ -612,9 +780,172 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 <span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>sample_dummy_A      <span class="ot">=</span> sample_dummy<span class="sc">$</span>A.posterior</span>
 <span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>sample_dummy_Sigma  <span class="ot">=</span> sample_dummy<span class="sc">$</span>Sigma.posterior</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Posterior A means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">6</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">7</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">9</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">10</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">11</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">12</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">13</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">14</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">15</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">16</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">17</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.109378</td>
+<td style="text-align: right;">0.960144</td>
+<td style="text-align: right;">-0.021032</td>
+<td style="text-align: right;">0.054659</td>
+<td style="text-align: right;">-0.161725</td>
+<td style="text-align: right;">-0.037150</td>
+<td style="text-align: right;">0.005050</td>
+<td style="text-align: right;">0.014763</td>
+<td style="text-align: right;">0.155331</td>
+<td style="text-align: right;">-0.051809</td>
+<td style="text-align: right;">0.007478</td>
+<td style="text-align: right;">0.005357</td>
+<td style="text-align: right;">0.036278</td>
+<td style="text-align: right;">0.028091</td>
+<td style="text-align: right;">0.002429</td>
+<td style="text-align: right;">0.002725</td>
+<td style="text-align: right;">-0.001100</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3.243886</td>
+<td style="text-align: right;">0.116815</td>
+<td style="text-align: right;">0.335138</td>
+<td style="text-align: right;">0.356141</td>
+<td style="text-align: right;">0.108669</td>
+<td style="text-align: right;">0.128781</td>
+<td style="text-align: right;">0.200228</td>
+<td style="text-align: right;">0.204205</td>
+<td style="text-align: right;">0.144081</td>
+<td style="text-align: right;">0.099879</td>
+<td style="text-align: right;">0.136838</td>
+<td style="text-align: right;">0.137718</td>
+<td style="text-align: right;">0.106364</td>
+<td style="text-align: right;">0.075543</td>
+<td style="text-align: right;">0.103837</td>
+<td style="text-align: right;">0.103470</td>
+<td style="text-align: right;">0.071154</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.005263</td>
+<td style="text-align: right;">0.005680</td>
+<td style="text-align: right;">0.998495</td>
+<td style="text-align: right;">-0.000387</td>
+<td style="text-align: right;">0.001170</td>
+<td style="text-align: right;">0.001233</td>
+<td style="text-align: right;">-0.000250</td>
+<td style="text-align: right;">-0.000071</td>
+<td style="text-align: right;">0.000605</td>
+<td style="text-align: right;">-0.002361</td>
+<td style="text-align: right;">-0.000029</td>
+<td style="text-align: right;">-0.000044</td>
+<td style="text-align: right;">-0.000632</td>
+<td style="text-align: right;">-0.001195</td>
+<td style="text-align: right;">0.000056</td>
+<td style="text-align: right;">-0.000048</td>
+<td style="text-align: right;">-0.001226</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.107422</td>
+<td style="text-align: right;">0.003839</td>
+<td style="text-align: right;">0.011044</td>
+<td style="text-align: right;">0.011822</td>
+<td style="text-align: right;">0.003552</td>
+<td style="text-align: right;">0.004237</td>
+<td style="text-align: right;">0.006584</td>
+<td style="text-align: right;">0.006644</td>
+<td style="text-align: right;">0.004734</td>
+<td style="text-align: right;">0.003296</td>
+<td style="text-align: right;">0.004497</td>
+<td style="text-align: right;">0.004546</td>
+<td style="text-align: right;">0.003507</td>
+<td style="text-align: right;">0.002507</td>
+<td style="text-align: right;">0.003419</td>
+<td style="text-align: right;">0.003438</td>
+<td style="text-align: right;">0.002339</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Posterior Sigma means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.176142</td>
+<td style="text-align: right;">-0.002082</td>
+<td style="text-align: right;">-0.000106</td>
+<td style="text-align: right;">-0.029608</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.024464</td>
+<td style="text-align: right;">0.000600</td>
+<td style="text-align: right;">0.000060</td>
+<td style="text-align: right;">0.015212</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-0.002082</td>
+<td style="text-align: right;">0.000191</td>
+<td style="text-align: right;">0.000004</td>
+<td style="text-align: right;">0.000509</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.000600</td>
+<td style="text-align: right;">0.000026</td>
+<td style="text-align: right;">0.000002</td>
+<td style="text-align: right;">0.000493</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+<p>Similarly to the baseline model, the trace plots and histograms posterior draws on A and <span class="math inline">\(\Sigma\)</span> shows that unemployment rate has strong positive correlation with its first lag.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
-<section id="extension-2---regime-change" class="level2">
-<h2 class="anchored" data-anchor-id="extension-2---regime-change">Extension 2 - Regime change</h2>
+<section id="baseline-model-extension-2---regime-change" class="level2">
+<h2 class="anchored" data-anchor-id="baseline-model-extension-2---regime-change">Baseline Model Extension 2 - Regime change</h2>
 <p>With 2 regime states, we would have <span class="math inline">\(Y_m\)</span> and <span class="math inline">\(X_m\)</span></p>
 <p>The full conditional joint posterior have the following form <span class="math display">\[\begin{align}
 p(A|Y,X,\Sigma) &amp;\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\
@@ -626,7 +957,10 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 \overline{S_m} &amp;= \underline{S}+Y_m'Y_m+\underline{A}'\underline{V}^{-1}\underline{A}-\overline{A_m}'
 \overline{V_m}^{-1}\overline{A_m} \\
 \end{align}\]</span></p>
-<p>Markov Switching Initial probability of regimes <span class="math display">\[\begin{align}
+</section>
+<section id="markov-switching" class="level2">
+<h2 class="anchored" data-anchor-id="markov-switching">Markov Switching</h2>
+<p>Initial probability of regimes <span class="math display">\[\begin{align}
 \begin{bmatrix}
 p_{1} &amp; p_{2}\\
 \end{bmatrix}
@@ -648,44 +982,96 @@ p_{21} &amp; p_{22}\\
 0\\
 1\\
 \end{bmatrix}, if s_t = 2
-\end{align}\]</span> The posterior draws are done with Gibb sampling.</p>
+\end{align}\]</span></p>
+<p>The posterior draws are obtain with the following code</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gibbs sampling function</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Gibbs_draws <span class="ot">=</span> <span class="cf">function</span>(S, Y, X, xi, P, pi) {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> <span class="fu">ncol</span>(Y)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">=</span> (<span class="fu">ncol</span>(X) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> N </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  M <span class="ot">=</span> <span class="dv">2</span>   <span class="co"># Number of regimes</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  T <span class="ot">=</span> <span class="fu">nrow</span>(Y)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior.draws1 <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(N, N, S))</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior.draws2 <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(N, N, S))</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  A.posterior.draws1 <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>((<span class="dv">1</span> <span class="sc">+</span> p <span class="sc">*</span> N), N, S))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  A.posterior.draws2 <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>((<span class="dv">1</span> <span class="sc">+</span> p <span class="sc">*</span> N), N, S))</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  xi.draws <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="at">dim =</span> <span class="fu">c</span>(M, T, S))</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  P.draws <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, S))</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  pi.draws <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> M, <span class="at">ncol =</span> S)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  P <span class="ot">=</span> <span class="fl">0.95</span> <span class="sc">*</span> <span class="fu">diag</span>(<span class="dv">2</span>) <span class="sc">+</span> <span class="fl">0.025</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  pi <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  xi <span class="ot">=</span> <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">50</span>), <span class="fu">rep</span>(<span class="dv">0</span>,T<span class="dv">-50</span>)), <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">0</span>,<span class="dv">50</span>), <span class="fu">rep</span>(<span class="dv">1</span>,T<span class="dv">-50</span>)))</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  Z <span class="ot">=</span> <span class="fu">array</span>(<span class="fu">rnorm</span>(T<span class="sc">*</span>N<span class="sc">*</span>M), <span class="fu">c</span>(N,T,M))</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S) {</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update xi, P, and pi using the sample_Markov_process function</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    gibbs_draw <span class="ot">=</span> <span class="fu">sample_Markov_process</span>(Z, xi, P, pi)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    xi <span class="ot">=</span> gibbs_draw<span class="sc">$</span>aux_xi</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    P <span class="ot">=</span> gibbs_draw<span class="sc">$</span>aux_PR_TR</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    pi <span class="ot">=</span> gibbs_draw<span class="sc">$</span>aux_pi_0</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    xi.draws[, , s] <span class="ot">&lt;-</span> xi</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    P.draws[, , s] <span class="ot">&lt;-</span> P</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    pi.draws[, s] <span class="ot">&lt;-</span> pi</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Loop to get regime-specific Y, X, Sigma, A</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (m <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>      Y_m <span class="ot">=</span>  Y[xi[m,]<span class="sc">==</span><span class="dv">1</span>,]</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>      X_m <span class="ot">=</span>  X[xi[m,]<span class="sc">==</span><span class="dv">1</span>,]</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>      T_m <span class="ot">=</span> <span class="fu">nrow</span>(Y_m)</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (T_m <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Posterior parameters</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>        V.bar.inv <span class="ot">=</span> <span class="fu">t</span>(X_m) <span class="sc">%*%</span> X_m <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">diag</span>(V.prior))</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>        V.bar <span class="ot">=</span> <span class="fu">solve</span>(V.bar.inv)</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>        A.bar <span class="ot">=</span> V.bar <span class="sc">%*%</span> (<span class="fu">t</span>(X_m) <span class="sc">%*%</span> Y_m <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">diag</span>(V.prior)) <span class="sc">%*%</span> A.prior)</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>        nu.bar <span class="ot">=</span> T_m <span class="sc">+</span> nu.prior</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>        S.bar <span class="ot">=</span> S.prior <span class="sc">+</span> <span class="fu">t</span>(Y_m) <span class="sc">%*%</span> Y_m <span class="sc">+</span> <span class="fu">t</span>(A.prior) <span class="sc">%*%</span> <span class="fu">diag</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">diag</span>(V.prior)) <span class="sc">%*%</span> A.prior <span class="sc">-</span> <span class="fu">t</span>(A.bar) <span class="sc">%*%</span> V.bar.inv <span class="sc">%*%</span> A.bar</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>        S.bar.inv <span class="ot">=</span> <span class="fu">solve</span>(S.bar)</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Posterior draws for Sigma</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>        Sigma.posterior <span class="ot">=</span> <span class="fu">rWishart</span>(<span class="dv">1</span>, <span class="at">df =</span> nu.bar, <span class="at">Sigma =</span> S.bar.inv)</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>        Sigma.posterior <span class="ot">=</span> <span class="fu">solve</span>(Sigma.posterior[, , <span class="dv">1</span>])</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (m <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>          Sigma.posterior.draws1[, , s] <span class="ot">=</span> Sigma.posterior</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> {</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>          Sigma.posterior.draws2[, , s] <span class="ot">=</span> Sigma.posterior</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Posterior draws for A</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>        L <span class="ot">=</span> <span class="fu">t</span>(<span class="fu">chol</span>(V.bar))</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>        xx <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="fu">prod</span>(<span class="fu">dim</span>(A.bar))), <span class="fu">dim</span>(A.bar)[<span class="dv">1</span>], <span class="fu">dim</span>(A.bar)[<span class="dv">2</span>])</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>        A.posterior <span class="ot">&lt;-</span> A.bar <span class="sc">+</span> L <span class="sc">%*%</span> xx <span class="sc">%*%</span> <span class="fu">chol</span>(Sigma.posterior)</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (m <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>          A.posterior.draws1[, , s] <span class="ot">=</span> A.posterior</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> {</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>          A.posterior.draws2[, , s] <span class="ot">=</span> A.posterior</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Compute Z_m for the next iteration</span></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>        LL <span class="ot">=</span> <span class="fu">t</span>(<span class="fu">chol</span>(Sigma.posterior))</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>        Z[, , m] <span class="ot">&lt;-</span>   <span class="fu">t</span>((Y <span class="sc">-</span> X <span class="sc">%*%</span> A.posterior) <span class="sc">%*%</span> LL)</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>  output <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>    <span class="at">A.posterior1 =</span> A.posterior.draws1,</span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>    <span class="at">A.posterior2 =</span> A.posterior.draws2,</span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sigma.posterior1 =</span> Sigma.posterior.draws1,</span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sigma.posterior2 =</span> Sigma.posterior.draws2,</span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>    <span class="at">xi =</span> xi.draws,</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>    <span class="at">P =</span> P.draws,</span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>    <span class="at">pi =</span> pi.draws</span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(output)</span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <p>To examine how the regime draws are distributed between the two states, we visualize the switching variable <span class="math inline">\(\xi\)</span>. Initially, the plot suggests that the regime assignments appear arbitrary. To address this issue, a label switching procedure is implemented to ensure consitency in how the two regimes are identified, in this case regime 1 is identified as the state with higher volatility. Following the label switching, the distinction between the two regimes becomes more evident. The drawn regimes indicate that regime 1 corresponds to the period around 2020, which aligns with the Covid-19 pandemic. This finding is intuitive as the Covid-19 pandemic significantly impacted the economy at large, including unemployment rates. Regime 2, on the other hand, represents other periods.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-20-2.png" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="final-model" class="level2">
-<h2 class="anchored" data-anchor-id="final-model">Final model</h2>
-<p>The final model is the combination of Minnesota prior, dummy observation prior and regime change to account for heteroskedasticity.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-24-2.png" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
-</div>
-</div>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -702,146 +1088,784 @@ p_{21} &amp; p_{22}\\
 </div>
 </div>
 </div>
-</section>
-</section>
-<section id="forecasting" class="level1">
-<h1>Forecasting</h1>
-<section id="basic-model-1" class="level2">
-<h2 class="anchored" data-anchor-id="basic-model-1">Basic model</h2>
-<p>The forecasting process can be done with the following code.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>forecast <span class="ot">&lt;-</span> <span class="cf">function</span>(S, sample_A, sample_Sigma, Y, p, h) {</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Initialize the array to store forecasts</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  Y.h <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(h, N, S))</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Loop over each sample</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S) {</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    A.posterior.draw <span class="ot">&lt;-</span> sample_A[,,s]</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior <span class="ot">&lt;-</span> sample_Sigma[,,s]</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">&lt;-</span> Y[(<span class="fu">nrow</span>(Y) <span class="sc">-</span> p <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(Y),]</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">&lt;-</span> x.Ti[p<span class="sc">:</span><span class="dv">1</span>,]</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Forecast h steps ahead</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h) {</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>      x.T <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">as.vector</span>(<span class="fu">t</span>(x.Ti)))</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>      Y.f <span class="ot">&lt;-</span> <span class="fu">rmvnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> x.T <span class="sc">%*%</span> A.posterior.draw, <span class="at">sigma =</span> Sigma.posterior)</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>      x.Ti <span class="ot">&lt;-</span> <span class="fu">rbind</span>(Y.f, x.Ti[<span class="dv">1</span><span class="sc">:</span>(p <span class="sc">-</span> <span class="dv">1</span>),])</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>      Y.h[i,,s] <span class="ot">&lt;-</span> Y.f[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Y.h)</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "&lt;table&gt;\n&lt;caption&gt;Posterior A means and s.d. deviation table&lt;/caption&gt;\n &lt;thead&gt;\n  &lt;tr&gt;\n   &lt;th style=\"text-align:right;\"&gt; 1 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 2 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 3 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 4 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 5 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 6 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 7 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 8 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 9 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 10 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 11 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 12 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 13 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 14 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 15 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 16 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 17 &lt;/th&gt;\n  &lt;/tr&gt;\n &lt;/thead&gt;\n&lt;tbody&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.136077 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.960000 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.021506 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.053533 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.162047 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.037728 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003492 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.014125 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.154908 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.051878 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.006933 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.006051 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.036237 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.028663 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.002400 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.004038 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000543 &lt;/td&gt;\n  &lt;/tr&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 3.317267 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.119860 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.342575 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.366206 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.111462 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.132343 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.205321 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.207407 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.147811 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.102596 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.140604 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.141155 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.107893 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.078081 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.106231 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.106277 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.072322 &lt;/td&gt;\n  &lt;/tr&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.005136 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.005730 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.998521 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000516 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.001196 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.001224 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000218 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000099 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000603 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.002387 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000018 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000020 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000633 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.001204 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000047 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000021 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.001251 &lt;/td&gt;\n  &lt;/tr&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.109550 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003935 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.011301 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.012069 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003672 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.004373 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.006761 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.006855 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.004867 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003395 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.004615 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.004639 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003564 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.002553 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003507 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003504 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.002386 &lt;/td&gt;\n  &lt;/tr&gt;\n&lt;/tbody&gt;\n&lt;/table&gt;\n\n&lt;table&gt;\n&lt;caption&gt;Posterior Sigma means and s.d. table&lt;/caption&gt;\n &lt;thead&gt;\n  &lt;tr&gt;\n   &lt;th style=\"text-align:right;\"&gt; 1 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 2 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 3 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 4 &lt;/th&gt;\n  &lt;/tr&gt;\n &lt;/thead&gt;\n&lt;tbody&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.184892 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.002195 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000112 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.031063 &lt;/td&gt;\n  &lt;/tr&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.026188 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000644 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000065 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.016407 &lt;/td&gt;\n  &lt;/tr&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.002195 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000201 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000004 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000537 &lt;/td&gt;\n  &lt;/tr&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000644 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000029 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000002 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000531 &lt;/td&gt;\n  &lt;/tr&gt;\n&lt;/tbody&gt;\n&lt;/table&gt;"</code></pre>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-29-2.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>The plot of point forecast and density for 21 periods ahead, equivalent to 21 quarters or 5 years and 1 quarter from Q4 2023 to Q4 2028 shows a clear upward trend. The confidence interval is quite large. The unemployment rate seems to converge to the mean and has a slight downward trend in the last horizons.</p>
-<p>For the 3D plot of the density, we can see that the further the period ahead, the density is more dispersed since the data is become less informative as horizon increases.</p>
-</section>
-<section id="extension-1" class="level2">
-<h2 class="anchored" data-anchor-id="extension-1">Extension 1</h2>
 <div class="cell">
 <div class="cell-output-display">
 <div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Regime 1 Posterior A means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">6</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">7</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">9</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">10</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">11</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">12</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">13</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">14</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">15</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">16</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">17</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.316886</td>
+<td style="text-align: right;">0.987699</td>
+<td style="text-align: right;">-0.004379</td>
+<td style="text-align: right;">0.019651</td>
+<td style="text-align: right;">-0.128876</td>
+<td style="text-align: right;">-0.066004</td>
+<td style="text-align: right;">0.005840</td>
+<td style="text-align: right;">0.003655</td>
+<td style="text-align: right;">0.087500</td>
+<td style="text-align: right;">-0.037444</td>
+<td style="text-align: right;">0.004902</td>
+<td style="text-align: right;">0.001665</td>
+<td style="text-align: right;">0.036290</td>
+<td style="text-align: right;">0.008789</td>
+<td style="text-align: right;">0.002809</td>
+<td style="text-align: right;">0.000623</td>
+<td style="text-align: right;">0.016396</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4.579147</td>
+<td style="text-align: right;">0.245385</td>
+<td style="text-align: right;">0.462288</td>
+<td style="text-align: right;">0.517717</td>
+<td style="text-align: right;">0.210322</td>
+<td style="text-align: right;">0.227110</td>
+<td style="text-align: right;">0.273410</td>
+<td style="text-align: right;">0.280962</td>
+<td style="text-align: right;">0.234766</td>
+<td style="text-align: right;">0.161253</td>
+<td style="text-align: right;">0.187338</td>
+<td style="text-align: right;">0.191290</td>
+<td style="text-align: right;">0.158211</td>
+<td style="text-align: right;">0.123496</td>
+<td style="text-align: right;">0.142242</td>
+<td style="text-align: right;">0.142651</td>
+<td style="text-align: right;">0.114609</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-0.009075</td>
+<td style="text-align: right;">0.003698</td>
+<td style="text-align: right;">0.998953</td>
+<td style="text-align: right;">0.000655</td>
+<td style="text-align: right;">0.001413</td>
+<td style="text-align: right;">0.001634</td>
+<td style="text-align: right;">-0.000226</td>
+<td style="text-align: right;">0.000111</td>
+<td style="text-align: right;">0.000430</td>
+<td style="text-align: right;">-0.001153</td>
+<td style="text-align: right;">-0.000101</td>
+<td style="text-align: right;">0.000086</td>
+<td style="text-align: right;">-0.000333</td>
+<td style="text-align: right;">-0.000704</td>
+<td style="text-align: right;">0.000017</td>
+<td style="text-align: right;">0.000046</td>
+<td style="text-align: right;">-0.000903</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.147534</td>
+<td style="text-align: right;">0.008456</td>
+<td style="text-align: right;">0.014858</td>
+<td style="text-align: right;">0.016655</td>
+<td style="text-align: right;">0.006463</td>
+<td style="text-align: right;">0.007686</td>
+<td style="text-align: right;">0.008866</td>
+<td style="text-align: right;">0.009089</td>
+<td style="text-align: right;">0.007280</td>
+<td style="text-align: right;">0.005341</td>
+<td style="text-align: right;">0.006080</td>
+<td style="text-align: right;">0.006135</td>
+<td style="text-align: right;">0.005086</td>
+<td style="text-align: right;">0.004042</td>
+<td style="text-align: right;">0.004572</td>
+<td style="text-align: right;">0.004631</td>
+<td style="text-align: right;">0.003669</td>
+</tr>
+</tbody>
+</table>
+
+
 </div>
 </div>
 <div class="cell-output-display">
 <div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-30-2.png" class="img-fluid figure-img" width="672"></p>
-</figure>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Regime 2 Posterior A means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">6</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">7</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">9</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">10</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">11</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">12</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">13</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">14</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">15</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">16</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">17</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">-0.096053</td>
+<td style="text-align: right;">0.972897</td>
+<td style="text-align: right;">-0.006798</td>
+<td style="text-align: right;">0.058393</td>
+<td style="text-align: right;">-0.105348</td>
+<td style="text-align: right;">-0.025707</td>
+<td style="text-align: right;">0.001306</td>
+<td style="text-align: right;">0.015532</td>
+<td style="text-align: right;">0.104734</td>
+<td style="text-align: right;">-0.041000</td>
+<td style="text-align: right;">0.003113</td>
+<td style="text-align: right;">0.006194</td>
+<td style="text-align: right;">0.036421</td>
+<td style="text-align: right;">0.009507</td>
+<td style="text-align: right;">0.001743</td>
+<td style="text-align: right;">0.003292</td>
+<td style="text-align: right;">-0.000216</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3.701503</td>
+<td style="text-align: right;">0.185834</td>
+<td style="text-align: right;">0.372567</td>
+<td style="text-align: right;">0.413256</td>
+<td style="text-align: right;">0.166425</td>
+<td style="text-align: right;">0.178010</td>
+<td style="text-align: right;">0.222131</td>
+<td style="text-align: right;">0.225355</td>
+<td style="text-align: right;">0.189637</td>
+<td style="text-align: right;">0.127066</td>
+<td style="text-align: right;">0.150843</td>
+<td style="text-align: right;">0.152754</td>
+<td style="text-align: right;">0.125474</td>
+<td style="text-align: right;">0.097754</td>
+<td style="text-align: right;">0.114329</td>
+<td style="text-align: right;">0.115042</td>
+<td style="text-align: right;">0.089384</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.004280</td>
+<td style="text-align: right;">0.004430</td>
+<td style="text-align: right;">0.999113</td>
+<td style="text-align: right;">-0.000701</td>
+<td style="text-align: right;">0.000640</td>
+<td style="text-align: right;">0.000463</td>
+<td style="text-align: right;">-0.000142</td>
+<td style="text-align: right;">-0.000235</td>
+<td style="text-align: right;">0.000003</td>
+<td style="text-align: right;">-0.001327</td>
+<td style="text-align: right;">-0.000001</td>
+<td style="text-align: right;">-0.000105</td>
+<td style="text-align: right;">-0.000367</td>
+<td style="text-align: right;">-0.000753</td>
+<td style="text-align: right;">0.000027</td>
+<td style="text-align: right;">-0.000049</td>
+<td style="text-align: right;">-0.000512</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.125892</td>
+<td style="text-align: right;">0.006916</td>
+<td style="text-align: right;">0.012706</td>
+<td style="text-align: right;">0.014065</td>
+<td style="text-align: right;">0.005289</td>
+<td style="text-align: right;">0.006457</td>
+<td style="text-align: right;">0.007576</td>
+<td style="text-align: right;">0.007739</td>
+<td style="text-align: right;">0.006114</td>
+<td style="text-align: right;">0.004499</td>
+<td style="text-align: right;">0.005204</td>
+<td style="text-align: right;">0.005237</td>
+<td style="text-align: right;">0.004274</td>
+<td style="text-align: right;">0.003407</td>
+<td style="text-align: right;">0.003923</td>
+<td style="text-align: right;">0.003927</td>
+<td style="text-align: right;">0.003055</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Regime 1 Posterior Sigma means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.332383</td>
+<td style="text-align: right;">-0.003033</td>
+<td style="text-align: right;">-0.000152</td>
+<td style="text-align: right;">-0.038300</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.083753</td>
+<td style="text-align: right;">0.002432</td>
+<td style="text-align: right;">0.000186</td>
+<td style="text-align: right;">0.044302</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-0.003033</td>
+<td style="text-align: right;">0.000345</td>
+<td style="text-align: right;">0.000005</td>
+<td style="text-align: right;">0.000676</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.002432</td>
+<td style="text-align: right;">0.000101</td>
+<td style="text-align: right;">0.000006</td>
+<td style="text-align: right;">0.001402</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Regime 2 Posterior Sigma means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.215171</td>
+<td style="text-align: right;">-0.001017</td>
+<td style="text-align: right;">-6.6e-05</td>
+<td style="text-align: right;">-0.023592</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.042905</td>
+<td style="text-align: right;">0.001485</td>
+<td style="text-align: right;">1.2e-04</td>
+<td style="text-align: right;">0.028948</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-0.001017</td>
+<td style="text-align: right;">0.000251</td>
+<td style="text-align: right;">2.0e-06</td>
+<td style="text-align: right;">0.000304</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.001485</td>
+<td style="text-align: right;">0.000066</td>
+<td style="text-align: right;">4.0e-06</td>
+<td style="text-align: right;">0.001030</td>
+</tr>
+</tbody>
+</table>
+
+
 </div>
 </div>
 </div>
-<p>The plot of forecast for the dummy observation prior doesn’t show any significant differences visually. The confidence interval narrowed insignificantly.</p>
-</section>
-<section id="extension-2" class="level2">
-<h2 class="anchored" data-anchor-id="extension-2">Extension 2</h2>
-<p>After the regimes are correctly placed, we can forecast h-step ahead using the posterior draws.</p>
+<p>The trace plots and histograms posterior draws on A and <span class="math inline">\(\Sigma\)</span> shows that unemployment rate has strong positive correlation with its first lag. The sigma plots shows that regime 1 has higher volatility than regime 2, which is expected considering label switching set up.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Markov_forecast <span class="ot">&lt;-</span> <span class="cf">function</span>(S, sample, Y, p, h) {</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">&lt;-</span> <span class="fu">ncol</span>(Y)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Initialize the array to store forecasts</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  Y.h <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(h, <span class="dv">2</span>, S))</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    A.posterior.draw1 <span class="ot">=</span> sample<span class="sc">$</span>A.posterior1[,,s]</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    A.posterior.draw2 <span class="ot">=</span> sample<span class="sc">$</span>A.posterior2[,,s]</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior1 <span class="ot">=</span> sample<span class="sc">$</span>Sigma.posterior1[,,s]</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior2 <span class="ot">=</span> sample<span class="sc">$</span>Sigma.posterior2[,,s]</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    T <span class="ot">=</span> <span class="fu">dim</span>(sample<span class="sc">$</span>xi)[<span class="dv">2</span>]</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">=</span> Y[(<span class="fu">nrow</span>(Y)<span class="sc">-</span>p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(Y),]</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">=</span> x.Ti[p<span class="sc">:</span><span class="dv">1</span>,]</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    P_h <span class="ot">=</span> sample<span class="sc">$</span>P[,,s] <span class="sc">%*%</span> sample<span class="sc">$</span>xi[,T,s]  <span class="co"># Initializing P_h</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h){</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>      x.T <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">as.vector</span>(<span class="fu">t</span>(x.Ti)))</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (i <span class="sc">&gt;</span> <span class="dv">1</span>) {  <span class="co"># Only update P_h if i &gt; 1</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        P_h <span class="ot">=</span> sample<span class="sc">$</span>P[,,s] <span class="sc">%*%</span> P_h</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>      sample_m <span class="ot">=</span> <span class="fu">sample.int</span>(<span class="dv">2</span>,<span class="dv">1</span>, <span class="at">prob=</span><span class="fu">as.numeric</span>(P_h))</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (sample_m <span class="sc">==</span> <span class="dv">1</span>) {</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>        A.posterior.draw <span class="ot">=</span> A.posterior.draw1</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>        Sigma.posterior <span class="ot">=</span> Sigma.posterior1</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>        A.posterior.draw <span class="ot">=</span> A.posterior.draw2</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>        Sigma.posterior <span class="ot">=</span> Sigma.posterior2</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>      Y.f <span class="ot">=</span> <span class="fu">rmvnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> x.T <span class="sc">%*%</span> A.posterior.draw, <span class="at">sigma =</span> Sigma.posterior)</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>      x.Ti <span class="ot">=</span> <span class="fu">rbind</span>(Y.f, x.Ti[<span class="dv">1</span><span class="sc">:</span>(p<span class="dv">-1</span>),])</span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>      Y.h[i,,s] <span class="ot">=</span> Y.f[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Y.h)</span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>The plot below shows the forecast using Minnesota prior and regime change for unemployment rate.</p>
-<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-32-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="final-model-1" class="level2">
-<h2 class="anchored" data-anchor-id="final-model-1">Final model</h2>
-<p>Similarly to the baseline model, the prior will be a combination of Minnesota and dummy observation prior. Then the Markov-switching Gibb-sampling is done with these new priors to obtain posterior draws</p>
+</section>
+<section id="model-with-minnesota-prior-dummy-observation-prior-and-regime-change" class="level1">
+<h1>Model with Minnesota prior, dummy observation prior and regime change</h1>
+<p>The final model is the combination of Minnesota prior, dummy observation prior and regime change to account for heteroskedasticity.</p>
+<p>Prior distribution of a combination of Minnesota and dummy observation prior <span class="math display">\[\begin{align*}
+A \mid \Sigma &amp;\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}) \\
+\Sigma &amp;\sim  \text{IW}_{N} (\widetilde{S}, \widetilde{v})\\
+\\
+\widetilde{A} &amp;= \widetilde{V}(X_m^{+'}Y_m^{+}+\underline{V}^{-1}\underline{A}) \\
+\widetilde{V} &amp;= (X_m^{+'}X_m^{+} + \underline{V}^{-1})^{-1} \\
+\widetilde{v} &amp;= T^{+} + \underline{v} \\
+\widetilde{S} &amp;= \underline{S}+Y_m^{+'}Y_m^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\widetilde{A}'\widetilde{V}^{-1}\widetilde{A} \\
+\end{align*}\]</span></p>
+<p>The full conditional joint posterior have the following form <span class="math display">\[\begin{align}
+p(A|Y,X,\Sigma) &amp;\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\
+p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
+\\
+\overline{V_m} &amp;= (X_m'X_m + \widetilde{V}^{-1})^{-1} \\
+\overline{A_m} &amp;= \overline{V_m}(X_m'Y_m+\widetilde{V}^{-1}\widetilde{A}) \\
+\overline{v} &amp;= T_m + \widetilde{v} \\
+\overline{S_m} &amp;= \widetilde{S}+Y_m'Y_m+\widetilde{A}'\widetilde{V}^{-1}\widetilde{A}-\overline{A_m}'
+\overline{V_m}^{-1}\overline{A_m} \\
+\end{align}\]</span></p>
+<p>The posterior draws are obtain with the following code</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gibbs sampling function</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>FinalGibbs_draws <span class="ot">=</span> <span class="cf">function</span>(S, Y, X, xi, P, pi, A.prior, V.prior, S.prior, nu.prior) {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> <span class="fu">ncol</span>(Y)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">=</span> (<span class="fu">ncol</span>(X) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> N </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  M <span class="ot">=</span> <span class="dv">2</span>   <span class="co"># Number of regimes</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  T <span class="ot">=</span> <span class="fu">nrow</span>(Y)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  mu      <span class="ot">=</span> <span class="dv">1000</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  delta   <span class="ot">=</span> <span class="dv">1000</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  avg_unmp <span class="ot">&lt;-</span> <span class="fu">mean</span>(X[<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">6</span>, <span class="dv">10</span>, <span class="dv">14</span>)])</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  avg_gdp <span class="ot">&lt;-</span> <span class="fu">mean</span>(X[<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">11</span>, <span class="dv">15</span>)])</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  avg_wpi <span class="ot">&lt;-</span> <span class="fu">mean</span>(X[<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">12</span>, <span class="dv">16</span>)])</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  avg_cash <span class="ot">&lt;-</span> <span class="fu">mean</span>(X[<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">13</span>, <span class="dv">17</span>)])</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  diag_mu <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="fu">c</span>(avg_unmp<span class="sc">/</span>mu, avg_gdp<span class="sc">/</span>mu, avg_wpi<span class="sc">/</span>mu, avg_cash<span class="sc">/</span>mu))</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  row_delta <span class="ot">&lt;-</span>  <span class="fu">matrix</span>(<span class="fu">c</span>(avg_unmp<span class="sc">/</span>delta, avg_gdp<span class="sc">/</span>delta, avg_wpi<span class="sc">/</span>delta, avg_cash<span class="sc">/</span>delta), </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                       <span class="at">nrow =</span> <span class="dv">1</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  Y_d       <span class="ot">=</span> <span class="fu">rbind</span>(diag_mu, row_delta)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  first_vector <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>, <span class="dv">1</span><span class="sc">/</span>delta), <span class="at">ncol =</span> <span class="dv">1</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  X_d      <span class="ot">=</span> <span class="fu">cbind</span>(first_vector, Y_d, Y_d, Y_d, Y_d)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Normal-inverse Wishart prior parameters</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="do">############################################################</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  V.tilde.inv   <span class="ot">=</span> <span class="fu">t</span>(X_d)<span class="sc">%*%</span>X_d <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  V.tilde       <span class="ot">=</span> <span class="fu">solve</span>(V.tilde.inv)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  A.tilde       <span class="ot">=</span> V.tilde<span class="sc">%*%</span>(<span class="fu">t</span>(X_d)<span class="sc">%*%</span>Y_d <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))<span class="sc">%*%</span>A.prior)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  nu.tilde      <span class="ot">=</span> <span class="fu">nrow</span>(Y_d) <span class="sc">+</span> nu.prior</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  S.tilde       <span class="ot">=</span> S.prior <span class="sc">+</span> <span class="fu">t</span>(Y_d)<span class="sc">%*%</span>Y_d <span class="sc">+</span> <span class="fu">t</span>(A.prior)<span class="sc">%*%</span><span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))<span class="sc">%*%</span>A.prior <span class="sc">-</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">t</span>(A.tilde)<span class="sc">%*%</span>V.tilde.inv<span class="sc">%*%</span>A.tilde</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  S.tilde.inv   <span class="ot">=</span> <span class="fu">solve</span>(S.tilde)</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior.draws1 <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(N, N, S))</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior.draws2 <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(N, N, S))</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  A.posterior.draws1 <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>((<span class="dv">1</span> <span class="sc">+</span> p <span class="sc">*</span> N), N, S))</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  A.posterior.draws2 <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>((<span class="dv">1</span> <span class="sc">+</span> p <span class="sc">*</span> N), N, S))</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  xi.draws <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="at">dim =</span> <span class="fu">c</span>(M, T, S))</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  P.draws <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, S))</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  pi.draws <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> M, <span class="at">ncol =</span> S)</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>  P <span class="ot">=</span> <span class="fl">0.95</span> <span class="sc">*</span> <span class="fu">diag</span>(<span class="dv">2</span>) <span class="sc">+</span> <span class="fl">0.025</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  pi <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>)</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>  xi <span class="ot">=</span> <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">50</span>), <span class="fu">rep</span>(<span class="dv">0</span>,T<span class="dv">-50</span>)), <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">0</span>,<span class="dv">50</span>), <span class="fu">rep</span>(<span class="dv">1</span>,T<span class="dv">-50</span>)))</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>  Z <span class="ot">=</span> <span class="fu">array</span>(<span class="fu">rnorm</span>(T<span class="sc">*</span>N<span class="sc">*</span>M), <span class="fu">c</span>(N,T,M))</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S) {</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update xi, P, and pi using the sample_Markov_process function</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    gibbs_draw <span class="ot">=</span> <span class="fu">sample_Markov_process</span>(Z, xi, P, pi)</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>    xi <span class="ot">=</span> gibbs_draw<span class="sc">$</span>aux_xi</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>    P <span class="ot">=</span> gibbs_draw<span class="sc">$</span>aux_PR_TR</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>    pi <span class="ot">=</span> gibbs_draw<span class="sc">$</span>aux_pi_0</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>    xi.draws[, , s] <span class="ot">&lt;-</span> xi</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>    P.draws[, , s] <span class="ot">&lt;-</span> P</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    pi.draws[, s] <span class="ot">&lt;-</span> pi</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Loop to get regime-specific Y, X, Sigma, A</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (m <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>      Y_m <span class="ot">=</span>  Y[xi[m,]<span class="sc">==</span><span class="dv">1</span>,]</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>      X_m <span class="ot">=</span>  X[xi[m,]<span class="sc">==</span><span class="dv">1</span>,]</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>      T_m <span class="ot">=</span> <span class="fu">nrow</span>(Y_m)</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (T_m <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Posterior parameters</span></span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>        V.bar.inv <span class="ot">=</span> <span class="fu">t</span>(X_m) <span class="sc">%*%</span> X_m <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">diag</span>(V.tilde))</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>        V.bar <span class="ot">=</span> <span class="fu">solve</span>(V.bar.inv)</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>        A.bar <span class="ot">=</span> V.bar <span class="sc">%*%</span> (<span class="fu">t</span>(X_m) <span class="sc">%*%</span> Y_m <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">diag</span>(V.tilde)) <span class="sc">%*%</span> A.tilde)</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>        nu.bar <span class="ot">=</span> T_m <span class="sc">+</span> nu.tilde</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>        S.bar <span class="ot">=</span> S.tilde <span class="sc">+</span> <span class="fu">t</span>(Y_m) <span class="sc">%*%</span> Y_m <span class="sc">+</span> <span class="fu">t</span>(A.tilde) <span class="sc">%*%</span> <span class="fu">diag</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">diag</span>(V.tilde)) <span class="sc">%*%</span> A.tilde <span class="sc">-</span>                 <span class="fu">t</span>(A.bar) <span class="sc">%*%</span> V.bar.inv <span class="sc">%*%</span> A.bar</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>        S.bar.inv <span class="ot">=</span> <span class="fu">solve</span>(S.bar)</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Posterior draws for Sigma</span></span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>        Sigma.posterior <span class="ot">=</span> <span class="fu">rWishart</span>(<span class="dv">1</span>, <span class="at">df =</span> nu.bar, <span class="at">Sigma =</span> S.bar.inv)</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>        Sigma.posterior <span class="ot">=</span> <span class="fu">solve</span>(Sigma.posterior[, , <span class="dv">1</span>])</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (m <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>          Sigma.posterior.draws1[, , s] <span class="ot">=</span> Sigma.posterior</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> {</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>          Sigma.posterior.draws2[, , s] <span class="ot">=</span> Sigma.posterior</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Posterior draws for A</span></span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>        L <span class="ot">=</span> <span class="fu">t</span>(<span class="fu">chol</span>(V.bar))</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>        xx <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="fu">prod</span>(<span class="fu">dim</span>(A.bar))), <span class="fu">dim</span>(A.bar)[<span class="dv">1</span>], <span class="fu">dim</span>(A.bar)[<span class="dv">2</span>])</span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>        A.posterior <span class="ot">&lt;-</span> A.bar <span class="sc">+</span> L <span class="sc">%*%</span> xx <span class="sc">%*%</span> <span class="fu">chol</span>(Sigma.posterior)</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (m <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>          A.posterior.draws1[, , s] <span class="ot">=</span> A.posterior</span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> {</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>          A.posterior.draws2[, , s] <span class="ot">=</span> A.posterior</span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Compute Z_m for the next iteration</span></span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>        LL <span class="ot">=</span> <span class="fu">t</span>(<span class="fu">chol</span>(Sigma.posterior))</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>        Z[, , m] <span class="ot">&lt;-</span>   <span class="fu">t</span>((Y <span class="sc">-</span> X <span class="sc">%*%</span> A.posterior) <span class="sc">%*%</span> LL)</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>  output <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>    <span class="at">A.posterior1 =</span> A.posterior.draws1,</span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>    <span class="at">A.posterior2 =</span> A.posterior.draws2,</span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sigma.posterior1 =</span> Sigma.posterior.draws1,</span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sigma.posterior2 =</span> Sigma.posterior.draws2,</span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a>    <span class="at">xi =</span> xi.draws,</span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>    <span class="at">P =</span> P.draws,</span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>    <span class="at">pi =</span> pi.draws</span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(output)</span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a>Final.draws <span class="ot">=</span> <span class="fu">FinalGibbs_draws</span>(<span class="at">S =</span> <span class="dv">50000</span>, Y, X, xi, P, pi, A.prior, V.prior, S.prior, nu.prior)</span>
+<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a>before_f <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">t</span>(<span class="fu">apply</span>(Final.draws<span class="sc">$</span>xi, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, mean)), <span class="at">start =</span> <span class="fu">c</span>(<span class="dv">1998</span>,<span class="dv">3</span>), <span class="at">frequency =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Similarly to the Regime change on the baseline model, the Bayesian Vars with dummy observation prior and regime change also indicate that regime 1 corresponds to the period around 2020, which aligns with the Covid-19 pandemic.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-31-2.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Regime 1 Posterior A means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">6</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">7</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">9</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">10</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">11</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">12</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">13</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">14</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">15</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">16</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">17</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.343829</td>
+<td style="text-align: right;">0.987092</td>
+<td style="text-align: right;">-0.004772</td>
+<td style="text-align: right;">0.016505</td>
+<td style="text-align: right;">-0.134296</td>
+<td style="text-align: right;">-0.068899</td>
+<td style="text-align: right;">0.007408</td>
+<td style="text-align: right;">0.004466</td>
+<td style="text-align: right;">0.089832</td>
+<td style="text-align: right;">-0.037493</td>
+<td style="text-align: right;">0.004570</td>
+<td style="text-align: right;">0.000906</td>
+<td style="text-align: right;">0.037778</td>
+<td style="text-align: right;">0.009424</td>
+<td style="text-align: right;">0.002548</td>
+<td style="text-align: right;">0.001377</td>
+<td style="text-align: right;">0.016809</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4.352028</td>
+<td style="text-align: right;">0.232753</td>
+<td style="text-align: right;">0.435566</td>
+<td style="text-align: right;">0.490333</td>
+<td style="text-align: right;">0.200004</td>
+<td style="text-align: right;">0.217068</td>
+<td style="text-align: right;">0.261190</td>
+<td style="text-align: right;">0.265762</td>
+<td style="text-align: right;">0.223283</td>
+<td style="text-align: right;">0.152914</td>
+<td style="text-align: right;">0.178327</td>
+<td style="text-align: right;">0.180433</td>
+<td style="text-align: right;">0.148910</td>
+<td style="text-align: right;">0.117598</td>
+<td style="text-align: right;">0.134891</td>
+<td style="text-align: right;">0.135807</td>
+<td style="text-align: right;">0.108462</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-0.010114</td>
+<td style="text-align: right;">0.003754</td>
+<td style="text-align: right;">0.998977</td>
+<td style="text-align: right;">0.000703</td>
+<td style="text-align: right;">0.001549</td>
+<td style="text-align: right;">0.001715</td>
+<td style="text-align: right;">-0.000289</td>
+<td style="text-align: right;">0.000217</td>
+<td style="text-align: right;">0.000425</td>
+<td style="text-align: right;">-0.001164</td>
+<td style="text-align: right;">-0.000052</td>
+<td style="text-align: right;">0.000082</td>
+<td style="text-align: right;">-0.000399</td>
+<td style="text-align: right;">-0.000710</td>
+<td style="text-align: right;">-0.000038</td>
+<td style="text-align: right;">0.000027</td>
+<td style="text-align: right;">-0.000921</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.140075</td>
+<td style="text-align: right;">0.008169</td>
+<td style="text-align: right;">0.014084</td>
+<td style="text-align: right;">0.015776</td>
+<td style="text-align: right;">0.006146</td>
+<td style="text-align: right;">0.007383</td>
+<td style="text-align: right;">0.008449</td>
+<td style="text-align: right;">0.008591</td>
+<td style="text-align: right;">0.006940</td>
+<td style="text-align: right;">0.005087</td>
+<td style="text-align: right;">0.005764</td>
+<td style="text-align: right;">0.005817</td>
+<td style="text-align: right;">0.004812</td>
+<td style="text-align: right;">0.003867</td>
+<td style="text-align: right;">0.004363</td>
+<td style="text-align: right;">0.004372</td>
+<td style="text-align: right;">0.003462</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Regime 2 Posterior A means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">6</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">7</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">9</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">10</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">11</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">12</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">13</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">14</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">15</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">16</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">17</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">-0.102644</td>
+<td style="text-align: right;">0.973869</td>
+<td style="text-align: right;">-0.012248</td>
+<td style="text-align: right;">0.064400</td>
+<td style="text-align: right;">-0.101801</td>
+<td style="text-align: right;">-0.024741</td>
+<td style="text-align: right;">0.003802</td>
+<td style="text-align: right;">0.015359</td>
+<td style="text-align: right;">0.103301</td>
+<td style="text-align: right;">-0.040828</td>
+<td style="text-align: right;">0.002775</td>
+<td style="text-align: right;">0.006752</td>
+<td style="text-align: right;">0.036687</td>
+<td style="text-align: right;">0.008937</td>
+<td style="text-align: right;">0.001156</td>
+<td style="text-align: right;">0.003529</td>
+<td style="text-align: right;">-0.001284</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3.537709</td>
+<td style="text-align: right;">0.177769</td>
+<td style="text-align: right;">0.354277</td>
+<td style="text-align: right;">0.396318</td>
+<td style="text-align: right;">0.160692</td>
+<td style="text-align: right;">0.170499</td>
+<td style="text-align: right;">0.212534</td>
+<td style="text-align: right;">0.216888</td>
+<td style="text-align: right;">0.182355</td>
+<td style="text-align: right;">0.122576</td>
+<td style="text-align: right;">0.144122</td>
+<td style="text-align: right;">0.146100</td>
+<td style="text-align: right;">0.120443</td>
+<td style="text-align: right;">0.093357</td>
+<td style="text-align: right;">0.109225</td>
+<td style="text-align: right;">0.109918</td>
+<td style="text-align: right;">0.085591</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.005677</td>
+<td style="text-align: right;">0.004400</td>
+<td style="text-align: right;">0.999128</td>
+<td style="text-align: right;">-0.000906</td>
+<td style="text-align: right;">0.000567</td>
+<td style="text-align: right;">0.000404</td>
+<td style="text-align: right;">-0.000164</td>
+<td style="text-align: right;">-0.000205</td>
+<td style="text-align: right;">0.000026</td>
+<td style="text-align: right;">-0.001327</td>
+<td style="text-align: right;">-0.000010</td>
+<td style="text-align: right;">-0.000107</td>
+<td style="text-align: right;">-0.000397</td>
+<td style="text-align: right;">-0.000726</td>
+<td style="text-align: right;">0.000020</td>
+<td style="text-align: right;">-0.000018</td>
+<td style="text-align: right;">-0.000464</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.120811</td>
+<td style="text-align: right;">0.006671</td>
+<td style="text-align: right;">0.012099</td>
+<td style="text-align: right;">0.013372</td>
+<td style="text-align: right;">0.005064</td>
+<td style="text-align: right;">0.006181</td>
+<td style="text-align: right;">0.007180</td>
+<td style="text-align: right;">0.007364</td>
+<td style="text-align: right;">0.005844</td>
+<td style="text-align: right;">0.004309</td>
+<td style="text-align: right;">0.004908</td>
+<td style="text-align: right;">0.005008</td>
+<td style="text-align: right;">0.004080</td>
+<td style="text-align: right;">0.003265</td>
+<td style="text-align: right;">0.003713</td>
+<td style="text-align: right;">0.003740</td>
+<td style="text-align: right;">0.002912</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Regime 1 Posterior Sigma means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.298269</td>
+<td style="text-align: right;">-0.002835</td>
+<td style="text-align: right;">-0.000141</td>
+<td style="text-align: right;">-0.034759</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.069175</td>
+<td style="text-align: right;">0.002048</td>
+<td style="text-align: right;">0.000156</td>
+<td style="text-align: right;">0.037195</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-0.002835</td>
+<td style="text-align: right;">0.000311</td>
+<td style="text-align: right;">0.000004</td>
+<td style="text-align: right;">0.000628</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.002048</td>
+<td style="text-align: right;">0.000085</td>
+<td style="text-align: right;">0.000005</td>
+<td style="text-align: right;">0.001164</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Regime 2 Posterior Sigma means and sd table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.196361</td>
+<td style="text-align: right;">-0.000849</td>
+<td style="text-align: right;">-0.000058</td>
+<td style="text-align: right;">-0.020982</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.037726</td>
+<td style="text-align: right;">0.001301</td>
+<td style="text-align: right;">0.000104</td>
+<td style="text-align: right;">0.025547</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-0.000849</td>
+<td style="text-align: right;">0.000228</td>
+<td style="text-align: right;">0.000002</td>
+<td style="text-align: right;">0.000271</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.001301</td>
+<td style="text-align: right;">0.000057</td>
+<td style="text-align: right;">0.000004</td>
+<td style="text-align: right;">0.000897</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+<p>The trace plots and histograms posterior draws on A and <span class="math inline">\(\Sigma\)</span> shows that unemployment rate has strong positive correlation with its first lag. The <span class="math inline">\(\Sigma\)</span> plots still illustrate that regime 1 has higher volatility as expected, also the volatility for bothe regimes are lower than that of regime change on baseline model.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -850,104 +1874,183 @@ p_{21} &amp; p_{22}\\
 </figure>
 </div>
 </div>
+</div>
+</section>
+<section id="forecasting" class="level1">
+<h1>Forecasting</h1>
+<p>The forecasting process can be done with the following code.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>forecast <span class="ot">&lt;-</span> <span class="cf">function</span>(S, sample_A, sample_Sigma, Y, p, h) {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Initialize the array to store forecasts</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  Y.h <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(h, N, S))</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Loop over each sample</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S) {</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    A.posterior.draw <span class="ot">&lt;-</span> sample_A[,,s]</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior <span class="ot">&lt;-</span> sample_Sigma[,,s]</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">&lt;-</span> Y[(<span class="fu">nrow</span>(Y) <span class="sc">-</span> p <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(Y),]</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">&lt;-</span> x.Ti[p<span class="sc">:</span><span class="dv">1</span>,]</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Forecast h steps ahead</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h) {</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>      x.T <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">as.vector</span>(<span class="fu">t</span>(x.Ti)))</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>      Y.f <span class="ot">&lt;-</span> <span class="fu">rmvnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> x.T <span class="sc">%*%</span> A.posterior.draw, <span class="at">sigma =</span> Sigma.posterior)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>      x.Ti <span class="ot">&lt;-</span> <span class="fu">rbind</span>(Y.f, x.Ti[<span class="dv">1</span><span class="sc">:</span>(p <span class="sc">-</span> <span class="dv">1</span>),])</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>      Y.h[i,,s] <span class="ot">&lt;-</span> Y.f[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Y.h)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="baseline-model" class="level2">
+<h2 class="anchored" data-anchor-id="baseline-model">Baseline model</h2>
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-33-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-36-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+<p>The plot of point forecast and density for 21 periods ahead, equivalent to 21 quarters or 5 years and 1 quarter from Q4 2023 to Q4 2028 shows a clear upward trend. The confidence interval is quite large. The unemployment rate seems to converge to the mean and has a slight downward trend in the last horizons.</p>
+<p>For the 3D plot of the density, we can see that the further the period ahead, the density is more dispersed since the data is become less informative as horizon increases.</p>
+</section>
+<section id="baseline-model-extension-1---dummy-observation-prior" class="level2">
+<h2 class="anchored" data-anchor-id="baseline-model-extension-1---dummy-observation-prior">Baseline Model Extension 1 - Dummy observation prior</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-37-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot of forecast for the dummy observation prior doesn’t show any significant differences visually. The confidence interval narrowed insignificantly.</p>
+</section>
+<section id="baseline-model-extension-2---regime-change-1" class="level2">
+<h2 class="anchored" data-anchor-id="baseline-model-extension-2---regime-change-1">Baseline Model Extension 2 - Regime change</h2>
+<p>After the regimes are correctly placed, we can forecast h-step ahead using the posterior draws.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Markov_forecast <span class="ot">&lt;-</span> <span class="cf">function</span>(S, sample, Y, p, h) {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">&lt;-</span> <span class="fu">ncol</span>(Y)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Initialize the array to store forecasts</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  Y.h <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(h, <span class="dv">2</span>, S))</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    A.posterior.draw1 <span class="ot">=</span> sample<span class="sc">$</span>A.posterior1[,,s]</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    A.posterior.draw2 <span class="ot">=</span> sample<span class="sc">$</span>A.posterior2[,,s]</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior1 <span class="ot">=</span> sample<span class="sc">$</span>Sigma.posterior1[,,s]</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior2 <span class="ot">=</span> sample<span class="sc">$</span>Sigma.posterior2[,,s]</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    T <span class="ot">=</span> <span class="fu">dim</span>(sample<span class="sc">$</span>xi)[<span class="dv">2</span>]</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">=</span> Y[(<span class="fu">nrow</span>(Y)<span class="sc">-</span>p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(Y),]</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">=</span> x.Ti[p<span class="sc">:</span><span class="dv">1</span>,]</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    P_h <span class="ot">=</span> sample<span class="sc">$</span>P[,,s] <span class="sc">%*%</span> sample<span class="sc">$</span>xi[,T,s]  <span class="co"># Initializing P_h</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h){</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>      x.T <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">as.vector</span>(<span class="fu">t</span>(x.Ti)))</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (i <span class="sc">&gt;</span> <span class="dv">1</span>) {  <span class="co"># Only update P_h if i &gt; 1</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>        P_h <span class="ot">=</span> sample<span class="sc">$</span>P[,,s] <span class="sc">%*%</span> P_h</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>      sample_m <span class="ot">=</span> <span class="fu">sample.int</span>(<span class="dv">2</span>,<span class="dv">1</span>, <span class="at">prob=</span><span class="fu">as.numeric</span>(P_h))</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (sample_m <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>        A.posterior.draw <span class="ot">=</span> A.posterior.draw1</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        Sigma.posterior <span class="ot">=</span> Sigma.posterior1</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>        A.posterior.draw <span class="ot">=</span> A.posterior.draw2</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        Sigma.posterior <span class="ot">=</span> Sigma.posterior2</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>      Y.f <span class="ot">=</span> <span class="fu">rmvnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> x.T <span class="sc">%*%</span> A.posterior.draw, <span class="at">sigma =</span> Sigma.posterior)</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>      x.Ti <span class="ot">=</span> <span class="fu">rbind</span>(Y.f, x.Ti[<span class="dv">1</span><span class="sc">:</span>(p<span class="dv">-1</span>),])</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>      Y.h[i,,s] <span class="ot">=</span> Y.f[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Y.h)</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The plot below shows the forecast using Minnesota prior and regime change for unemployment rate.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-39-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The point forecast have similar positive trend to the mean and slight downward trend for the last few horizons. The 3D density intervals show that the peak of the intervals are lower.</p>
+</section>
+<section id="model-with-minnesota-prior-dummy-observation-prior-and-regime-change-1" class="level2">
+<h2 class="anchored" data-anchor-id="model-with-minnesota-prior-dummy-observation-prior-and-regime-change-1">Model with Minnesota prior, dummy observation prior and regime change</h2>
+<p>Similarly to the baseline model, the prior will be a combination of Minnesota and dummy observation prior. Then the Markov-switching Gibb-sampling is done with these new priors to obtain posterior draws</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-40-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The forecast shows positive upward trend, converging to the mean, the downward trend for the last horizons is less evident.</p>
+<p>The below is an interactive density intervals for easier inspection.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-620a2d9f81cf66bcd05e" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-620a2d9f81cf66bcd05e">{"x":{"visdat":{"eceaba69087":["function () ","plotlyVisDat"]},"cur_data":"eceaba69087","attrs":{"eceaba69087":{"y":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],"x":[6.8223000661250968,7.9686252420918811,9.1149504180586653,10.261275594025451,11.407600769992234,12.553925945959019,13.700251121925804,14.846576297892588,15.992901473859373],"z":[[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,1.744705640189089e-05,0.8723353730381439,0,0,0,0,0],[0,0,3.4894112803781779e-05,0.87231792598174207,0,0,0,0,0],[0,0,5.2341169205672672e-05,0.87230047892534013,0,0,0,0,0],[0,0,0.00012212939481323623,0.87223069069973258,0,0,0,0,0],[0,0,0.00017447056401890889,0.87217834953052686,0,0,0,0,0],[0,0,0.00048851757925294492,0.8718643025152929,0,0,0,0,0],[0,0,0.0011340586661229078,0.87121876142842292,0,0,0,0,0],[0,0,0.0016051291889739618,0.8707476909055718,0,0,0,0,0],[0,0,0.0024774820090685064,0.8698578910290754,1.7447056401890917e-05,0,0,0,0],[0,0,0.0035591995059857415,0.86877617353215819,1.7447056401890917e-05,0,0,0,0],[0,1.744705640189089e-05,0.0048677287361275582,0.86741530313281068,5.2341169205672747e-05,0,0,0,0],[0,3.4894112803781779e-05,0.0065600932071109746,0.86570549160542543,5.2341169205672747e-05,0,0,0,0],[0,5.2341169205672672e-05,0.0089154458213662451,0.86321056253995498,0.00015702350761701825,1.7447056401890863e-05,0,0,0],[0,5.2341169205672672e-05,0.011201010210013952,0.86087265698210158,0.00019191762042080007,3.4894112803781725e-05,0,0,0],[1.7447056401890903e-05,5.2341169205672672e-05,0.01373083338828813,0.85818581029621044,0.00033149407163592744,1.7447056401890863e-05,0,1.7447056401890917e-05,0],[1.7447056401890903e-05,0.00010468233841134534,0.016086186002543402,0.85569088123074,0.00038383524084160015,5.2341169205672591e-05,0,0,1.7447056401890863e-05],[3.4894112803781806e-05,0.00022681173322458158,0.019139420872874305,0.85213168172475429,0.00073277636887941853,8.723528200945431e-05,0,0,0]],"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"surface","colors":["#05386B","magenta2","#EDF5E1"],"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"Unemployment rate"},"yaxis":{"title":"h-step forecast"},"zaxis":{"title":"density"}},"title":"AUD/USD forecast densities for extended model","hovermode":"closest","showlegend":false,"legend":{"yanchor":"top","y":0.5}},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"colorbar":{"title":"","ticklen":2,"len":0.5,"lenmode":"fraction","y":1,"yanchor":"top"},"colorscale":[["0","rgba(5,56,107,1)"],["0.0416666666666667","rgba(40,58,117,1)"],["0.0833333333333333","rgba(62,60,127,1)"],["0.125","rgba(81,61,138,1)"],["0.166666666666667","rgba(99,62,148,1)"],["0.208333333333333","rgba(116,61,159,1)"],["0.25","rgba(134,60,170,1)"],["0.291666666666667","rgba(151,58,181,1)"],["0.333333333333333","rgba(168,55,192,1)"],["0.375","rgba(185,49,203,1)"],["0.416666666666667","rgba(203,42,215,1)"],["0.458333333333333","rgba(220,29,226,1)"],["0.5","rgba(238,0,238,1)"],["0.541666666666667","rgba(240,59,237,1)"],["0.583333333333333","rgba(242,85,237,1)"],["0.625","rgba(243,106,236,1)"],["0.666666666666667","rgba(244,125,235,1)"],["0.708333333333333","rgba(245,142,234,1)"],["0.75","rgba(245,158,233,1)"],["0.791666666666667","rgba(245,173,232,1)"],["0.833333333333333","rgba(245,188,231,1)"],["0.875","rgba(243,203,230,1)"],["0.916666666666667","rgba(242,217,228,1)"],["0.958333333333333","rgba(240,231,227,1)"],["1","rgba(237,245,225,1)"]],"showscale":true,"y":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],"x":[6.8223000661250968,7.9686252420918811,9.1149504180586653,10.261275594025451,11.407600769992234,12.553925945959019,13.700251121925804,14.846576297892588,15.992901473859373],"z":[[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,1.744705640189089e-05,0.8723353730381439,0,0,0,0,0],[0,0,3.4894112803781779e-05,0.87231792598174207,0,0,0,0,0],[0,0,5.2341169205672672e-05,0.87230047892534013,0,0,0,0,0],[0,0,0.00012212939481323623,0.87223069069973258,0,0,0,0,0],[0,0,0.00017447056401890889,0.87217834953052686,0,0,0,0,0],[0,0,0.00048851757925294492,0.8718643025152929,0,0,0,0,0],[0,0,0.0011340586661229078,0.87121876142842292,0,0,0,0,0],[0,0,0.0016051291889739618,0.8707476909055718,0,0,0,0,0],[0,0,0.0024774820090685064,0.8698578910290754,1.7447056401890917e-05,0,0,0,0],[0,0,0.0035591995059857415,0.86877617353215819,1.7447056401890917e-05,0,0,0,0],[0,1.744705640189089e-05,0.0048677287361275582,0.86741530313281068,5.2341169205672747e-05,0,0,0,0],[0,3.4894112803781779e-05,0.0065600932071109746,0.86570549160542543,5.2341169205672747e-05,0,0,0,0],[0,5.2341169205672672e-05,0.0089154458213662451,0.86321056253995498,0.00015702350761701825,1.7447056401890863e-05,0,0,0],[0,5.2341169205672672e-05,0.011201010210013952,0.86087265698210158,0.00019191762042080007,3.4894112803781725e-05,0,0,0],[1.7447056401890903e-05,5.2341169205672672e-05,0.01373083338828813,0.85818581029621044,0.00033149407163592744,1.7447056401890863e-05,0,1.7447056401890917e-05,0],[1.7447056401890903e-05,0.00010468233841134534,0.016086186002543402,0.85569088123074,0.00038383524084160015,5.2341169205672591e-05,0,0,1.7447056401890863e-05],[3.4894112803781806e-05,0.00022681173322458158,0.019139420872874305,0.85213168172475429,0.00073277636887941853,8.723528200945431e-05,0,0,0]],"type":"surface","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
-</div>
-</div>
-<p>The data used is up to September 2023. The subsequent unemployment rate is released by the</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<table data-quarto-postprocess="true" class="table table-sm table-striped small">
-<caption>ABS Data</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">Month</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">ABS</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Oct-23</td>
-<td style="text-align: right;">3.8</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Nov-23</td>
-<td style="text-align: right;">3.9</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Dec-23</td>
-<td style="text-align: right;">4.0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Jan-24</td>
-<td style="text-align: right;">4.1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Feb-24</td>
-<td style="text-align: right;">3.7</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Mar-24</td>
-<td style="text-align: right;">3.9</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Apr-24</td>
-<td style="text-align: right;">4.1</td>
-</tr>
-</tbody>
-</table>
-
-
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<table data-quarto-postprocess="true" class="table table-sm table-striped small">
-<caption>Forecast Data</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">Quarter</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Forecast</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Q4-23</td>
-<td style="text-align: right;">3.694583</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Q1-24</td>
-<td style="text-align: right;">3.868261</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Q2-24</td>
-<td style="text-align: right;">4.063661</td>
-</tr>
-</tbody>
-</table>
-
-
-</div>
+<script type="application/json" data-for="htmlwidget-620a2d9f81cf66bcd05e">{"x":{"visdat":{"f90128863932":["function () ","plotlyVisDat"]},"cur_data":"f90128863932","attrs":{"f90128863932":{"y":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],"x":[6.8223000661250968,7.9686252420918811,9.1149504180586653,10.261275594025451,11.407600769992234,12.553925945959019,13.700251121925804,14.846576297892588,15.992901473859373],"z":[[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,1.744705640189089e-05,0.8723353730381439,0,0,0,0,0],[0,0,3.4894112803781779e-05,0.87231792598174207,0,0,0,0,0],[0,0,5.2341169205672672e-05,0.87230047892534013,0,0,0,0,0],[0,0,0.00012212939481323623,0.87223069069973258,0,0,0,0,0],[0,0,0.00017447056401890889,0.87217834953052686,0,0,0,0,0],[0,0,0.00048851757925294492,0.8718643025152929,0,0,0,0,0],[0,0,0.0011340586661229078,0.87121876142842292,0,0,0,0,0],[0,0,0.0016051291889739618,0.8707476909055718,0,0,0,0,0],[0,0,0.0024774820090685064,0.8698578910290754,1.7447056401890917e-05,0,0,0,0],[0,0,0.0035591995059857415,0.86877617353215819,1.7447056401890917e-05,0,0,0,0],[0,1.744705640189089e-05,0.0048677287361275582,0.86741530313281068,5.2341169205672747e-05,0,0,0,0],[0,3.4894112803781779e-05,0.0065600932071109746,0.86570549160542543,5.2341169205672747e-05,0,0,0,0],[0,5.2341169205672672e-05,0.0089154458213662451,0.86321056253995498,0.00015702350761701825,1.7447056401890863e-05,0,0,0],[0,5.2341169205672672e-05,0.011201010210013952,0.86087265698210158,0.00019191762042080007,3.4894112803781725e-05,0,0,0],[1.7447056401890903e-05,5.2341169205672672e-05,0.01373083338828813,0.85818581029621044,0.00033149407163592744,1.7447056401890863e-05,0,1.7447056401890917e-05,0],[1.7447056401890903e-05,0.00010468233841134534,0.016086186002543402,0.85569088123074,0.00038383524084160015,5.2341169205672591e-05,0,0,1.7447056401890863e-05],[3.4894112803781806e-05,0.00022681173322458158,0.019139420872874305,0.85213168172475429,0.00073277636887941853,8.723528200945431e-05,0,0,0]],"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"surface","colors":["#05386B","magenta2","#EDF5E1"],"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"Unemployment rate"},"yaxis":{"title":"h-step forecast"},"zaxis":{"title":"density"}},"title":"Unemployment rate forecast densities","hovermode":"closest","showlegend":false,"legend":{"yanchor":"top","y":0.5}},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"colorbar":{"title":"","ticklen":2,"len":0.5,"lenmode":"fraction","y":1,"yanchor":"top"},"colorscale":[["0","rgba(5,56,107,1)"],["0.0416666666666667","rgba(40,58,117,1)"],["0.0833333333333333","rgba(62,60,127,1)"],["0.125","rgba(81,61,138,1)"],["0.166666666666667","rgba(99,62,148,1)"],["0.208333333333333","rgba(116,61,159,1)"],["0.25","rgba(134,60,170,1)"],["0.291666666666667","rgba(151,58,181,1)"],["0.333333333333333","rgba(168,55,192,1)"],["0.375","rgba(185,49,203,1)"],["0.416666666666667","rgba(203,42,215,1)"],["0.458333333333333","rgba(220,29,226,1)"],["0.5","rgba(238,0,238,1)"],["0.541666666666667","rgba(240,59,237,1)"],["0.583333333333333","rgba(242,85,237,1)"],["0.625","rgba(243,106,236,1)"],["0.666666666666667","rgba(244,125,235,1)"],["0.708333333333333","rgba(245,142,234,1)"],["0.75","rgba(245,158,233,1)"],["0.791666666666667","rgba(245,173,232,1)"],["0.833333333333333","rgba(245,188,231,1)"],["0.875","rgba(243,203,230,1)"],["0.916666666666667","rgba(242,217,228,1)"],["0.958333333333333","rgba(240,231,227,1)"],["1","rgba(237,245,225,1)"]],"showscale":true,"y":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],"x":[6.8223000661250968,7.9686252420918811,9.1149504180586653,10.261275594025451,11.407600769992234,12.553925945959019,13.700251121925804,14.846576297892588,15.992901473859373],"z":[[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,1.744705640189089e-05,0.8723353730381439,0,0,0,0,0],[0,0,3.4894112803781779e-05,0.87231792598174207,0,0,0,0,0],[0,0,5.2341169205672672e-05,0.87230047892534013,0,0,0,0,0],[0,0,0.00012212939481323623,0.87223069069973258,0,0,0,0,0],[0,0,0.00017447056401890889,0.87217834953052686,0,0,0,0,0],[0,0,0.00048851757925294492,0.8718643025152929,0,0,0,0,0],[0,0,0.0011340586661229078,0.87121876142842292,0,0,0,0,0],[0,0,0.0016051291889739618,0.8707476909055718,0,0,0,0,0],[0,0,0.0024774820090685064,0.8698578910290754,1.7447056401890917e-05,0,0,0,0],[0,0,0.0035591995059857415,0.86877617353215819,1.7447056401890917e-05,0,0,0,0],[0,1.744705640189089e-05,0.0048677287361275582,0.86741530313281068,5.2341169205672747e-05,0,0,0,0],[0,3.4894112803781779e-05,0.0065600932071109746,0.86570549160542543,5.2341169205672747e-05,0,0,0,0],[0,5.2341169205672672e-05,0.0089154458213662451,0.86321056253995498,0.00015702350761701825,1.7447056401890863e-05,0,0,0],[0,5.2341169205672672e-05,0.011201010210013952,0.86087265698210158,0.00019191762042080007,3.4894112803781725e-05,0,0,0],[1.7447056401890903e-05,5.2341169205672672e-05,0.01373083338828813,0.85818581029621044,0.00033149407163592744,1.7447056401890863e-05,0,1.7447056401890917e-05,0],[1.7447056401890903e-05,0.00010468233841134534,0.016086186002543402,0.85569088123074,0.00038383524084160015,5.2341169205672591e-05,0,0,1.7447056401890863e-05],[3.4894112803781806e-05,0.00022681173322458158,0.019139420872874305,0.85213168172475429,0.00073277636887941853,8.723528200945431e-05,0,0,0]],"type":"surface","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>The research project presents 4 models for forecasting unemployment rate in Australia: baseline model with Minnesota prior, extension on baseline model with dummy observation prior, extension on baseline model with regime change, and finally, model with Minnesota prior, dummy observation prior and regime change.</p>
+<p>The dummy observation prior extension seems to have minimal effect on the forecast of unemployment rate, the confidence intervals narrow insignificantly.</p>
+<p>The regime change on both baseline model and final model show similar forecasting trend. Though the full model does have the smaller confidence intervals, indicating more informative model.</p>
+<p>Generally, the trivial effect of the dummy observation prior can be due to the dominance of Minnesota prior. Therefore, adding a small number of dummy observations, specifically 5 observations may not significantly alter the posterior distribution. For the regime change, as observed from the regimes distribution, regime 1 is mainly the period correspond to Covid-19, the COVID-19 period was highly volatile and significantly different from other periods. Thus, it could dominate the overall model dynamics, making it difficult for regime 2 to show its influence, since it covers a much longer period with relatively lower volatile data. Furthermore, the high volatility of Covid-19 might be leading to large uncertainty in the estimates for regime 1, causing the model to be less sensitive to changes or differences between regimes.</p>
+<p>To enhance the effect of regime changes in the model, we can use higher frequency data. Transitioning from quarterly to monthly or daily data by interpolation would increase the number of observations, allowing for a more granular capture of economic dynamics and short-term fluctuations. This is particularly useful for inspecting the timing of regime changes more precisely. Additionally, increasing the number of regimes from two to three could allow the model to capture more nuanced economic conditions. For instance, the three-regime model could differentiate between normal economic conditions, periods of moderate volatility, and severe events like the COVID-19 pandemic. These changes would potentially enable a more accurate representation of the underlying economic processes and improve the model’s forecasting capabilities of regime changes.</p>
 </section>
 <section id="model-proof" class="level1">
 <h1>Model Proof</h1>
 <p>1000 observations are simulated from a bi-variate Gaussian random walk process annd is used as data for the below proofs.</p>
-<section id="basic-model-2" class="level3">
-<h3 class="anchored" data-anchor-id="basic-model-2">Basic model</h3>
+<section id="basic-model" class="level3">
+<h3 class="anchored" data-anchor-id="basic-model">Basic model</h3>
 <div class="cell">
 <div class="cell-output-display">
 <div>
