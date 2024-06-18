@@ -1,5 +1,5 @@
 ---
-title: "Forecasting Unemployment rate using Bayesian VARs with Regime change"
+title: "Forecasting Unemployment rate n Australia using Bayesian VARs with Regime change"
 author: "Nhu Minh Pham"
 
 execute:
@@ -9,9 +9,9 @@ bibliography: references.bib
 ---
 
 > **Abstract.** Research on how Bayesian VARs with regime change affect the forecasting 
-of unemployment rate
+of unemployment rate in Australia
 >
-> **Keywords.** bsvars, regime change, forecasting, R, 
+> **Keywords.** bsvars, minnesota, dummy-observation, regime change, forecasting, R, 
 
 # Introduction
 
@@ -27,9 +27,9 @@ Understanding the impact of economic regime changes on the unemployment rate dyn
 
 For the investigation of the problem at hand, the selection of variables includes a comprehensive set of economic indicators and demographic factors that are crucial for understanding labour market dynamics and their impact on unemployment rates. 
 
-For instance, GDP growth provides a broad measure of economic activity, serving as an indicator of overall labour market. Consumer price index, wage price index and interest rate reflect macroeconomic conditions and monetary policy, influencing consumer spending, business investment, and hiring decisions, thereby affecting unemployment trends. Government spending impacts aggregate demand and employment levels, while demographic factors such as population growth rate, average age of the workforce, and level of highest educational attainment offer insights into labour force participation and composition. 
+For instance, GDP growth provides a broad measure of economic activity, serving as an indicator of overall labour market. Consumer price index, wage price index and interest rate reflect macroeconomic conditions and monetary policy, influencing consumer spending, business investment, and hiring decisions, thereby affecting unemployment trends. Government spending impacts aggregate demand and employment levels, while demographic factors such as population growth rate, average age of the workforce, and level of highest educational attainment offer insights into labour force participation and composition. For the purpose of this research, the variables are GDP, wage price index and inflation.
 
-Each variable's form/transformation will depend on its specific characteristics and the nature of its relationship with unemployment. For instance, variables like GDP growth may be included in their original form, while others, such as wpi might need to be computed from the index data. 
+Each variable's form/transformation will depend on its specific characteristics and the nature of its relationship with unemployment. For instance, variables like GDP may be included in their original form, while others, such as wpi might need to be computed from the index data. 
 
 It's important to note that all data will be quarterly since the interest forecasting for unemployment will be conducted at a quarterly frequency. Quarterly frequency is suitable for capturing the diverse movements influencing unemployment, including short-term shocks, long-term trends, and policy changes, providing a balanced perspective.
 
@@ -176,8 +176,8 @@ for (df_name in log_dataframes) {
 
 ```
 
-
-
+To stabilize the variance, log tranformation is performed on all variables except 
+unemployment rate.
 
 ```{r, echo=FALSE, fig.width=8, fig.height=6}
 
@@ -197,10 +197,12 @@ for (df_name in names(dataframes)) {
        main = dataframes[[df_name]])
 }
 ```
-To stabilize the variance, log tranformation is performed on all variables except 
-unemployment rate, participation rate and cash rate.
+<div id="figure1" style="text-align: center; color: #696969;">
+###### Figure 1: Transformed Time series plots
+</div>
 
-From the plot of the variables, some show stationary and some non-stationary, which can make it challenging to analyse data. Therefore, the ACF test is performed to identify patterns and trend.
+
+From the plot of the variables, some show stationary and some non-stationary, which can create some challenges in general analysis . Therefore, the ACF test is performed to identify patterns and trend.
 
 
 ```{r,echo=FALSE, fig.width=8, fig.height=6}
@@ -271,9 +273,9 @@ print(adf)
 ```
 
 
-## Model
+# Model
 
-### Hypothesis
+## Hypothesis
 
 Var(p) model
 \begin{aligned}
@@ -335,7 +337,7 @@ merged_df <- merge(merged_df, cashrate_df, by = "Date", suffixes = c("", "_cash"
 
 ```
 
-## Basic Model
+# Basic Model
 The model follows the Normal Inverse Wishart distribution.
 
 Likelihood function kernel
@@ -344,7 +346,7 @@ L(A,\Sigma|Y,X) \propto det(\Sigma)^{-\frac{T}{2}}exp\{-\frac{1}{2}tr[\Sigma^{-1
 \end{align}
 
 
-### Minnesota Prior distribution
+## Minnesota Prior distribution
 
 The Minnesota prior is commonly used in Bayesian Vector Autoregression (BVAR) models due to its ability to impose shrinkage towards zero on the coefficients, effectively regularizing the estimation process. The Minnesota prior aligns effectively with the stylized fact of nonstationarity observed in macroeconomic variables.
 
@@ -461,6 +463,7 @@ S.prior     = diag(diag(Sigma.hat))
 nu.prior    = N+1
 ```
 
+The posterior draws are obtain with the following code
 ```{r, echo=TRUE, cache=TRUE}
 ###############################################
 # Posterior draws Normal-inverse Wishart
@@ -495,7 +498,7 @@ sample_minnesota_Sigma  = sample_minnesota$Sigma.posterior
 ```
 
 #######################################################################################
-## Extension 1 Model
+# Extension 1: Dummy observation prior
 Cointegration is when the non-stationary variables have an equilibrium long term 
 relationship or a common trend. The model is extended to incorporate dummy-observation-prior, aiming to account for the potential cointegration amongst the variables, capturing the underlying economic relationships and dynamics.
 
@@ -558,11 +561,11 @@ A \mid \Sigma &\sim \text{MN}_{K \times N} (\underline{A}^{+}, \Sigma, \underlin
 \end{align*}
 
 
-### Minnesota and dummy observation prior distribution 
+## Minnesota and dummy observation prior distribution 
 The newly created matrix specified the model has 5 dummy observations. The above prior distribution is likely to encounter the problem of not having enough observations and 
 lead to many challenges to meet the requirements for degree of freedom or 
 invertibility of matrices. To resolve this, the combination of specifying the prior 
-through both Normal inverse Wishart and dummy-observations is proposed, which is detived similarly to the posterior distribution in the basic model. 
+through both Normal inverse Wishart and dummy-observations is proposed, which is derived similarly to the posterior distribution in the basic model. 
 
 
 \begin{align*}
@@ -587,6 +590,7 @@ p(\Sigma|Y,X) &\sim IW_{N}(\overline{S}, \overline{v})\\
 \overline{V}^{-1}\overline{A} \\
 \end{align}
 
+The posterior draws are obtain with the following code
 ```{r, echo=TRUE, cache=TRUE}
 ###############################################
 # Posterior draws for dummy prior
@@ -646,232 +650,6 @@ posterior_draws_dummy = function(S, Y, X, A.prior, V.prior, S.prior, nu.prior) {
 sample_dummy        = posterior_draws_dummy(S = 50000, Y, X, A.prior, V.prior, S.prior, nu.prior)
 sample_dummy_A      = sample_dummy$A.posterior
 sample_dummy_Sigma  = sample_dummy$Sigma.posterior
-```
-
-
-# Forecasting
-## Basic model
-```{r, echo=TRUE}
-posterior_summary <- function(sample) {
-  # Report posterior means and sd of parameters
-  A.E <- round(apply(sample$A.posterior, 1:2, mean), 6)
-  A.sd <- round(apply(sample$A.posterior, 1:2, sd), 6)
-  Sigma.E <- round(apply(sample$Sigma.posterior, 1:2, mean), 6)
-  Sigma.sd <- round(apply(sample$Sigma.posterior, 1:2, sd), 6)
-  
-  # Create tables
-  A_table <- data.frame(rbind(t(A.E)[1,], t(A.sd)[1,], t(A.E)[2,], t(A.sd)[2,]))
-  Sigma_table <- data.frame(rbind(t(Sigma.E)[1,], t(Sigma.sd)[1,], t(Sigma.E)[2,],
-                                  t(Sigma.sd)[2,]))
-  # Format tables using kable
-  A_table_html <- kable(A_table, format = "html", caption = "Posterior A means and s.d. deviation table",
-                        col.names = paste0(1:ncol(A_table)))
-  Sigma_table_html <- kable(Sigma_table, format = "html", caption = "Posterior Sigma means and s.d. table", col.names = paste0(1:ncol(Sigma_table)))
-  html_content <- paste(A_table_html, Sigma_table_html, sep = "\n\n")
-  
-  # Return the HTML content
-  return(html_content)
-  # Return tables as list
-  #return(A_table_html, Sigma_table_html)
-  #return(list(A_table_html = A_table_html, Sigma_table_html = Sigma_table_html))
-}
-  
-
-############################################################
-# Point forecasts 2D plot
-forecast_plots <- function(Y, Y.h, h, theta, phi, xlim) {
-  
-  # Define colors
-  mcxs1  = "#05386B"
-  mcxs2  = "#379683"
-  mcxs3  = "#5CDB95"
-  mcxs4  = "#8EE4AF"
-  mcxs5  = "#EDF5E1"
-  
-  mcxs1.rgb   = col2rgb(mcxs1)
-  mcxs1.shade1= rgb(mcxs1.rgb[1],mcxs1.rgb[2],mcxs1.rgb[3], alpha=50, maxColorValue=255)
-  mcxs2.rgb   = col2rgb(mcxs2)
-  mcxs2.shade1= rgb(mcxs2.rgb[1],mcxs2.rgb[2],mcxs2.rgb[3], alpha=50, maxColorValue=255)
-  
-  point_forecast    = apply(Y.h[,1,],1,mean) 
-  interval_forecast = apply(Y.h[,1,],1,hdi,credMass=0.90)
-  interval_forecast_1 = apply(Y.h[,1,],1,hdi,credMass=0.68)
-  range             = range(Y[,1],interval_forecast)
-  
-  par(mfrow=c(1,1), mar=rep(3,4),cex.axis=1)
-  plot(1:(length(Y[,1])), Y[,1], type="l", axes=FALSE, 
-       xlim = c(1, nrow(Y)+h), ylim=range, 
-       xlab="", ylab="", 
-       lwd=2, col = mcxs1)
-  lines(length(Y[,1]):(length(Y[,1]) + h), c(Y[nrow(Y), 1],point_forecast), type="l", 
-        xlim = c(1, nrow(Y)+h), ylim=range,
-        xlab="", ylab="", 
-        lwd=2, col = mcxs2)
-  axis(1,c(3,23,43,63,83,101,nrow(Y), nrow(Y)+h),
-       c("1999","2003","2008","20013","2018","2023","", "2028"), 
-       col="black")
-  axis(2, at=seq(from=range[1], to=range[2], length.out=5), 
-       labels=round(seq(from=range[1], to=range[2], length.out=5), 2),
-       col="black")
-  end_y_value <- point_forecast[13] 
-  abline(h = end_y_value, col="red", lty=2, lwd=1)
-  abline(v = nrow(Y), col = "black")
-  legend("bottomleft", legend=c("Data", "Forecast"), 
-         col=c(mcxs1, mcxs2), lty=c(1, 1), lwd=c(2, 2))
-  polygon(c(length(Y[,1]):(length(Y[,1]) + h), (length(Y[,1]):(length(Y[,1]) + h))[(h+1):1]), 
-          c(Y[nrow(Y), 1], interval_forecast[1,], interval_forecast[2,h:1], Y[nrow(Y), 1]), 
-          col = mcxs1.shade1, border = mcxs1.shade1)
-  polygon(c(length(Y[,1]):(length(Y[,1]) + h), (length(Y[,1]):(length(Y[,1]) + h))[(h+1):1]), 
-          c(Y[nrow(Y), 1], interval_forecast_1[1,], interval_forecast_1[2,h:1], Y[nrow(Y), 1]), 
-          col = mcxs1.shade1, border = mcxs1.shade1)
-  
-  limits.1    = range(Y.h[,1,])
-  point.f     = apply(Y.h[,1,],1,mean)
-  interval.f  = apply(Y.h[,1,],1,hdi,credMass=0.90)
-  
-  x           = seq(from=limits.1[1], to=limits.1[2], length.out=100)
-  z           = matrix(NA,h,99)
-  for (i in 1:h){
-    z[i,]     = hist(Y.h[i,1,], breaks=x, plot=FALSE)$density
-  }
-  x           = hist(Y.h[i,1,], breaks=x, plot=FALSE)$mids
-  yy          = 1:h
-  z           = t(z)
-  
-  # Adjust xlim, ylim, zlim based on h
-  xlim <- c(limits.1[1], limits.1[2])
-  ylim <- c(1, h)
-  zlim <- range(z)
-  
-  f4 <- persp3D(x=x, y=yy, z=z, phi=phi, theta=theta, xlab="\nunmp[t+h|t]", ylab="h",
-                zlab="\npredictive densities of unemployment rate", shade=NA, border=NA,
-                ticktype="detailed", nticks=3,cex.lab=1, col=NA, plot=FALSE, 
-                xlim = xlim, ylim = ylim, zlim = zlim)
-  
-  perspbox(x=x, y=yy, z=z, bty="f", col.axis="black", phi=phi, theta=theta,
-           xlab="\nunemployment[t+h|t]", ylab="h", zlab="\npredictive densities of unemployment rate",
-           ticktype="detailed", nticks=3, cex.lab=1, col = NULL, plot = TRUE, 
-           xlim = xlim, ylim = ylim, zlim = zlim)
-  
-  polygon3D(x = c(interval.f[1,], interval.f[2,h:1]), y = c(1:h, h:1), z = rep(0, 2*h), 
-            col = mcxs1.shade1, NAcol = "white", border = NA, add = TRUE, plot = TRUE, 
-            xlim = xlim, ylim = ylim, zlim = zlim)
-  
-  for (i in 1:h){
-    f4.l <- trans3d(x = x, y = yy[i], z = z[,i], pmat = f4)
-    lines(f4.l, lwd = 0.5, col = "black")
-  }
-  
-  f4.l1 <- trans3d(x = point.f, y = yy, z = 0, pmat = f4)
-  lines(f4.l1, lwd = 2, col = mcxs1)
-}
-
-forecast <- function(S, sample_A, sample_Sigma, Y, p, h) {
-  # Initialize the array to store forecasts
-  Y.h <- array(NA, c(h, N, S))
-  
-  # Loop over each sample
-  for (s in 1:S) {
-    A.posterior.draw <- sample_A[,,s]
-    Sigma.posterior <- sample_Sigma[,,s]
-    x.Ti <- Y[(nrow(Y) - p + 1):nrow(Y),]
-    x.Ti <- x.Ti[p:1,]
-    
-    # Forecast h steps ahead
-    for (i in 1:h) {
-      x.T <- c(1, as.vector(t(x.Ti)))
-      Y.f <- rmvnorm(1, mean = x.T %*% A.posterior.draw, sigma = Sigma.posterior)
-      x.Ti <- rbind(Y.f, x.Ti[1:(p - 1),])
-      Y.h[i,,s] <- Y.f[1:2]
-    }
-  }
-  
-  return(Y.h)
-}
-```
-
-```{r, eval=FALSE}
-# Report posterior means and sd of parameters
-A.E         = round(apply(sample_minnesota$A.posterior,1:2,mean),6)
-A.sd        = round(apply(sample_minnesota$A.posterior,1:2,sd),6)
-Sigma.E     = round(apply(sample_minnesota$Sigma.posterior,1:2,mean),6)
-Sigma.sd    = round(apply(sample_minnesota$Sigma.posterior,1:2,sd),6)
-
-A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
-Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
-
-kable(A_table, format = "html", caption = "Posterior A means and sd table",
-      col.names = paste0(1:ncol(A_table)))
-
-kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
-      col.names = paste0(1:ncol(Sigma_table)))
-
-
-###############################################
-# Report posterior means and sd of parameters
-A.E         = round(apply(sample_dummy$A.posterior,1:2,mean),6)
-A.sd        = round(apply(sample_dummy$A.posterior,1:2,sd),6)
-Sigma.E     = round(apply(sample_dummy$Sigma.posterior,1:2,mean),6)
-Sigma.sd    = round(apply(sample_dummy$Sigma.posterior,1:2,sd),6)
-
-A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
-Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
-
-kable(A_table, format = "html", caption = "Posterior A means and sd table",
-      col.names = paste0(1:ncol(A_table)))
-
-kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
-      col.names = paste0(1:ncol(Sigma_table)))
-```
-
-
-Simulate draws from the predictive density
-```{r, cache=TRUE}
-N       = 4
-p       = 4
-S       = 50000 
-
-posterior_summary(sample_minnesota)
-
-Y.h_minnesota <- forecast(S, sample_minnesota_A, sample_minnesota_Sigma, Y, p, h = 21)
-
-forecast_plots(Y, Y.h_minnesota, h = 21, theta = 190, phi = 10, xlim = c(-50, 50))
-```
-The plot of point forecast and density for 13 periods ahead, equivalent to 13 quarters or 3 years and 1 quarter from Q4 2023 to Q4 2026 shows a clear upward trend. The confidence interval is quite large. The unemployment rate seems to go back to the mean. 
-
-For the 3D plot of the density, we can see that the further the period ahead, the density is more dispersed since the data is become less informative as horizon increases.
-
-
-## Extended model
-```{r, cache=TRUE}
-N       = 4
-p       = 4
-
-# posterior_summary(sample_dummy)
-
-Y.h_dummy <- forecast(S = 50000, sample_dummy_A,sample_dummy_Sigma, Y, p, h = 21)
-
-forecast_plots(Y, Y.h_dummy, h =21, theta = 190, phi = 10, xlim = c(-30, 30))
-```
-The plot of forecast for the extended model doesn't show any significant differences visually. The confidence interval narrowed insignificantly.
-
-
-The data used is up to September 2023. The subsequent unemployment rate is released by the 
-```{r}
-# Create the data frame for the table
-data <- data.frame(
-  Month = c("Oct-23", "Nov-23", "Dec-23", "Jan-24", "Feb-24", "Mar-24", "Apr-24"),
-  ABS = c(3.8, 3.9, 4.0, 4.1, 3.7, 3.9, 4.1)
-)
-
-# Create the forecast data frame
-forecast <- data.frame(
-  Quarter = c("Q4-23", "Q1-24", "Q2-24"),
-  Forecast = c(3.694583, 3.868261, 4.063661)
-)
-
-kable(data, caption = "ABS Data", format="html")
-kable(forecast, caption = "Forecast Data", format="html") 
 ```
 
 ## Extension 2 - Regime change
@@ -958,7 +736,6 @@ invisible({
   unlink(tmp_file)  # Remove the temporary file
 })  
 ```
-
 
 ```{r}
 # Gibbs sampling function
@@ -1104,66 +881,9 @@ for (i in seq_along(plots)) {
 }
 ```
 
-
-After the regimes are correctly placed, we can forecast h-step ahead using the posterior draws.
-```{r, echo=TRUE}
-Markov_forecast <- function(S, sample, Y, p, h) {
-  N <- ncol(Y)
-  # Initialize the array to store forecasts
-  Y.h = array(NA, c(h, 2, S))
-
-  for (s in 1:S){
-    A.posterior.draw1 = sample$A.posterior1[,,s]
-    A.posterior.draw2 = sample$A.posterior2[,,s]
-    Sigma.posterior1 = sample$Sigma.posterior1[,,s]
-    Sigma.posterior2 = sample$Sigma.posterior2[,,s]
-  
-    T = dim(sample$xi)[2]
-  
-    x.Ti = Y[(nrow(Y)-p+1):nrow(Y),]
-    x.Ti = x.Ti[p:1,]
-    
-    P_h = sample$P[,,s] %*% sample$xi[,T,s]  # Initializing P_h
-  
-    for (i in 1:h){
-      x.T = c(1, as.vector(t(x.Ti)))
-    
-      if (i > 1) {  # Only update P_h if i > 1
-        P_h = sample$P[,,s] %*% P_h
-      }
-      sample_m = sample.int(2,1, prob=as.numeric(P_h))
-    
-      if (sample_m == 1) {
-        A.posterior.draw = A.posterior.draw1
-        Sigma.posterior = Sigma.posterior1
-      } else {
-        A.posterior.draw = A.posterior.draw2
-        Sigma.posterior = Sigma.posterior2
-      }
-    
-      Y.f = rmvnorm(1, mean = x.T %*% A.posterior.draw, sigma = Sigma.posterior)
-      x.Ti = rbind(Y.f, x.Ti[1:(p-1),])
-      Y.h[i,,s] = Y.f[1:2]
-    }
-  }
-  return(Y.h)
-}
-```
-
-
-The plot below shows the forecast using Minnesota prior and regime change for unemployment rate.
-```{r }
-Y.h_Markov = Markov_forecast(S = 50000, sample = Markov.draws, Y, p, h = 21)
-
-forecast_plots(Y, Y.h_Markov, h = 21, theta = 190, phi = 10, xlim = c(-50, 50))
-```
-
 ## Final model
-
 The final model is the combination of Minnesota prior, dummy observation prior and 
 regime change to account for heteroskedasticity.
-
-Similarly to the baseline model, the prior will be a combination of Minnesota and dummy observation prior. Then the Markov-switching Gibb-sampling is done with these new priors to obtain posterior draws
 
 ```{r}
 # Data configuration
@@ -1322,11 +1042,278 @@ plot.ts(after_f, main = "After label switching")
 ```
 
 ```{r, fig.width=8, fig.height=6}
-
 par(mfrow = c(1, 2))
 plot(before_f, type = "l", main = "Before label switching", xlab = "Date", ylab = "Value")
 plot(after_f, type = "l", main = "Before label switching", xlab = "Date", ylab = "Value")
 ```
+
+# Forecasting
+## Basic model
+```{r}
+posterior_summary <- function(sample) {
+  # Report posterior means and sd of parameters
+  A.E <- round(apply(sample$A.posterior, 1:2, mean), 6)
+  A.sd <- round(apply(sample$A.posterior, 1:2, sd), 6)
+  Sigma.E <- round(apply(sample$Sigma.posterior, 1:2, mean), 6)
+  Sigma.sd <- round(apply(sample$Sigma.posterior, 1:2, sd), 6)
+  
+  # Create tables
+  A_table <- data.frame(rbind(t(A.E)[1,], t(A.sd)[1,], t(A.E)[2,], t(A.sd)[2,]))
+  Sigma_table <- data.frame(rbind(t(Sigma.E)[1,], t(Sigma.sd)[1,], t(Sigma.E)[2,],
+                                  t(Sigma.sd)[2,]))
+  # Format tables using kable
+  A_table_html <- kable(A_table, format = "html", caption = "Posterior A means and s.d. deviation table",
+                        col.names = paste0(1:ncol(A_table)))
+  Sigma_table_html <- kable(Sigma_table, format = "html", caption = "Posterior Sigma means and s.d. table", col.names = paste0(1:ncol(Sigma_table)))
+  html_content <- paste(A_table_html, Sigma_table_html, sep = "\n\n")
+  
+  # Return the HTML content
+  return(html_content)
+  # Return tables as list
+  #return(A_table_html, Sigma_table_html)
+  #return(list(A_table_html = A_table_html, Sigma_table_html = Sigma_table_html))
+}
+  
+
+############################################################
+# Point forecasts 2D plot
+forecast_plots <- function(Y, Y.h, h, theta, phi, xlim) {
+  
+  # Define colors
+  mcxs1  = "#05386B"
+  mcxs2  = "#379683"
+  mcxs3  = "#5CDB95"
+  mcxs4  = "#8EE4AF"
+  mcxs5  = "#EDF5E1"
+  
+  mcxs1.rgb   = col2rgb(mcxs1)
+  mcxs1.shade1= rgb(mcxs1.rgb[1],mcxs1.rgb[2],mcxs1.rgb[3], alpha=50, maxColorValue=255)
+  mcxs2.rgb   = col2rgb(mcxs2)
+  mcxs2.shade1= rgb(mcxs2.rgb[1],mcxs2.rgb[2],mcxs2.rgb[3], alpha=50, maxColorValue=255)
+  
+  point_forecast    = apply(Y.h[,1,],1,mean) 
+  interval_forecast = apply(Y.h[,1,],1,hdi,credMass=0.90)
+  interval_forecast_1 = apply(Y.h[,1,],1,hdi,credMass=0.68)
+  range             = range(Y[,1],interval_forecast)
+  
+  par(mfrow=c(1,1), mar=rep(3,4),cex.axis=1)
+  plot(1:(length(Y[,1])), Y[,1], type="l", axes=FALSE, 
+       xlim = c(1, nrow(Y)+h), ylim=range, 
+       xlab="", ylab="", 
+       lwd=2, col = mcxs1, main = "Unemployment rate forecasts")
+  lines(length(Y[,1]):(length(Y[,1]) + h), c(Y[nrow(Y), 1],point_forecast), type="l", 
+        xlim = c(1, nrow(Y)+h), ylim=range,
+        xlab="", ylab="", 
+        lwd=2, col = mcxs2)
+  axis(1,c(3,23,43,63,83,101,nrow(Y), nrow(Y)+h),
+       c("1999","2003","2008","20013","2018","2023","", "2028"), 
+       col="black")
+  axis(2, at=seq(from=range[1], to=range[2], length.out=5), 
+       labels=round(seq(from=range[1], to=range[2], length.out=5), 2),
+       col="black")
+  end_y_value <- point_forecast[13] 
+  abline(h = end_y_value, col="red", lty=2, lwd=1)
+  abline(v = nrow(Y), col = "black")
+  legend("bottomleft", legend=c("Data", "Forecast"), 
+         col=c(mcxs1, mcxs2), lty=c(1, 1), lwd=c(2, 2))
+  polygon(c(length(Y[,1]):(length(Y[,1]) + h), (length(Y[,1]):(length(Y[,1]) + h))[(h+1):1]), 
+          c(Y[nrow(Y), 1], interval_forecast[1,], interval_forecast[2,h:1], Y[nrow(Y), 1]), 
+          col = mcxs1.shade1, border = mcxs1.shade1)
+  polygon(c(length(Y[,1]):(length(Y[,1]) + h), (length(Y[,1]):(length(Y[,1]) + h))[(h+1):1]), 
+          c(Y[nrow(Y), 1], interval_forecast_1[1,], interval_forecast_1[2,h:1], Y[nrow(Y), 1]), 
+          col = mcxs1.shade1, border = mcxs1.shade1)
+  
+  limits.1    = range(Y.h[,1,])
+  point.f     = apply(Y.h[,1,],1,mean)
+  interval.f  = apply(Y.h[,1,],1,hdi,credMass=0.90)
+  
+  x           = seq(from=limits.1[1], to=limits.1[2], length.out=100)
+  z           = matrix(NA,h,99)
+  for (i in 1:h){
+    z[i,]     = hist(Y.h[i,1,], breaks=x, plot=FALSE)$density
+  }
+  x           = hist(Y.h[i,1,], breaks=x, plot=FALSE)$mids
+  yy          = 1:h
+  z           = t(z)
+  
+  # Adjust xlim, ylim, zlim based on h
+  xlim <- c(limits.1[1], limits.1[2])
+  ylim <- c(1, h)
+  zlim <- range(z)
+  
+  f4 <- persp3D(x=x, y=yy, z=z, phi=phi, theta=theta, xlab="\nunmp[t+h|t]", ylab="h",
+                zlab="\npredictive densities of unemployment rate", shade=NA, border=NA,
+                ticktype="detailed", nticks=3,cex.lab=1, col=NA, plot=FALSE, 
+                xlim = xlim, ylim = ylim, zlim = zlim)
+  
+  perspbox(x=x, y=yy, z=z, bty="f", col.axis="black", phi=phi, theta=theta,
+           xlab="\nunemployment[t+h|t]", ylab="h", zlab="\npredictive densities of unemployment rate",
+           ticktype="detailed", nticks=3, cex.lab=1, col = NULL, plot = TRUE, 
+           xlim = xlim, ylim = ylim, zlim = zlim)
+  
+  polygon3D(x = c(interval.f[1,], interval.f[2,h:1]), y = c(1:h, h:1), z = rep(0, 2*h), 
+            col = mcxs1.shade1, NAcol = "white", border = NA, add = TRUE, plot = TRUE, 
+            xlim = xlim, ylim = ylim, zlim = zlim)
+  
+  for (i in 1:h){
+    f4.l <- trans3d(x = x, y = yy[i], z = z[,i], pmat = f4)
+    lines(f4.l, lwd = 0.5, col = "black")
+  }
+  
+  f4.l1 <- trans3d(x = point.f, y = yy, z = 0, pmat = f4)
+  lines(f4.l1, lwd = 2, col = mcxs1)
+}
+```
+
+
+The forecasting process can be done with the following code. 
+```{r, echo=TRUE}
+forecast <- function(S, sample_A, sample_Sigma, Y, p, h) {
+  # Initialize the array to store forecasts
+  Y.h <- array(NA, c(h, N, S))
+  
+  # Loop over each sample
+  for (s in 1:S) {
+    A.posterior.draw <- sample_A[,,s]
+    Sigma.posterior <- sample_Sigma[,,s]
+    x.Ti <- Y[(nrow(Y) - p + 1):nrow(Y),]
+    x.Ti <- x.Ti[p:1,]
+    
+    # Forecast h steps ahead
+    for (i in 1:h) {
+      x.T <- c(1, as.vector(t(x.Ti)))
+      Y.f <- rmvnorm(1, mean = x.T %*% A.posterior.draw, sigma = Sigma.posterior)
+      x.Ti <- rbind(Y.f, x.Ti[1:(p - 1),])
+      Y.h[i,,s] <- Y.f[1:2]
+    }
+  }
+  
+  return(Y.h)
+}
+```
+
+
+```{r, eval=FALSE}
+# Report posterior means and sd of parameters
+A.E         = round(apply(sample_minnesota$A.posterior,1:2,mean),6)
+A.sd        = round(apply(sample_minnesota$A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(sample_minnesota$Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(sample_minnesota$Sigma.posterior,1:2,sd),6)
+
+A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
+Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
+
+kable(A_table, format = "html", caption = "Posterior A means and sd table",
+      col.names = paste0(1:ncol(A_table)))
+
+kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
+      col.names = paste0(1:ncol(Sigma_table)))
+
+
+###############################################
+# Report posterior means and sd of parameters
+A.E         = round(apply(sample_dummy$A.posterior,1:2,mean),6)
+A.sd        = round(apply(sample_dummy$A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(sample_dummy$Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(sample_dummy$Sigma.posterior,1:2,sd),6)
+
+A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
+Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
+
+kable(A_table, format = "html", caption = "Posterior A means and sd table",
+      col.names = paste0(1:ncol(A_table)))
+
+kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
+      col.names = paste0(1:ncol(Sigma_table)))
+```
+
+
+```{r, cache=TRUE}
+N       = 4
+p       = 4
+S       = 50000 
+
+posterior_summary(sample_minnesota)
+
+Y.h_minnesota <- forecast(S, sample_minnesota_A, sample_minnesota_Sigma, Y, p, h = 21)
+
+forecast_plots(Y, Y.h_minnesota, h = 21, theta = 190, phi = 10, xlim = c(-50, 50))
+```
+The plot of point forecast and density for 21 periods ahead, equivalent to 21 quarters or 5 years and 1 quarter from Q4 2023 to Q4 2028 shows a clear upward trend. The confidence interval is quite large. The unemployment rate seems to converge to the mean and has a slight downward trend in the last horizons. 
+
+For the 3D plot of the density, we can see that the further the period ahead, the density is more dispersed since the data is become less informative as horizon increases.
+
+
+## Extension 1
+```{r, cache=TRUE}
+N       = 4
+p       = 4
+
+# posterior_summary(sample_dummy)
+
+Y.h_dummy <- forecast(S = 50000, sample_dummy_A,sample_dummy_Sigma, Y, p, h = 21)
+
+forecast_plots(Y, Y.h_dummy, h =21, theta = 190, phi = 10, xlim = c(-30, 30))
+```
+The plot of forecast for the dummy observation prior doesn't show any significant differences visually. The confidence interval narrowed insignificantly.
+
+## Extension 2
+
+After the regimes are correctly placed, we can forecast h-step ahead using the posterior draws.
+```{r, echo=TRUE}
+Markov_forecast <- function(S, sample, Y, p, h) {
+  N <- ncol(Y)
+  # Initialize the array to store forecasts
+  Y.h = array(NA, c(h, 2, S))
+
+  for (s in 1:S){
+    A.posterior.draw1 = sample$A.posterior1[,,s]
+    A.posterior.draw2 = sample$A.posterior2[,,s]
+    Sigma.posterior1 = sample$Sigma.posterior1[,,s]
+    Sigma.posterior2 = sample$Sigma.posterior2[,,s]
+  
+    T = dim(sample$xi)[2]
+  
+    x.Ti = Y[(nrow(Y)-p+1):nrow(Y),]
+    x.Ti = x.Ti[p:1,]
+    
+    P_h = sample$P[,,s] %*% sample$xi[,T,s]  # Initializing P_h
+  
+    for (i in 1:h){
+      x.T = c(1, as.vector(t(x.Ti)))
+    
+      if (i > 1) {  # Only update P_h if i > 1
+        P_h = sample$P[,,s] %*% P_h
+      }
+      sample_m = sample.int(2,1, prob=as.numeric(P_h))
+    
+      if (sample_m == 1) {
+        A.posterior.draw = A.posterior.draw1
+        Sigma.posterior = Sigma.posterior1
+      } else {
+        A.posterior.draw = A.posterior.draw2
+        Sigma.posterior = Sigma.posterior2
+      }
+    
+      Y.f = rmvnorm(1, mean = x.T %*% A.posterior.draw, sigma = Sigma.posterior)
+      x.Ti = rbind(Y.f, x.Ti[1:(p-1),])
+      Y.h[i,,s] = Y.f[1:2]
+    }
+  }
+  return(Y.h)
+}
+```
+
+The plot below shows the forecast using Minnesota prior and regime change for unemployment rate.
+```{r }
+Y.h_Markov = Markov_forecast(S = 50000, sample = Markov.draws, Y, p, h = 21)
+
+forecast_plots(Y, Y.h_Markov, h = 21, theta = 190, phi = 10, xlim = c(-50, 50))
+```
+
+## Final model
+
+Similarly to the baseline model, the prior will be a combination of Minnesota and dummy observation prior. Then the Markov-switching Gibb-sampling is done with these new priors to obtain posterior draws
 
 
 ```{r}
@@ -1395,6 +1382,23 @@ plots_3d(Y.h_Final, h = 21)
 
 ```
 
+The data used is up to September 2023. The subsequent unemployment rate is released by the 
+```{r}
+# Create the data frame for the table
+data <- data.frame(
+  Month = c("Oct-23", "Nov-23", "Dec-23", "Jan-24", "Feb-24", "Mar-24", "Apr-24"),
+  ABS = c(3.8, 3.9, 4.0, 4.1, 3.7, 3.9, 4.1)
+)
+
+# Create the forecast data frame
+forecast <- data.frame(
+  Quarter = c("Q4-23", "Q1-24", "Q2-24"),
+  Forecast = c(3.694583, 3.868261, 4.063661)
+)
+
+kable(data, caption = "ABS Data", format="html")
+kable(forecast, caption = "Forecast Data", format="html") 
+```
 
 
 
@@ -1514,3 +1518,11 @@ kable(Sigma.E, format = "html", caption = "Posterior mean of covarince",
 
 
 # References {.unnumbered}
+Woźniak, T. (2016), Bayesian Vector Autoregressions. Australian Economic Review, 49: 365-380. https://doi.org/10.1111/1467-8462.12179
+
+Giannone, Domenico, Lenza, Michele and Primiceri, Giorgio, (2015), Prior Selection for Vector Autoregressions, The Review of Economics and Statistics, 97, issue 2, p. 436-451.
+
+Song, Y., & Woźniak, T.  (2021, March 25). Markov Switching. Oxford Research Encyclopedia of Economics and Finance. Retrieved 18 Jun. 2024, from https://oxfordre.com/economics/view/10.1093/acrefore/9780190625979.001.0001/acrefore-9780190625979-e-174.
+
+Fu, W.; Smith, B.R.; Brewer, P.; Droms, S. Markov-Switching Bayesian Vector Autoregression Model in Mortality Forecasting. Risks 2023, 11, 152. https://doi.org/10.3390/risks11090152
+
