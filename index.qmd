@@ -1,5 +1,5 @@
 ---
-title: "Forecasting Unemployment rate n Australia using Bayesian VARs with Regime change"
+title: "Forecasting Unemployment rate in Australia using Bayesian VARs with Regime change"
 author: "Nhu Minh Pham"
 
 execute:
@@ -49,7 +49,7 @@ knitr::opts_chunk$set(message = FALSE)
 knitr::opts_chunk$set(warning = FALSE)
 ```
 
-# Data Visualisation
+## Data Visualisation
 ```{r, hide = TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 library(readrba)
 library(readabs)
@@ -273,7 +273,7 @@ print(adf)
 ```
 
 
-# Model
+# General Model
 
 ## Hypothesis
 
@@ -295,7 +295,7 @@ P(S_t = j | S_{t-1} = i) &= \pi_{ij}
 
 
 
-### Matrix form
+## Matrix form
 
 
 \begin{align*}
@@ -337,7 +337,7 @@ merged_df <- merge(merged_df, cashrate_df, by = "Date", suffixes = c("", "_cash"
 
 ```
 
-# Basic Model
+# Baseline Model with Minnesota prior
 The model follows the Normal Inverse Wishart distribution.
 
 Likelihood function kernel
@@ -416,7 +416,7 @@ for (i in 1:p){
 }
 ```
 
-### The joint posterior distribution
+## The joint posterior distribution
 \begin{align*}
 p(A,\Sigma|Y,X) &\propto L(A,\Sigma|Y,X)p(A,\Sigma) \\
 &= L(A,\Sigma|Y,X)p(A|\Sigma)p(\Sigma)
@@ -497,8 +497,49 @@ sample_minnesota_A      = sample_minnesota$A.posterior
 sample_minnesota_Sigma  = sample_minnesota$Sigma.posterior
 ```
 
+```{r}
+# Report posterior means and sd of parameters
+A.E         = round(apply(sample_minnesota$A.posterior,1:2,mean),6)
+A.sd        = round(apply(sample_minnesota$A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(sample_minnesota$Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(sample_minnesota$Sigma.posterior,1:2,sd),6)
+
+A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
+Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
+
+kable(A_table, format = "html", caption = "Posterior A means and sd table",
+      col.names = paste0(1:ncol(A_table)))
+
+kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
+      col.names = paste0(1:ncol(Sigma_table)))
+
+```
+
+The trace plots and histograms posterior draws on A and $\Sigma$ shows that unemployment rate has strong positive correlation with its first lag, this is expected from observing the data properties. 
+```{r}
+mcxs1  = "#05386B"
+mcxs2  = "#379683"
+mcxs3  = "#5CDB95"
+mcxs4  = "#8EE4AF"
+mcxs5  = "#EDF5E1"
+
+par(mfrow=c(2,2), mar=c(4,4,2,2))
+# Trace plot for A.posterior
+plot.ts(sample_minnesota$A.posterior[2,1,], xlab = "Simulation times S", ylab = "A posterior draws", col = mcxs1)
+
+# Histogram for A.posterior
+hist(sample_minnesota$A.posterior[2,1,], xlab = "A posterior draws", col = mcxs1, main = '')
+
+# Trace plot for Sigma.posterior[1,1,]
+plot.ts(sample_minnesota$Sigma.posterior[1,1,], xlab = "Simulation times S", ylab = "Sigma posterior draws", col = mcxs2)
+
+# Histogram for Sigma.posterior[1,1,]
+hist(sample_minnesota$Sigma.posterior[1,1,], xlab = "Sigma posterior draws", 
+     col = mcxs2, main = '')
+```
+
 #######################################################################################
-# Extension 1: Dummy observation prior
+# Baseline Model Extension 1: Dummy observation prior
 Cointegration is when the non-stationary variables have an equilibrium long term 
 relationship or a common trend. The model is extended to incorporate dummy-observation-prior, aiming to account for the potential cointegration amongst the variables, capturing the underlying economic relationships and dynamics.
 
@@ -578,7 +619,9 @@ A \mid \Sigma &\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}
 \widetilde{S} &= \underline{S}+Y^{+'}Y^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\widetilde{A}'\widetilde{V}^{-1}\widetilde{A} \\
 \end{align*}
 
+## The full conditional joint posterior
 The full conditional joint posterior have the following form
+
 \begin{align}
 p(A|Y,X,\Sigma) &\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\ 
 p(\Sigma|Y,X) &\sim IW_{N}(\overline{S}, \overline{v})\\
@@ -652,7 +695,48 @@ sample_dummy_A      = sample_dummy$A.posterior
 sample_dummy_Sigma  = sample_dummy$Sigma.posterior
 ```
 
-## Extension 2 - Regime change
+```{r}
+###############################################
+# Report posterior means and sd of parameters
+A.E         = round(apply(sample_dummy$A.posterior,1:2,mean),6)
+A.sd        = round(apply(sample_dummy$A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(sample_dummy$Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(sample_dummy$Sigma.posterior,1:2,sd),6)
+
+A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
+Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
+
+kable(A_table, format = "html", caption = "Posterior A means and sd table",
+      col.names = paste0(1:ncol(A_table)))
+
+kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
+      col.names = paste0(1:ncol(Sigma_table)))
+```
+
+Similarly to the baseline model, the trace plots and histograms posterior draws on A and $\Sigma$ shows that unemployment rate has strong positive correlation with its first lag.
+```{r}
+mcxs1  = "#05386B"
+mcxs2  = "#379683"
+mcxs3  = "#5CDB95"
+mcxs4  = "#8EE4AF"
+mcxs5  = "#EDF5E1"
+
+par(mfrow=c(2,2), mar=c(4,4,2,2))
+# Trace plot for A.posterior
+plot.ts(sample_dummy$A.posterior[2,1,], xlab = "Simulation times S", ylab = "A posterior draws", col = mcxs1)
+
+# Histogram for A.posterior
+hist(sample_dummy$A.posterior[2,1,], xlab = "A posterior draws", col = mcxs1, main = '')
+
+# Trace plot for Sigma.posterior[1,1,]
+plot.ts(sample_dummy$Sigma.posterior[1,1,], xlab = "Simulation times S", ylab = "Sigma posterior draws", col = mcxs2)
+
+# Histogram for Sigma.posterior[1,1,]
+hist(sample_dummy$Sigma.posterior[1,1,], xlab = "Sigma posterior draws", 
+     col = mcxs2, main = '')
+```
+      
+## Baseline Model Extension 2 - Regime change
 With 2 regime states, we would have $Y_m$ and $X_m$
 
 The full conditional joint posterior have the following form
@@ -667,7 +751,8 @@ p(\Sigma|Y,X) &\sim IW_{N}(\overline{S}, \overline{v})\\
 \overline{V_m}^{-1}\overline{A_m} \\
 \end{align}
 
-Markov Switching 
+## Markov Switching 
+
 Initial probability of regimes
 \begin{align}
 \begin{bmatrix}
@@ -696,7 +781,6 @@ p_{21} & p_{22}\\
 1\\
 \end{bmatrix}, if s_t = 2
 \end{align}
-The posterior draws are done with Gibb sampling. 
 
 ```{r}
 # Data configuration
@@ -737,7 +821,8 @@ invisible({
 })  
 ```
 
-```{r}
+The posterior draws are obtain with the following code
+```{r, echo=TRUE}
 # Gibbs sampling function
 Gibbs_draws = function(S, Y, X, xi, P, pi) {
   N = ncol(Y)
@@ -823,7 +908,9 @@ Gibbs_draws = function(S, Y, X, xi, P, pi) {
   )
   return(output)
 }
+```
 
+```{r}
 label_switching <- function(draws) {
   S <- dim(draws$Sigma.posterior1)[3]  # Number of draws
   
@@ -881,9 +968,92 @@ for (i in seq_along(plots)) {
 }
 ```
 
-## Final model
+```{r}
+###############################################
+# Report posterior means and sd of parameters
+A1.E         = round(apply(Markov.draws$A.posterior1,1:2,mean),6)
+A1.sd        = round(apply(Markov.draws$A.posterior1,1:2,sd),6)
+A2.E         = round(apply(Markov.draws$A.posterior2,1:2,mean),6)
+A2.sd        = round(apply(Markov.draws$A.posterior2,1:2,sd),6)
+Sigma1.E     = round(apply(Markov.draws$Sigma.posterior1,1:2,mean),6)
+Sigma1.sd    = round(apply(Markov.draws$Sigma.posterior1,1:2,sd),6)
+Sigma2.E     = round(apply(Markov.draws$Sigma.posterior2,1:2,mean),6)
+Sigma2.sd    = round(apply(Markov.draws$Sigma.posterior2,1:2,sd),6)
+
+A1_table <- data.frame(rbind(t(A1.E)[1,],t(A1.sd)[1,],t(A1.E)[2,],t(A1.sd)[2,]))
+Sigma1_table <- data.frame(rbind(t(Sigma1.E)[1,],t(Sigma1.sd)[1,],t(Sigma1.E)[2,],t(Sigma1.sd)[2,]))
+A2_table <- data.frame(rbind(t(A2.E)[1,],t(A2.sd)[1,],t(A2.E)[2,],t(A2.sd)[2,]))
+Sigma2_table <- data.frame(rbind(t(Sigma2.E)[1,],t(Sigma2.sd)[1,],t(Sigma2.E)[2,],t(Sigma2.sd)[2,]))
+
+kable(A1_table, format = "html", caption = "Regime 1 Posterior A means and sd table",
+      col.names = paste0(1:ncol(A1_table)))
+kable(A2_table, format = "html", caption = "Regime 2 Posterior A means and sd table",
+      col.names = paste0(1:ncol(A2_table)))
+
+kable(Sigma1_table, format = "html", caption = "Regime 1 Posterior Sigma means and sd table",
+      col.names = paste0(1:ncol(Sigma1_table)))
+kable(Sigma2_table, format = "html", caption = "Regime 2 Posterior Sigma means and sd table",
+      col.names = paste0(1:ncol(Sigma2_table)))
+```
+The trace plots and histograms posterior draws on A and $\Sigma$ shows that unemployment rate has strong positive correlation with its first lag. The sigma plots shows that regime 1 has higher volatility than regime 2, which is expected considering label switching set up.
+```{r, fig.height=6}
+mcxs1  = "#05386B"
+mcxs2  = "#379683"
+mcxs3  = "#5CDB95"
+mcxs4  = "#8EE4AF"
+mcxs5  = "#EDF5E1"
+
+par(mfrow=c(4,2), mar=c(4,4,2,2))
+# Trace plot for A.posterior
+plot.ts(Markov.draws$A.posterior1[2,1,], xlab = "Simulation times S", ylab = "Regime 1 A", col = mcxs1)
+# Histogram for A.posterior
+hist(Markov.draws$A.posterior1[2,1,], xlab = "Regime 1 A", col = mcxs1, main = '')
+
+# Trace plot for Sigma.posterior[1,1,]
+plot.ts(Markov.draws$Sigma.posterior1[1,1,], xlab = "Simulation times S", ylab = "Regime 1 Sigma", col = mcxs2)
+# Histogram for Sigma.posterior[1,1,]
+hist(Markov.draws$Sigma.posterior1[1,1,], xlab = "Regime 1 Sigma", 
+     col = mcxs2, main = '')
+
+# Trace plot for A.posterior
+plot.ts(Markov.draws$A.posterior2[2,1,], xlab = "Simulation times S", ylab = "Regime 2 A", col = mcxs1)
+# Histogram for A.posterior
+hist(Markov.draws$A.posterior2[2,1,], xlab = "Regime 2 A", col = mcxs1, main = '')
+
+# Trace plot for Sigma.posterior[1,1,]
+plot.ts(Markov.draws$Sigma.posterior2[1,1,], xlab = "Simulation times S", ylab = "Regime 2 Sigma", col = mcxs2)
+# Histogram for Sigma.posterior[1,1,]
+hist(Markov.draws$Sigma.posterior2[1,1,], xlab = "Regime 2 Sigma", 
+     col = mcxs2, main = '')
+
+```
+
+# Model with Minnesota prior, dummy observation prior and regime change
 The final model is the combination of Minnesota prior, dummy observation prior and 
 regime change to account for heteroskedasticity.
+
+Prior distribution of a combination of Minnesota and dummy observation prior 
+\begin{align*}
+A \mid \Sigma &\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}) \\
+\Sigma &\sim  \text{IW}_{N} (\widetilde{S}, \widetilde{v})\\
+\\
+\widetilde{A} &= \widetilde{V}(X_m^{+'}Y_m^{+}+\underline{V}^{-1}\underline{A}) \\
+\widetilde{V} &= (X_m^{+'}X_m^{+} + \underline{V}^{-1})^{-1} \\
+\widetilde{v} &= T^{+} + \underline{v} \\ 
+\widetilde{S} &= \underline{S}+Y_m^{+'}Y_m^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\widetilde{A}'\widetilde{V}^{-1}\widetilde{A} \\
+\end{align*}
+
+The full conditional joint posterior have the following form
+\begin{align}
+p(A|Y,X,\Sigma) &\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\ 
+p(\Sigma|Y,X) &\sim IW_{N}(\overline{S}, \overline{v})\\
+\\
+\overline{V_m} &= (X_m'X_m + \widetilde{V}^{-1})^{-1} \\
+\overline{A_m} &= \overline{V_m}(X_m'Y_m+\widetilde{V}^{-1}\widetilde{A}) \\
+\overline{v} &= T_m + \widetilde{v} \\ 
+\overline{S_m} &= \widetilde{S}+Y_m'Y_m+\widetilde{A}'\widetilde{V}^{-1}\widetilde{A}-\overline{A_m}'
+\overline{V_m}^{-1}\overline{A_m} \\
+\end{align}
 
 ```{r}
 # Data configuration
@@ -912,7 +1082,8 @@ S.prior = diag(diag(Sigma.hat))
 nu.prior = N + 1
 ```
 
-```{r}
+The posterior draws are obtain with the following code
+```{r, echo=TRUE}
 # Gibbs sampling function
 FinalGibbs_draws = function(S, Y, X, xi, P, pi, A.prior, V.prior, S.prior, nu.prior) {
   N = ncol(Y)
@@ -1035,46 +1206,76 @@ Final.draws <- label_switching(Final.draws)
 after_f <- ts(t(apply(Final.draws$xi, 1:2, mean)), start = c(1998,3), frequency = 4)
 ```
 
+Similarly to the Regime change on the baseline model, the Bayesian Vars with dummy observation prior and regime change also indicate that regime 1 corresponds to the period around 2020, which aligns with the Covid-19 pandemic.
+
 ```{r, fig.width=8, fig.height=6}
 par(mfrow = c(1, 2))
 plot.ts(before_f, main = "Before label switching")
 plot.ts(after_f, main = "After label switching")
 ```
 
-```{r, fig.width=8, fig.height=6}
-par(mfrow = c(1, 2))
-plot(before_f, type = "l", main = "Before label switching", xlab = "Date", ylab = "Value")
-plot(after_f, type = "l", main = "Before label switching", xlab = "Date", ylab = "Value")
-```
-
-# Forecasting
-## Basic model
 ```{r}
-posterior_summary <- function(sample) {
-  # Report posterior means and sd of parameters
-  A.E <- round(apply(sample$A.posterior, 1:2, mean), 6)
-  A.sd <- round(apply(sample$A.posterior, 1:2, sd), 6)
-  Sigma.E <- round(apply(sample$Sigma.posterior, 1:2, mean), 6)
-  Sigma.sd <- round(apply(sample$Sigma.posterior, 1:2, sd), 6)
-  
-  # Create tables
-  A_table <- data.frame(rbind(t(A.E)[1,], t(A.sd)[1,], t(A.E)[2,], t(A.sd)[2,]))
-  Sigma_table <- data.frame(rbind(t(Sigma.E)[1,], t(Sigma.sd)[1,], t(Sigma.E)[2,],
-                                  t(Sigma.sd)[2,]))
-  # Format tables using kable
-  A_table_html <- kable(A_table, format = "html", caption = "Posterior A means and s.d. deviation table",
-                        col.names = paste0(1:ncol(A_table)))
-  Sigma_table_html <- kable(Sigma_table, format = "html", caption = "Posterior Sigma means and s.d. table", col.names = paste0(1:ncol(Sigma_table)))
-  html_content <- paste(A_table_html, Sigma_table_html, sep = "\n\n")
-  
-  # Return the HTML content
-  return(html_content)
-  # Return tables as list
-  #return(A_table_html, Sigma_table_html)
-  #return(list(A_table_html = A_table_html, Sigma_table_html = Sigma_table_html))
-}
-  
+###############################################
+# Report posterior means and sd of parameters
+A1.E         = round(apply(Final.draws$A.posterior1,1:2,mean),6)
+A1.sd        = round(apply(Final.draws$A.posterior1,1:2,sd),6)
+A2.E         = round(apply(Final.draws$A.posterior2,1:2,mean),6)
+A2.sd        = round(apply(Final.draws$A.posterior2,1:2,sd),6)
+Sigma1.E     = round(apply(Final.draws$Sigma.posterior1,1:2,mean),6)
+Sigma1.sd    = round(apply(Final.draws$Sigma.posterior1,1:2,sd),6)
+Sigma2.E     = round(apply(Final.draws$Sigma.posterior2,1:2,mean),6)
+Sigma2.sd    = round(apply(Final.draws$Sigma.posterior2,1:2,sd),6)
 
+A1_table <- data.frame(rbind(t(A1.E)[1,],t(A1.sd)[1,],t(A1.E)[2,],t(A1.sd)[2,]))
+Sigma1_table <- data.frame(rbind(t(Sigma1.E)[1,],t(Sigma1.sd)[1,],t(Sigma1.E)[2,],t(Sigma1.sd)[2,]))
+A2_table <- data.frame(rbind(t(A2.E)[1,],t(A2.sd)[1,],t(A2.E)[2,],t(A2.sd)[2,]))
+Sigma2_table <- data.frame(rbind(t(Sigma2.E)[1,],t(Sigma2.sd)[1,],t(Sigma2.E)[2,],t(Sigma2.sd)[2,]))
+
+kable(A1_table, format = "html", caption = "Regime 1 Posterior A means and sd table",
+      col.names = paste0(1:ncol(A1_table)))
+kable(A2_table, format = "html", caption = "Regime 2 Posterior A means and sd table",
+      col.names = paste0(1:ncol(A2_table)))
+
+kable(Sigma1_table, format = "html", caption = "Regime 1 Posterior Sigma means and sd table",
+      col.names = paste0(1:ncol(Sigma1_table)))
+kable(Sigma2_table, format = "html", caption = "Regime 2 Posterior Sigma means and sd table",
+      col.names = paste0(1:ncol(Sigma2_table)))
+```
+The trace plots and histograms posterior draws on A and $\Sigma$ shows that unemployment rate has strong positive correlation with its first lag. The $\Sigma$ plots still illustrate that regime 1 has higher volatility as expected, also the volatility for bothe regimes are lower than that of regime change on baseline model.
+
+```{r, fig.height=6}
+mcxs1  = "#05386B"
+mcxs2  = "#379683"
+mcxs3  = "#5CDB95"
+mcxs4  = "#8EE4AF"
+mcxs5  = "#EDF5E1"
+
+par(mfrow=c(4,2), mar=c(4,4,2,2))
+# Trace plot for A.posterior
+plot.ts(Final.draws$A.posterior1[2,1,], xlab = "Simulation times S", ylab = "Regime 1 A", col = mcxs1)
+# Histogram for A.posterior
+hist(Final.draws$A.posterior1[2,1,], xlab = "Regime 1 A", col = mcxs1, main = '')
+
+# Trace plot for Sigma.posterior[1,1,]
+plot.ts(Final.draws$Sigma.posterior1[1,1,], xlab = "Simulation times S", ylab = "Regime 1 ASigma", col = mcxs2)
+# Histogram for Sigma.posterior[1,1,]
+hist(Final.draws$Sigma.posterior1[1,1,], xlab = "Regime 1 Sigma", 
+     col = mcxs2, main = '')
+
+# Trace plot for A.posterior
+plot.ts(Final.draws$A.posterior2[2,1,], xlab = "Simulation times S", ylab = "Regime 2 A", col = mcxs1)
+# Histogram for A.posterior
+hist(Final.draws$A.posterior2[2,1,], xlab = "Regime 2 A", col = mcxs1, main = '')
+
+# Trace plot for Sigma.posterior[1,1,]
+plot.ts(Final.draws$Sigma.posterior2[1,1,], xlab = "Simulation times S", ylab = "Regime 2 Sigma", col = mcxs2)
+# Histogram for Sigma.posterior[1,1,]
+hist(Final.draws$Sigma.posterior2[1,1,], xlab = "Regime 2 Sigma", 
+     col = mcxs2, main = '')
+
+```
+# Forecasting
+```{r}
 ############################################################
 # Point forecasts 2D plot
 forecast_plots <- function(Y, Y.h, h, theta, phi, xlim) {
@@ -1192,48 +1393,11 @@ forecast <- function(S, sample_A, sample_Sigma, Y, p, h) {
 }
 ```
 
-
-```{r, eval=FALSE}
-# Report posterior means and sd of parameters
-A.E         = round(apply(sample_minnesota$A.posterior,1:2,mean),6)
-A.sd        = round(apply(sample_minnesota$A.posterior,1:2,sd),6)
-Sigma.E     = round(apply(sample_minnesota$Sigma.posterior,1:2,mean),6)
-Sigma.sd    = round(apply(sample_minnesota$Sigma.posterior,1:2,sd),6)
-
-A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
-Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
-
-kable(A_table, format = "html", caption = "Posterior A means and sd table",
-      col.names = paste0(1:ncol(A_table)))
-
-kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
-      col.names = paste0(1:ncol(Sigma_table)))
-
-
-###############################################
-# Report posterior means and sd of parameters
-A.E         = round(apply(sample_dummy$A.posterior,1:2,mean),6)
-A.sd        = round(apply(sample_dummy$A.posterior,1:2,sd),6)
-Sigma.E     = round(apply(sample_dummy$Sigma.posterior,1:2,mean),6)
-Sigma.sd    = round(apply(sample_dummy$Sigma.posterior,1:2,sd),6)
-
-A_table <- data.frame(rbind(t(A.E)[1,],t(A.sd)[1,],t(A.E)[2,],t(A.sd)[2,]))
-Sigma_table <- data.frame(rbind(t(Sigma.E)[1,],t(Sigma.sd)[1,],t(Sigma.E)[2,],t(Sigma.sd)[2,]))
-
-kable(A_table, format = "html", caption = "Posterior A means and sd table",
-      col.names = paste0(1:ncol(A_table)))
-
-kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
-      col.names = paste0(1:ncol(Sigma_table)))
-```
-
-
+## Baseline model
 ```{r, cache=TRUE}
 N       = 4
 p       = 4
 S       = 50000 
-
-posterior_summary(sample_minnesota)
 
 Y.h_minnesota <- forecast(S, sample_minnesota_A, sample_minnesota_Sigma, Y, p, h = 21)
 
@@ -1244,12 +1408,11 @@ The plot of point forecast and density for 21 periods ahead, equivalent to 21 qu
 For the 3D plot of the density, we can see that the further the period ahead, the density is more dispersed since the data is become less informative as horizon increases.
 
 
-## Extension 1
+## Baseline Model Extension 1 - Dummy observation prior
 ```{r, cache=TRUE}
 N       = 4
 p       = 4
 
-# posterior_summary(sample_dummy)
 
 Y.h_dummy <- forecast(S = 50000, sample_dummy_A,sample_dummy_Sigma, Y, p, h = 21)
 
@@ -1257,7 +1420,7 @@ forecast_plots(Y, Y.h_dummy, h =21, theta = 190, phi = 10, xlim = c(-30, 30))
 ```
 The plot of forecast for the dummy observation prior doesn't show any significant differences visually. The confidence interval narrowed insignificantly.
 
-## Extension 2
+## Baseline Model Extension 2 - Regime change
 
 After the regimes are correctly placed, we can forecast h-step ahead using the posterior draws.
 ```{r, echo=TRUE}
@@ -1311,7 +1474,9 @@ Y.h_Markov = Markov_forecast(S = 50000, sample = Markov.draws, Y, p, h = 21)
 forecast_plots(Y, Y.h_Markov, h = 21, theta = 190, phi = 10, xlim = c(-50, 50))
 ```
 
-## Final model
+The point forecast have similar positive trend to the mean and slight downward trend for the last few horizons. The 3D density intervals show that the peak of the intervals are lower.
+
+## Model with Minnesota prior, dummy observation prior and regime change
 
 Similarly to the baseline model, the prior will be a combination of Minnesota and dummy observation prior. Then the Markov-switching Gibb-sampling is done with these new priors to obtain posterior draws
 
@@ -1320,8 +1485,9 @@ Similarly to the baseline model, the prior will be a combination of Minnesota an
 Y.h_Final = Markov_forecast(S = 50000, sample = Final.draws, Y, p, h = 21)
 forecast_plots(Y, Y.h_Final, h = 21, theta = 190, phi = 10, xlim = c(-10, 20))
 ```
+The forecast shows positive upward trend, converging to the mean, the downward trend for the last horizons is less evident.
 
-
+The below is an interactive density intervals for easier inspection.
 ```{r}
 plots_3d <- function(Y.h, h, xlim) {
   mcxs1  = "#05386B"
@@ -1330,7 +1496,7 @@ plots_3d <- function(Y.h, h, xlim) {
   
   par(mfrow=c(1,2), mar=c(2,2,1,1))
   
-  # Forecasting on basic model
+  # Forecasting
   limits.1    <- range(Y.h[,1,])
   point.f     <- apply(Y.h[,1,], 1, mean)
   interval.f  <- apply(Y.h[,1,], 1, hdi, credMass=0.90)
@@ -1350,7 +1516,7 @@ plots_3d <- function(Y.h, h, xlim) {
     layout(scene = list(xaxis = list(title = "Unemployment rate"),
                         yaxis = list(title = "h-step forecast"),
                         zaxis = list(title = "density")),
-           title = "Unemployment rate forecast densities for basic model") %>%
+           title = "Unemployment rate forecast densities") %>%
     add_surface(colors = c(mcxs1, mcxs4, mcxs5))
   
   # Forecasting on extended model
@@ -1373,7 +1539,7 @@ plots_3d <- function(Y.h, h, xlim) {
     layout(scene = list(xaxis = list(title = "Unemployment rate"),
                         yaxis = list(title = "h-step forecast"),
                         zaxis = list(title = "density")),
-           title = "AUD/USD forecast densities for extended model") %>%
+           title = "Unemployment rate forecast densities") %>%
     add_surface(colors = c(mcxs1, "magenta2", mcxs5))
 }
 
@@ -1382,23 +1548,16 @@ plots_3d(Y.h_Final, h = 21)
 
 ```
 
-The data used is up to September 2023. The subsequent unemployment rate is released by the 
-```{r}
-# Create the data frame for the table
-data <- data.frame(
-  Month = c("Oct-23", "Nov-23", "Dec-23", "Jan-24", "Feb-24", "Mar-24", "Apr-24"),
-  ABS = c(3.8, 3.9, 4.0, 4.1, 3.7, 3.9, 4.1)
-)
+# Conclusion
+The research project presents 4 models for forecasting unemployment rate in Australia: baseline model with Minnesota prior, extension on baseline model with dummy observation prior, extension on baseline model with regime change, and finally, model with Minnesota prior, dummy observation prior and regime change.
 
-# Create the forecast data frame
-forecast <- data.frame(
-  Quarter = c("Q4-23", "Q1-24", "Q2-24"),
-  Forecast = c(3.694583, 3.868261, 4.063661)
-)
+The dummy observation prior extension seems to have minimal effect on the forecast of unemployment rate, the confidence intervals narrow insignificantly.
 
-kable(data, caption = "ABS Data", format="html")
-kable(forecast, caption = "Forecast Data", format="html") 
-```
+The regime change on both baseline model and final model show similar forecasting trend. Though the full model does have the smaller confidence intervals, indicating more informative model.
+
+Generally, the trivial effect of the dummy observation prior can be due to the dominance of Minnesota prior. Therefore, adding a small number of dummy observations, specifically 5 observations may not significantly alter the posterior distribution. For the regime change, as observed from the regimes distribution, regime 1 is mainly the period correspond to Covid-19, the COVID-19 period was highly volatile and significantly different from other periods. Thus, it could dominate the overall model dynamics, making it difficult for regime 2 to show its influence, since it covers a much longer period with relatively lower volatile data. Furthermore, the high volatility of Covid-19 might be leading to large uncertainty in the estimates for regime 1, causing the model to be less sensitive to changes or differences between regimes. 
+
+To enhance the effect of regime changes in the model, we can use higher frequency data. Transitioning from quarterly to monthly or daily data by interpolation would increase the number of observations, allowing for a more granular capture of economic dynamics and short-term fluctuations. This is particularly useful for inspecting the timing of regime changes more precisely. Additionally, increasing the number of regimes from two to three could allow the model to capture more nuanced economic conditions. For instance, the three-regime model could differentiate between normal economic conditions, periods of moderate volatility, and severe events like the COVID-19 pandemic. These changes would potentially enable a more accurate representation of the underlying economic processes and improve the model's forecasting capabilities of regime changes.
 
 
 
