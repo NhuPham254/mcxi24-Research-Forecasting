@@ -65,6 +65,8 @@ library(HDInterval)
 library(plot3D)
 library(Rcpp)
 library(RcppArmadillo)
+library(gridExtra)
+library(plotly)
 ```
 
 
@@ -459,7 +461,7 @@ S.prior     = diag(diag(Sigma.hat))
 nu.prior    = N+1
 ```
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, cache=TRUE}
 ###############################################
 # Posterior draws Normal-inverse Wishart
 ###############################################
@@ -487,11 +489,9 @@ posterior_draws       = function (S, Y, X, A.prior, V.prior, S.prior, nu.prior){
     return(output)
 }
 
-S = 50000
-sample_minnesota        = posterior_draws(S, Y, X, A.prior, V.prior, S.prior, nu.prior)
+sample_minnesota        = posterior_draws(S=50000, Y, X, A.prior, V.prior, S.prior, nu.prior)
 sample_minnesota_A      = sample_minnesota$A.posterior
 sample_minnesota_Sigma  = sample_minnesota$Sigma.posterior
-# sample_minnesota = posterior_draws(1000, Y, X, A.prior, V.prior, S.prior, nu.prior)
 ```
 
 #######################################################################################
@@ -510,7 +510,6 @@ Dummy observation prior also known as known as “sum-of-coefficients” propose
 
 To be consistent with cointegration, an additional prior proposed by Sims (1993)
 is also added.
-
 
 \begin{align*}
 \underset{1\times 4}y^{++} &= \frac{\overline{y_0}^{'}}{\delta}, ,   \ i =1,2,3,4\\
@@ -576,41 +575,6 @@ A \mid \Sigma &\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}
 \widetilde{S} &= \underline{S}+Y^{+'}Y^{+}+\underline{A}'\underline{V}^{-1}\underline{A} -\widetilde{A}'\widetilde{V}^{-1}\widetilde{A} \\
 \end{align*}
 
-```{r, eval=FALSE}
-# Data configuration
-N       = 4
-p       = 4
-mu      = 1000
-delta   = 1000
-
-avg_unmp <- mean(X[1, c(2, 6, 10, 14)])
-avg_gdp <- mean(X[1, c(3, 7, 11, 15)])
-avg_wpi <- mean(X[1, c(4, 8, 12, 16)])
-avg_cash <- mean(X[1, c(5, 9, 13, 17)])
-
-diag_mu <- diag(c(avg_unmp/mu, avg_gdp/mu, avg_wpi/mu, avg_cash/mu))
-row_delta <-  matrix(c(avg_unmp/delta, avg_gdp/delta, avg_wpi/delta, avg_cash/delta), nrow = 1)
-
-Y_d       = rbind(diag_mu, row_delta)
-  
-first_vector <- matrix(c(0,0,0,0, 1/delta), ncol = 1)
-X_d      = cbind(first_vector, Y_d, Y_d, Y_d, Y_d)
-```
-
-
-```{r, eval=FALSE}
-# Normal-inverse Wishart combination of specifying the prior 
-############################################################
-V.tilde.inv   = t(X_d)%*%X_d + diag(1/diag(V.prior))
-V.tilde       = solve(V.tilde.inv)
-A.tilde       = V.tilde%*%(t(X_d)%*%Y_d + diag(1/diag(V.prior))%*%A.prior)
-nu.tilde      = nrow(Y_d) + nu.prior
-S.tilde       = S.prior + t(Y_d)%*%Y_d + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior -
-                t(A.tilde)%*%V.tilde.inv%*%A.tilde
-S.tilde.inv   = solve(S.tilde)
-
-```
-
 The full conditional joint posterior have the following form
 \begin{align}
 p(A|Y,X,\Sigma) &\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\ 
@@ -623,7 +587,7 @@ p(\Sigma|Y,X) &\sim IW_{N}(\overline{S}, \overline{v})\\
 \overline{V}^{-1}\overline{A} \\
 \end{align}
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, cache=TRUE}
 ###############################################
 # Posterior draws for dummy prior
 ###############################################
@@ -679,214 +643,154 @@ posterior_draws_dummy = function(S, Y, X, A.prior, V.prior, S.prior, nu.prior) {
   output            = list(A.posterior=A.posterior, Sigma.posterior=Sigma.posterior)
   return(output)
 }
-S = 50000
-sample_dummy        = posterior_draws_dummy(S, Y, X, A.prior, V.prior, S.prior, nu.prior)
+sample_dummy        = posterior_draws_dummy(S = 50000, Y, X, A.prior, V.prior, S.prior, nu.prior)
 sample_dummy_A      = sample_dummy$A.posterior
 sample_dummy_Sigma  = sample_dummy$Sigma.posterior
 ```
-## Model Proof
-1000 observations are simulated from a bi-variate Gaussian random walk process annd is used as data for the below proofs.
 
-### Basic model
-```{r, echo=FALSE}
-set.seed(123456)
-N       = 2
-p       = 1
-S       = 1000
-K       = 1+p*N
-
-r1 = cumsum(rnorm(1000,0,1))
-r2 = cumsum(rnorm(1000,0,1))
-
-r = cbind(r1, r2) 
-
-Y_p = ts(r[2:nrow(r),], frequency=1)
-
-X_p     = matrix(1,nrow(Y_p),1)
-X_p     = cbind(X_p,r[2:nrow(r)-1,])
-
-# MLE
-############################################################
-A.hat       = solve(t(X_p)%*%X_p)%*%t(X_p)%*%Y_p
-Sigma.hat   = t(Y_p-X_p%*%A.hat)%*%(Y_p-X_p%*%A.hat)/nrow(Y_p)
-
-# Prior distribution
-############################################################
-kappa.1     = 1
-kappa.2     = 100
-A.prior     = matrix(0,nrow(A.hat),ncol(A.hat))
-A.prior[2:(N + 1),] = diag(N)
-V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
-S.prior     = diag(diag(Sigma.hat))
-nu.prior    = N+1
-
-############################################################
-sample_minnesota_proof = posterior_draws(1000, Y_p, X_p, A.prior, V.prior, S.prior, nu.prior)
-
-# Report posterior means and sd of parameters
-A.E         = round(apply(sample_minnesota_proof$A.posterior,1:2,mean),6)
-A.sd        = round(apply(sample_minnesota_proof$A.posterior,1:2,sd),6)
-Sigma.E     = round(apply(sample_minnesota_proof$Sigma.posterior,1:2,mean),6)
-Sigma.sd    = round(apply(sample_minnesota_proof$Sigma.posterior,1:2,sd),6)
-
-
-kable(A.E, format = "html", caption = "Posterior mean of autoregressive",
-      col.names = paste0(1:ncol(A.E)))
-
-kable(Sigma.E, format = "html", caption = "Posterior mean of covarince",
-      col.names = paste0(1:ncol(Sigma.E)))
-
-
-
-# Ask A.prior Correct
-# Ask Dummy Good
-# Derivation do need the steps? Yes
-# Table presentation OK
-# Use artificial as data? Yes. construct Y and X
-
-# do this for basic and extension? Yes
-```
-### Extended model
-```{r, echo = FALSE, eval=FALSE}
-
-mu      = 1000
-delta   = 1000
-diag_mu <- diag(c(X_p[1,2]/mu, X_p[1,3]/mu))
-row_delta <-  matrix(c(X_p[1,2]/delta, X_p[1,3]/delta), nrow = 1)
-Y_d       = rbind(diag_mu, row_delta)
-  
-first_vector <- matrix(c(0,0, 1/delta), ncol = 1)
-X_d      = cbind(first_vector, Y_d)
-
-
-# Normal-inverse Wishart prior parameters
-############################################################
-V.tilde.inv     = t(X_d)%*%X_d + diag(1/diag(V.prior))
-V.tilde       = solve(V.tilde.inv)
-A.tilde       = V.tilde%*%(t(X_d)%*%Y_d + diag(1/diag(V.prior))%*%A.prior)
-nu.tilde      = nrow(Y_d) + nu.prior
-S.tilde       = S.prior + t(Y_d)%*%Y_d + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.tilde)%*%V.tilde.inv%*%A.tilde
-S.tilde.inv   = solve(S.tilde)
-
-############################################################
-sample_dummy_proof = posterior_draws_dummy(1000, Y_p, X_p, A.prior, V.prior, S.prior, nu.prior)
-
-# Report posterior means and sd of parameters
-A.E         = round(apply(sample_dummy_proof$A.posterior,1:2,mean),6)
-A.sd        = round(apply(sample_dummy_proof$A.posterior,1:2,sd),6)
-Sigma.E     = round(apply(sample_dummy_proof$Sigma.posterior,1:2,mean),6)
-Sigma.sd    = round(apply(sample_dummy_proof$Sigma.posterior,1:2,sd),6)
-
-kable(A.E, format = "html", caption = "Posterior mean of autoregressive",
-      col.names = paste0(1:ncol(A.E)))
-
-kable(Sigma.E, format = "html", caption = "Posterior mean of covarince",
-      col.names = paste0(1:ncol(Sigma.E)))
-
-```
 
 # Forecasting
 ## Basic model
 ```{r, echo=TRUE}
-# Set up
-# Define colors
-mcxs1  = "#05386B"
-mcxs2  = "#379683"
-mcxs3  = "#5CDB95"
-mcxs4  = "#8EE4AF"
-mcxs5  = "#EDF5E1"
-
-mcxs1.rgb   = col2rgb(mcxs1)
-mcxs1.shade1= rgb(mcxs1.rgb[1],mcxs1.rgb[2],mcxs1.rgb[3], alpha=50, maxColorValue=255)
-mcxs2.rgb   = col2rgb(mcxs2)
-mcxs2.shade1= rgb(mcxs2.rgb[1],mcxs2.rgb[2],mcxs2.rgb[3], alpha=50, maxColorValue=255)
+posterior_summary <- function(sample) {
+  # Report posterior means and sd of parameters
+  A.E <- round(apply(sample$A.posterior, 1:2, mean), 6)
+  A.sd <- round(apply(sample$A.posterior, 1:2, sd), 6)
+  Sigma.E <- round(apply(sample$Sigma.posterior, 1:2, mean), 6)
+  Sigma.sd <- round(apply(sample$Sigma.posterior, 1:2, sd), 6)
+  
+  # Create tables
+  A_table <- data.frame(rbind(t(A.E)[1,], t(A.sd)[1,], t(A.E)[2,], t(A.sd)[2,]))
+  Sigma_table <- data.frame(rbind(t(Sigma.E)[1,], t(Sigma.sd)[1,], t(Sigma.E)[2,],
+                                  t(Sigma.sd)[2,]))
+  # Format tables using kable
+  A_table_html <- kable(A_table, format = "html", caption = "Posterior A means and s.d. deviation table",
+                        col.names = paste0(1:ncol(A_table)))
+  Sigma_table_html <- kable(Sigma_table, format = "html", caption = "Posterior Sigma means and s.d. table", col.names = paste0(1:ncol(Sigma_table)))
+  html_content <- paste(A_table_html, Sigma_table_html, sep = "\n\n")
+  
+  # Return the HTML content
+  return(html_content)
+  # Return tables as list
+  #return(A_table_html, Sigma_table_html)
+  #return(list(A_table_html = A_table_html, Sigma_table_html = Sigma_table_html))
+}
+  
 
 ############################################################
 # Point forecasts 2D plot
-forecast_plots <- function(Y, Y.h, h, theta = 180, phi = 15.5, xlim = c(-100, 100)) {
+forecast_plots <- function(Y, Y.h, h, theta, phi, xlim) {
   
-point_forecast    = apply(Y.h[,1,],1,mean) 
-interval_forecast = apply(Y.h[,1,],1,hdi,credMass=0.90)
-interval_forecast_1 = apply(Y.h[,1,],1,hdi,credMass=0.68)
-range             = range(Y[,1],interval_forecast)
-
-par(mfrow=c(1,1), mar=rep(3,4),cex.axis=1)
-plot(1:(length(Y[,1])), Y[,1], type="l", axes=FALSE, 
-     xlim = c(1, nrow(Y)+h), ylim=range, 
-     xlab="", ylab="", 
-     lwd=2, col = mcxs1)
-lines(length(Y[,1]):(length(Y[,1]) + h), c(Y[nrow(Y), 1],point_forecast), type="l", 
-      xlim =nrow(Y)+h+5, ylim=range,
-      xlab="", ylab="", 
-      lwd=2, col = mcxs2)
-axis(1,c(3,23,43,63,83,101,nrow(Y), nrow(Y)+h),
-     c("1999","2003","2008","20013","2018","2023","", "2034"), 
-     col="black")
-axis(2, at=seq(from=range[1], to=range[2], length.out=5), 
-     labels=round(seq(from=range[1], to=range[2], length.out=5), 2),
-     col="black")
-end_y_value <- point_forecast[13] 
-abline(h = end_y_value, col="red", lty=2, lwd=1)
-abline(v = nrow(Y), col = "black")
-legend("bottomleft", legend=c("Data", "Forecast"), 
-       col=c(mcxs1, mcxs2), lty=c(1, 1), lwd=c(2, 2))
-polygon(c(length(Y[,1]):(length(Y[,1]) + h), (length(Y[,1]):(length(Y[,1]) + h))[(h+1):1]), 
-        c(Y[nrow(Y), 1], interval_forecast[1,], interval_forecast[2,h:1], Y[nrow(Y), 1]), 
-        col = mcxs1.shade1, border = mcxs1.shade1)
-polygon(c(length(Y[,1]):(length(Y[,1]) + h), (length(Y[,1]):(length(Y[,1]) + h))[(h+1):1]), 
-        c(Y[nrow(Y), 1], interval_forecast_1[1,], interval_forecast_1[2,h:1], Y[nrow(Y), 1]), 
-        col = mcxs1.shade1, border = mcxs1.shade1)
-
-limits.1    = range(Y.h[,1,])
-point.f     = apply(Y.h[,1,],1,mean)
-interval.f  = apply(Y.h[,1,],1,hdi,credMass=0.90)
-
-x           = seq(from=limits.1[1], to=limits.1[2], length.out=100)
-z           = matrix(NA,h,99)
-for (i in 1:h){
-  z[i,]     = hist(Y.h[i,1,], breaks=x, plot=FALSE)$density
-}
-x           = hist(Y.h[i,1,], breaks=x, plot=FALSE)$mids
-yy          = 1:h
-z           = t(z)
-
-
-  #range(limits.1[1], limits.1[2], interval.f[1, ], interval.f[2, ])
-ylim <- range(yy)
-zlim <- range(z)
-f4    = persp3D(x=x, y=yy, z=z, phi=phi, theta=theta, xlab="\nunmp[t+h|t]", ylab="h",
+  # Define colors
+  mcxs1  = "#05386B"
+  mcxs2  = "#379683"
+  mcxs3  = "#5CDB95"
+  mcxs4  = "#8EE4AF"
+  mcxs5  = "#EDF5E1"
+  
+  mcxs1.rgb   = col2rgb(mcxs1)
+  mcxs1.shade1= rgb(mcxs1.rgb[1],mcxs1.rgb[2],mcxs1.rgb[3], alpha=50, maxColorValue=255)
+  mcxs2.rgb   = col2rgb(mcxs2)
+  mcxs2.shade1= rgb(mcxs2.rgb[1],mcxs2.rgb[2],mcxs2.rgb[3], alpha=50, maxColorValue=255)
+  
+  point_forecast    = apply(Y.h[,1,],1,mean) 
+  interval_forecast = apply(Y.h[,1,],1,hdi,credMass=0.90)
+  interval_forecast_1 = apply(Y.h[,1,],1,hdi,credMass=0.68)
+  range             = range(Y[,1],interval_forecast)
+  
+  par(mfrow=c(1,1), mar=rep(3,4),cex.axis=1)
+  plot(1:(length(Y[,1])), Y[,1], type="l", axes=FALSE, 
+       xlim = c(1, nrow(Y)+h), ylim=range, 
+       xlab="", ylab="", 
+       lwd=2, col = mcxs1)
+  lines(length(Y[,1]):(length(Y[,1]) + h), c(Y[nrow(Y), 1],point_forecast), type="l", 
+        xlim = c(1, nrow(Y)+h), ylim=range,
+        xlab="", ylab="", 
+        lwd=2, col = mcxs2)
+  axis(1,c(3,23,43,63,83,101,nrow(Y), nrow(Y)+h),
+       c("1999","2003","2008","20013","2018","2023","", "2028"), 
+       col="black")
+  axis(2, at=seq(from=range[1], to=range[2], length.out=5), 
+       labels=round(seq(from=range[1], to=range[2], length.out=5), 2),
+       col="black")
+  end_y_value <- point_forecast[13] 
+  abline(h = end_y_value, col="red", lty=2, lwd=1)
+  abline(v = nrow(Y), col = "black")
+  legend("bottomleft", legend=c("Data", "Forecast"), 
+         col=c(mcxs1, mcxs2), lty=c(1, 1), lwd=c(2, 2))
+  polygon(c(length(Y[,1]):(length(Y[,1]) + h), (length(Y[,1]):(length(Y[,1]) + h))[(h+1):1]), 
+          c(Y[nrow(Y), 1], interval_forecast[1,], interval_forecast[2,h:1], Y[nrow(Y), 1]), 
+          col = mcxs1.shade1, border = mcxs1.shade1)
+  polygon(c(length(Y[,1]):(length(Y[,1]) + h), (length(Y[,1]):(length(Y[,1]) + h))[(h+1):1]), 
+          c(Y[nrow(Y), 1], interval_forecast_1[1,], interval_forecast_1[2,h:1], Y[nrow(Y), 1]), 
+          col = mcxs1.shade1, border = mcxs1.shade1)
+  
+  limits.1    = range(Y.h[,1,])
+  point.f     = apply(Y.h[,1,],1,mean)
+  interval.f  = apply(Y.h[,1,],1,hdi,credMass=0.90)
+  
+  x           = seq(from=limits.1[1], to=limits.1[2], length.out=100)
+  z           = matrix(NA,h,99)
+  for (i in 1:h){
+    z[i,]     = hist(Y.h[i,1,], breaks=x, plot=FALSE)$density
+  }
+  x           = hist(Y.h[i,1,], breaks=x, plot=FALSE)$mids
+  yy          = 1:h
+  z           = t(z)
+  
+  # Adjust xlim, ylim, zlim based on h
+  xlim <- c(limits.1[1], limits.1[2])
+  ylim <- c(1, h)
+  zlim <- range(z)
+  
+  f4 <- persp3D(x=x, y=yy, z=z, phi=phi, theta=theta, xlab="\nunmp[t+h|t]", ylab="h",
                 zlab="\npredictive densities of unemployment rate", shade=NA, border=NA,
                 ticktype="detailed", nticks=3,cex.lab=1, col=NA, plot=FALSE, 
-                xlim = xlim)
-perspbox (x=x, y=yy, z=z, bty="f", col.axis="black", phi=phi, theta=theta,
-          xlab="\nunemployment[t+h|t]", ylab="h", zlab="\npredictive densities of unemployment
-          rate", ticktype="detailed", nticks=3,cex.lab=1, col = NULL, plot = TRUE, 
-          xlim = xlim)
-polygon3D( x=c(interval.f[1,],interval.f[2,h:1]), y=c(1:h,h:1), z=rep(0,2*h), 
-           col = mcxs1.shade1, NAcol = "white", border = NA, add = TRUE, plot = TRUE, 
-           xlim = xlim)
-for (i in 1:h){
-  f4.l = trans3d(x=x, y=yy[i], z=z[,i], pmat=f4)
-  lines(f4.l, lwd=0.5, col="black")
+                xlim = xlim, ylim = ylim, zlim = zlim)
+  
+  perspbox(x=x, y=yy, z=z, bty="f", col.axis="black", phi=phi, theta=theta,
+           xlab="\nunemployment[t+h|t]", ylab="h", zlab="\npredictive densities of unemployment rate",
+           ticktype="detailed", nticks=3, cex.lab=1, col = NULL, plot = TRUE, 
+           xlim = xlim, ylim = ylim, zlim = zlim)
+  
+  polygon3D(x = c(interval.f[1,], interval.f[2,h:1]), y = c(1:h, h:1), z = rep(0, 2*h), 
+            col = mcxs1.shade1, NAcol = "white", border = NA, add = TRUE, plot = TRUE, 
+            xlim = xlim, ylim = ylim, zlim = zlim)
+  
+  for (i in 1:h){
+    f4.l <- trans3d(x = x, y = yy[i], z = z[,i], pmat = f4)
+    lines(f4.l, lwd = 0.5, col = "black")
+  }
+  
+  f4.l1 <- trans3d(x = point.f, y = yy, z = 0, pmat = f4)
+  lines(f4.l1, lwd = 2, col = mcxs1)
 }
-f4.l1 = trans3d(x=point.f, y=yy, z=0, pmat=f4)
-lines(f4.l1, lwd=2, col=mcxs1)
+
+forecast <- function(S, sample_A, sample_Sigma, Y, p, h) {
+  # Initialize the array to store forecasts
+  Y.h <- array(NA, c(h, N, S))
+  
+  # Loop over each sample
+  for (s in 1:S) {
+    A.posterior.draw <- sample_A[,,s]
+    Sigma.posterior <- sample_Sigma[,,s]
+    x.Ti <- Y[(nrow(Y) - p + 1):nrow(Y),]
+    x.Ti <- x.Ti[p:1,]
+    
+    # Forecast h steps ahead
+    for (i in 1:h) {
+      x.T <- c(1, as.vector(t(x.Ti)))
+      Y.f <- rmvnorm(1, mean = x.T %*% A.posterior.draw, sigma = Sigma.posterior)
+      x.Ti <- rbind(Y.f, x.Ti[1:(p - 1),])
+      Y.h[i,,s] <- Y.f[1:2]
+    }
+  }
+  
+  return(Y.h)
 }
 ```
 
-
-Simulate draws from the predictive density
-```{r}
-N       = 4
-p       = 4
-h           = 41
-S           = 50000 
-     
-
-#sample_minnesota        = posterior_draws(S, Y, X)
-#sample_minnesota_A      = sample_minnesota$A.posterior
-#sample_minnesota_Sigma  = sample_minnesota$Sigma.posterior
-
+```{r, eval=FALSE}
 # Report posterior means and sd of parameters
 A.E         = round(apply(sample_minnesota$A.posterior,1:2,mean),6)
 A.sd        = round(apply(sample_minnesota$A.posterior,1:2,sd),6)
@@ -902,54 +806,6 @@ kable(A_table, format = "html", caption = "Posterior A means and sd table",
 kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
       col.names = paste0(1:ncol(Sigma_table)))
 
-Y.h_minnesota = array(NA, c(h, 2, S))   
-
-for (s in 1:S){
-  A.posterior.draw= sample_minnesota_A[,,s]
-  Sigma.posterior = sample_minnesota_Sigma[,,s]
-  x.Ti          = Y[(nrow(Y)-p+1):nrow(Y),]
-  x.Ti          = x.Ti[p:1,]
-  for (i in 1:h){
-    x.T           = c(1,as.vector(t(x.Ti)))
-    Y.f           = rmvnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior)
-    x.Ti          = rbind(Y.f,x.Ti[1:(p-1),])
-    Y.h_minnesota[i,,s]     = Y.f[1:2]
-  }
-}
-
-
-forecast_plots(Y, Y.h_minnesota, h)
-
-#point_forecast    = apply(Y.h_minnesota[,1,],1,mean) 
-# 535.1734 554.6926 576.5822 598.5256 618.1544 635.2914 649.8251 662.4095 672.5107
-# 680.4133 686.5791 691.1974 694.1236
-# interval_forecast = apply(Y.h_minnesota[,1,],1,hdi,credMass=0.90)
-#        [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]     [,9]
-#lower 446.5610 424.3377 406.2926 400.4955 400.4391 402.8936 400.2963 393.8157 398.7862
-#upper 623.7617 690.5837 747.4941 793.6004 838.0991 875.0295 904.0784 924.9246 952.7060
- #        [,10]    [,11]    [,12]    [,13]
-#lower 396.8369 388.3988 383.5023 380.5817
-#upper 970.5962 974.3133 983.4537 992.4253
-# range             = range(Y[,1],interval_forecast)
-# 1] 380.5817 992.4253
-
-```
-The plot of point forecast and density for 13 periods ahead, equivalent to 13 quarters or 3 years and 1 quarter from Q4 2023 to Q4 2026 shows a clear upward trend. The confidence interval is quite large. The unemployment rate seems to go back to the mean. 
-
-For the 3D plot of the density, we can see that the further the period ahead, the density is more dispersed since the data is become less informative as horizon increases.
-
-
-## Extended model
-```{r}
-N       = 4
-p       = 4
-h           = 41
-S           = 50000 
-Y.h_dummy          = array(NA,c(h,N,S))
-
-#sample_dummy        = posterior_draws_dummy(S, Y, X)
-#sample_dummy_A      = sample_dummy$A.posterior
-#sample_dummy_Sigma  = sample_dummy$Sigma.posterior
 
 ###############################################
 # Report posterior means and sd of parameters
@@ -966,41 +822,41 @@ kable(A_table, format = "html", caption = "Posterior A means and sd table",
 
 kable(Sigma_table, format = "html", caption = "Posterior Sigma means and sd table",
       col.names = paste0(1:ncol(Sigma_table)))
+```
 
 
-for (s in 1:S){
-  A.posterior.draw= sample_dummy_A[,,s]
-  Sigma.posterior = sample_dummy_Sigma[,,s]
-  x.Ti          = Y[(nrow(Y)-p+1):nrow(Y),]
-  x.Ti          = x.Ti[p:1,]
-  for (i in 1:h){
-    x.T           = c(1,as.vector(t(x.Ti)))
-    Y.f           = rmvnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior)
-    x.Ti          = rbind(Y.f,x.Ti[1:(p-1),])
-    Y.h_dummy [i,,s]     = Y.f[1:2]
-  }
-}
+Simulate draws from the predictive density
+```{r, cache=TRUE}
+N       = 4
+p       = 4
+S       = 50000 
 
-forecast_plots(Y, Y.h_dummy, h)
+posterior_summary(sample_minnesota)
+
+Y.h_minnesota <- forecast(S, sample_minnesota_A, sample_minnesota_Sigma, Y, p, h = 21)
+
+forecast_plots(Y, Y.h_minnesota, h = 21, theta = 190, phi = 10, xlim = c(-50, 50))
+```
+The plot of point forecast and density for 13 periods ahead, equivalent to 13 quarters or 3 years and 1 quarter from Q4 2023 to Q4 2026 shows a clear upward trend. The confidence interval is quite large. The unemployment rate seems to go back to the mean. 
+
+For the 3D plot of the density, we can see that the further the period ahead, the density is more dispersed since the data is become less informative as horizon increases.
+
+
+## Extended model
+```{r, cache=TRUE}
+N       = 4
+p       = 4
+
+# posterior_summary(sample_dummy)
+
+Y.h_dummy <- forecast(S = 50000, sample_dummy_A,sample_dummy_Sigma, Y, p, h = 21)
+
+forecast_plots(Y, Y.h_dummy, h =21, theta = 190, phi = 10, xlim = c(-30, 30))
 ```
 The plot of forecast for the extended model doesn't show any significant differences visually. The confidence interval narrowed insignificantly.
 
 
 The data used is up to September 2023. The subsequent unemployment rate is released by the 
-
-\begin{table}[ht]
-\begin{tabular}{llllllll}
-   \hline
-  & Oct-23 & Nov-23 & Dec-23 & Jan-24 & Feb-24 & Mar-24 & Apr-24\\
-  \hline
- ABS & 3.8 & 3.9 & 4.0 & 4.1 & 3.7 & 3.9 & 4.1 \\ 
-  \hline
- & &Q4-23 &&& Q1-24 && Q2-24\\ 
-  \hline
- Forecast & &3.694583 &&& 3.868261 && 4.063661 \\ 
-   \hline
-\end{tabular}
-\end{table}
 ```{r}
 # Create the data frame for the table
 data <- data.frame(
@@ -1018,7 +874,7 @@ kable(data, caption = "ABS Data", format="html")
 kable(forecast, caption = "Forecast Data", format="html") 
 ```
 
-## Extension 2
+## Extension 2 - Regime change
 With 2 regime states, we would have $Y_m$ and $X_m$
 
 The full conditional joint posterior have the following form
@@ -1072,36 +928,39 @@ p       = 4
 y       = merged_df
 y       = ts(y[,c(2,3,4,5)], start = c(1997,3), frequency = 4,
               names=c("unmp","gdp","wpi","cashrate"))
-#y       = ts(y[,c(2,3)], start = c(1997,3), frequency = 4,
-#             names=c("unmp","gdp"))
 Y       = ts(y[5:nrow(y),], start = c(1998,3), frequency = 4)
 
 X       = matrix(1,nrow(Y),1)
 for (i in 1:p){
   X     = cbind(X,y[5:nrow(y)-i,])
 }
-```
 
-```{r}
 A.hat = solve(t(X) %*% X) %*% t(X) %*% Y
 Sigma.hat = t(Y - X %*% A.hat) %*% (Y - X %*% A.hat) / T
 
 kappa.1 = 1
 kappa.2 = 100
 A.prior = matrix(0, nrow = nrow(A.hat), ncol = ncol(A.hat))
-#A.prior[2:5, 1:4] = diag(1, nrow = 4)
+A.prior[2:5, 1:4] = diag(1, nrow = 4)
 V.prior = diag(c(kappa.2, kappa.1 * ((1:p)^(-2)) %x% rep(1, N)))
 S.prior = diag(diag(Sigma.hat))
 nu.prior = N + 1
 ```
 
 ```{r, echo=FALSE, results ='hide'}
-Rcpp::sourceCpp ("ms.cpp")
+#Rcpp::sourceCpp ("ms.cpp")
+invisible({
+  # Redirect plot output to a temporary file
+  tmp_file <- tempfile(fileext = ".pdf")
+  pdf(file = tmp_file)
+  Rcpp::sourceCpp("ms.cpp")
+  dev.off()
+  unlink(tmp_file)  # Remove the temporary file
+})  
 ```
 
 
 ```{r}
-S = 10000
 # Gibbs sampling function
 Gibbs_draws = function(S, Y, X, xi, P, pi) {
   N = ncol(Y)
@@ -1188,59 +1047,6 @@ Gibbs_draws = function(S, Y, X, xi, P, pi) {
   return(output)
 }
 
-Markov.draws = Gibbs_draws(S, Y, X, xi, P, pi)
-plot.ts(t(apply(Markov.draws$xi, 1:2, mean)))
-```
-
-We can check to see if the draws are correctly put in the correct regime, with regime 1 
-being regime with higher volatility, we can plot the sigmas of two regime.
-```{r}
-plot.ts(t(apply(Markov.draws$xi, 1:2, mean)))
-```
-
-
-```{r, eval=FALSE}
-dim(Markov.draws$Sigma.posterior1)
-dim(Markov.draws$Sigma.posterior2)
-dim(Markov.draws$A.posterior1)
-dim(Markov.draws$A.posterior2)
-dim(Markov.draws$xi)
-dim(Markov.draws$P)
-dim(Markov.draws$pi)
-
-Markov.draws$Sigma.posterior1[,,1000]
-Markov.draws$Sigma.posterior2[,,1000]
-Markov.draws$A.posterior1[,,1000]
-Markov.draws$xi[,,1000]
-Markov.draws$P[,,1000]
-Markov.draws$P[c(2,1), c(2,1), 1000]
-Markov.draws$pi[,1000]
-Markov.draws$pi[c(2, 1), 1000]
-
-#flip:sigma, A, xi, P,pi
-
-#Markov.draws$Sigma.posterior1[,,1000]
-#Markov.draws$Sigma.posterior2[,,1000]
-#Markov.draws$Sigma.posterior1[,,999]
-#Markov.draws$Sigma.posterior2[,,999]
-#Markov.draws$Sigma.posterior1[,,998]
-#Markov.draws$Sigma.posterior1[,,997]
-#Markov.draws$Sigma.posterior1[,,1000]
-#Markov.draws$Sigma.posterior1[,,999]
-#Markov.draws$Sigma.posterior2[,,1000]
-#Markov.draws$Sigma.posterior2[,,999]
-#plot.ts(t(Markov.draws$xi[,,1000]))
-#plot.ts(t(Markov.draws$xi[,,999]))
-#plot.ts(t(Markov.draws$xi[,,998]))
-#hist(Markov.draws$xi[1,1,], breaks = 100)
-#hist(Markov.draws$xi[1,1,], breaks = 1000)
-#hist(Markov.draws$Sigma.posterior1[1,1,], breaks = 100)
-#hist(Markov.draws$Sigma.posterior2[1,1,], breaks = 100)
-#plot(Markov.draws$Sigma.posterior1[1,1,],Markov.draws$Sigma.posterior2[1,1,])
-#plot.ts(t(apply(Markov.draws$xi, 1:2, mean)))
-```
-
-```{r}
 label_switching <- function(draws) {
   S <- dim(draws$Sigma.posterior1)[3]  # Number of draws
   
@@ -1271,61 +1077,93 @@ label_switching <- function(draws) {
   
   return(draws)
 }
-
-Markov.draws <- label_switching(Markov.draws)
-plot.ts(t(apply(Markov.draws$xi, 1:2, mean)))
 ```
 
-After the regimes are correctly placed, we can forecast h-step ahead
 
-```{r }
+```{r}
+Markov.draws = Gibbs_draws(S = 50000, Y, X, xi, P, pi)
+before <- ts(t(apply(Markov.draws$xi, 1:2, mean)), start = c(1998,3), frequency = 4)
+```
 
-Y.h_Markov = array(NA, c(h, 2, S))
+To examine how the regime draws are distributed between the two states, we visualize the switching variable $\xi$. Initially, the plot suggests that the regime assignments appear arbitrary. To address this issue, a label switching procedure is implemented to ensure consitency in how the two regimes are identified, in this case regime 1 is identified as the state with higher volatility. Following the label switching, the distinction between the two regimes becomes more evident. The drawn regimes indicate that regime 1 corresponds to the period around 2020, which aligns with the Covid-19 pandemic. This finding is intuitive as the Covid-19 pandemic significantly impacted the economy at large, including unemployment rates. Regime 2, on the other hand, represents other periods.
 
-for (s in 1:S){
-  #A.posterior.draw= sample_minnesota_A[,,s]
-  #Sigma.posterior = sample_minnesota_Sigma[,,s]
-  A.posterior.draw1 = Markov.draws$A.posterior1[,,s]
-  A.posterior.draw2 = Markov.draws$A.posterior2[,,s]
-  Sigma.posterior1 = Markov.draws$Sigma.posterior1[,,s]
-  Sigma.posterior2 = Markov.draws$Sigma.posterior2[,,s]
-  
-  T = dim(Markov.draws$xi)[2]
-  
-  x.Ti          = Y[(nrow(Y)-p+1):nrow(Y),]
-  x.Ti          = x.Ti[p:1,]
-    
-  P_h = Markov.draws$P[,,s] %*% Markov.draws$xi[,T,s]  # Initializing P_h
-  
-  for (i in 1:h){
-    x.T         = c(1, as.vector(t(x.Ti)))
-    
-    if (i > 1) {  # Only update P_h if i > 1
-      P_h = Markov.draws$P[,,s] %*% P_h
-    }
-    sample_m = sample.int(2,1, prob=as.numeric(P_h))
-    
-    if (sample_m == 1) {
-      A.posterior.draw = A.posterior.draw1
-      Sigma.posterior = Sigma.posterior1
-    } else {
-      A.posterior.draw = A.posterior.draw2
-      Sigma.posterior = Sigma.posterior2
-    }
-    
-    Y.f           = rmvnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior)
-    x.Ti          = rbind(Y.f,x.Ti[1:(p-1),])
-    Y.h_Markov[i,,s]     = Y.f[1:2]
-  }
+
+```{r, fig.width=8, fig.height=6}
+Markov.draws <- label_switching(Markov.draws)
+
+after <- ts(t(apply(Markov.draws$xi, 1:2, mean)), start = c(1998,3), frequency = 4)
+```
+
+```{r, fig.width=8, fig.height=6 }
+plots <- list(before, after)
+titles <- c("Before label switching", "After label switching")
+
+par(mfrow = c(1, 2))
+for (i in seq_along(plots)) {
+  plot.ts(plots[[i]], main = titles[i])
 }
+```
 
-forecast_plots(Y, Y.h_Markov, h, theta = 180, phi = 15.5, xlim = c(-100, 100))
+
+After the regimes are correctly placed, we can forecast h-step ahead using the posterior draws.
+```{r, echo=TRUE}
+Markov_forecast <- function(S, sample, Y, p, h) {
+  N <- ncol(Y)
+  # Initialize the array to store forecasts
+  Y.h = array(NA, c(h, 2, S))
+
+  for (s in 1:S){
+    A.posterior.draw1 = sample$A.posterior1[,,s]
+    A.posterior.draw2 = sample$A.posterior2[,,s]
+    Sigma.posterior1 = sample$Sigma.posterior1[,,s]
+    Sigma.posterior2 = sample$Sigma.posterior2[,,s]
+  
+    T = dim(sample$xi)[2]
+  
+    x.Ti = Y[(nrow(Y)-p+1):nrow(Y),]
+    x.Ti = x.Ti[p:1,]
+    
+    P_h = sample$P[,,s] %*% sample$xi[,T,s]  # Initializing P_h
+  
+    for (i in 1:h){
+      x.T = c(1, as.vector(t(x.Ti)))
+    
+      if (i > 1) {  # Only update P_h if i > 1
+        P_h = sample$P[,,s] %*% P_h
+      }
+      sample_m = sample.int(2,1, prob=as.numeric(P_h))
+    
+      if (sample_m == 1) {
+        A.posterior.draw = A.posterior.draw1
+        Sigma.posterior = Sigma.posterior1
+      } else {
+        A.posterior.draw = A.posterior.draw2
+        Sigma.posterior = Sigma.posterior2
+      }
+    
+      Y.f = rmvnorm(1, mean = x.T %*% A.posterior.draw, sigma = Sigma.posterior)
+      x.Ti = rbind(Y.f, x.Ti[1:(p-1),])
+      Y.h[i,,s] = Y.f[1:2]
+    }
+  }
+  return(Y.h)
+}
+```
+
+
+The plot below shows the forecast using Minnesota prior and regime change for unemployment rate.
+```{r }
+Y.h_Markov = Markov_forecast(S = 50000, sample = Markov.draws, Y, p, h = 21)
+
+forecast_plots(Y, Y.h_Markov, h = 21, theta = 190, phi = 10, xlim = c(-50, 50))
 ```
 
 ## Final model
 
-The final model is the combination of Minnesota prior, dummy obervation prior and 
-Markov-switching to account for heteroskedasticity.
+The final model is the combination of Minnesota prior, dummy observation prior and 
+regime change to account for heteroskedasticity.
+
+Similarly to the baseline model, the prior will be a combination of Minnesota and dummy observation prior. Then the Markov-switching Gibb-sampling is done with these new priors to obtain posterior draws
 
 ```{r}
 # Data configuration
@@ -1341,26 +1179,22 @@ X       = matrix(1,nrow(Y),1)
 for (i in 1:p){
   X     = cbind(X,y[5:nrow(y)-i,])
 }
-```
 
-
-```{r}
 A.hat = solve(t(X) %*% X) %*% t(X) %*% Y
 Sigma.hat = t(Y - X %*% A.hat) %*% (Y - X %*% A.hat) / T
 
 kappa.1 = 1
 kappa.2 = 100
 A.prior = matrix(0, nrow = nrow(A.hat), ncol = ncol(A.hat))
-#A.prior[2:5, 1:4] = diag(1, nrow = 4)
+A.prior[2:5, 1:4] = diag(1, nrow = 4)
 V.prior = diag(c(kappa.2, kappa.1 * ((1:p)^(-2)) %x% rep(1, N)))
 S.prior = diag(diag(Sigma.hat))
 nu.prior = N + 1
 ```
 
 ```{r}
-S = 10000
 # Gibbs sampling function
-FinalGibbs_draws = function(S, Y, X, xi, P, pi) {
+FinalGibbs_draws = function(S, Y, X, xi, P, pi, A.prior, V.prior, S.prior, nu.prior) {
   N = ncol(Y)
   p = (ncol(X) - 1) / N 
   M = 2   # Number of regimes
@@ -1472,62 +1306,209 @@ FinalGibbs_draws = function(S, Y, X, xi, P, pi) {
   return(output)
 }
 
-Final.draws = FinalGibbs_draws(S, Y, X, xi, P, pi)
-plot.ts(t(apply(Final.draws$xi, 1:2, mean)))
+Final.draws = FinalGibbs_draws(S = 50000, Y, X, xi, P, pi, A.prior, V.prior, S.prior, nu.prior)
+before_f <- ts(t(apply(Final.draws$xi, 1:2, mean)), start = c(1998,3), frequency = 4)
 ```
 
 ```{r}
 Final.draws <- label_switching(Final.draws)
-plot.ts(t(apply(Final.draws$xi, 1:2, mean)))
+after_f <- ts(t(apply(Final.draws$xi, 1:2, mean)), start = c(1998,3), frequency = 4)
 ```
+
+```{r, fig.width=8, fig.height=6}
+par(mfrow = c(1, 2))
+plot.ts(before_f, main = "Before label switching")
+plot.ts(after_f, main = "After label switching")
+```
+
+```{r, fig.width=8, fig.height=6}
+
+par(mfrow = c(1, 2))
+plot(before_f, type = "l", main = "Before label switching", xlab = "Date", ylab = "Value")
+plot(after_f, type = "l", main = "Before label switching", xlab = "Date", ylab = "Value")
+```
+
 
 ```{r}
-Y.h_Final = array(NA, c(h, 2, S))
+Y.h_Final = Markov_forecast(S = 50000, sample = Final.draws, Y, p, h = 21)
+forecast_plots(Y, Y.h_Final, h = 21, theta = 190, phi = 10, xlim = c(-10, 20))
+```
 
-for (s in 1:S){
-  #A.posterior.draw= sample_minnesota_A[,,s]
-  #Sigma.posterior = sample_minnesota_Sigma[,,s]
-  A.posterior.draw1 = Final.draws$A.posterior1[,,s]
-  A.posterior.draw2 = Final.draws$A.posterior2[,,s]
-  Sigma.posterior1 = Final.draws$Sigma.posterior1[,,s]
-  Sigma.posterior2 = Final.draws$Sigma.posterior2[,,s]
+
+```{r}
+plots_3d <- function(Y.h, h, xlim) {
+  mcxs1  = "#05386B"
+  mcxs4  = "#8EE4AF"
+  mcxs5  = "#EDF5E1"
   
-  T = dim(Final.draws$xi)[2]
+  par(mfrow=c(1,2), mar=c(2,2,1,1))
   
-  x.Ti          = Y[(nrow(Y)-p+1):nrow(Y),]
-  x.Ti          = x.Ti[p:1,]
-    
-  P_h = Final.draws$P[,,s] %*% Final.draws$xi[,T,s]  # Initializing P_h
+  # Forecasting on basic model
+  limits.1    <- range(Y.h[,1,])
+  point.f     <- apply(Y.h[,1,], 1, mean)
+  interval.f  <- apply(Y.h[,1,], 1, hdi, credMass=0.90)
+  theta       <- 180
+  phi         <- 15.5
   
+  x           <- seq(from=limits.1[1], to=limits.1[2], length.out=10)
+  z           <- matrix(NA, h, 9)
   for (i in 1:h){
-    x.T         = c(1, as.vector(t(x.Ti)))
-    
-    if (i > 1) {  # Only update P_h if i > 1
-      P_h = Final.draws$P[,,s] %*% P_h
-    }
-    sample_m = sample.int(2,1, prob=as.numeric(P_h))
-    
-    if (sample_m == 1) {
-      A.posterior.draw = A.posterior.draw1
-      Sigma.posterior = Sigma.posterior1
-    } else {
-      A.posterior.draw = A.posterior.draw2
-      Sigma.posterior = Sigma.posterior2
-    }
-    
-    Y.f           = rmvnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior)
-    x.Ti          = rbind(Y.f,x.Ti[1:(p-1),])
-    Y.h_Final[i,,s]     = Y.f[1:2]
+    z[i,]     <- hist(Y.h[i,1,], breaks=x, plot=FALSE)$density
   }
+  x           <- hist(Y.h[i,1,], breaks=x, plot=FALSE)$mids
+  yy          <- 1:h
+  
+  # Plot using plot_ly
+  plot_ly(y = yy, x = x, z = z) %>%
+    layout(scene = list(xaxis = list(title = "Unemployment rate"),
+                        yaxis = list(title = "h-step forecast"),
+                        zaxis = list(title = "density")),
+           title = "Unemployment rate forecast densities for basic model") %>%
+    add_surface(colors = c(mcxs1, mcxs4, mcxs5))
+  
+  # Forecasting on extended model
+  limits.2    <- range(Y.h[,2,])
+  point.f     <- apply(Y.h[,2,], 1, mean)
+  interval.f  <- apply(Y.h[,2,], 1, hdi, credMass=0.90)
+  theta       <- 180
+  phi         <- 15.5
+  
+  x           <- seq(from=limits.2[1], to=limits.2[2], length.out=10)
+  z           <- matrix(NA, h, 9)
+  for (i in 1:h){
+    z[i,]     <- hist(Y.h[i,2,], breaks=x, plot=FALSE)$density
+  }
+  x           <- hist(Y.h[i,2,], breaks=x, plot=FALSE)$mids
+  yy          <- 1:h
+  
+  # Plot using plot_ly
+  plot_ly(y = yy, x = x, z = z) %>%
+    layout(scene = list(xaxis = list(title = "Unemployment rate"),
+                        yaxis = list(title = "h-step forecast"),
+                        zaxis = list(title = "density")),
+           title = "AUD/USD forecast densities for extended model") %>%
+    add_surface(colors = c(mcxs1, "magenta2", mcxs5))
 }
 
-forecast_plots(Y, Y.h_Final, h, theta = 190, phi = 10, xlim = c(-10, 20))
+# Example usage
+plots_3d(Y.h_Final, h = 21)
+
 ```
 
 
 
 
+# Model Proof
+1000 observations are simulated from a bi-variate Gaussian random walk process annd is used as data for the below proofs.
 
+### Basic model
+```{r, echo=FALSE}
+set.seed(123456)
+N       = 2
+p       = 1
+S       = 1000
+K       = 1+p*N
+
+r1 = cumsum(rnorm(1000,0,1))
+r2 = cumsum(rnorm(1000,0,1))
+
+r = cbind(r1, r2) 
+
+Y_p = ts(r[2:nrow(r),], frequency=1)
+
+X_p     = matrix(1,nrow(Y_p),1)
+X_p     = cbind(X_p,r[2:nrow(r)-1,])
+
+# MLE
+############################################################
+A.hat       = solve(t(X_p)%*%X_p)%*%t(X_p)%*%Y_p
+Sigma.hat   = t(Y_p-X_p%*%A.hat)%*%(Y_p-X_p%*%A.hat)/nrow(Y_p)
+
+# Prior distribution
+############################################################
+kappa.1     = 1
+kappa.2     = 100
+A.prior     = matrix(0,nrow(A.hat),ncol(A.hat))
+A.prior[2:(N + 1),] = diag(N)
+V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
+S.prior     = diag(diag(Sigma.hat))
+nu.prior    = N+1
+
+############################################################
+sample_minnesota_proof = posterior_draws(1000, Y_p, X_p, A.prior, V.prior, S.prior, nu.prior)
+
+# Report posterior means and sd of parameters
+A.E         = round(apply(sample_minnesota_proof$A.posterior,1:2,mean),6)
+A.sd        = round(apply(sample_minnesota_proof$A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(sample_minnesota_proof$Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(sample_minnesota_proof$Sigma.posterior,1:2,sd),6)
+
+
+kable(A.E, format = "html", caption = "Posterior mean of autoregressive",
+      col.names = paste0(1:ncol(A.E)))
+
+kable(Sigma.E, format = "html", caption = "Posterior mean of covarince",
+      col.names = paste0(1:ncol(Sigma.E)))
+
+```
+### Extended model
+```{r, echo = FALSE}
+
+mu      = 1000
+delta   = 1000
+diag_mu <- diag(c(X_p[1,2]/mu, X_p[1,3]/mu))
+row_delta <-  matrix(c(X_p[1,2]/delta, X_p[1,3]/delta), nrow = 1)
+
+Y_d       = rbind(diag_mu, row_delta)
+  
+first_vector <- matrix(c(0,0, 1/delta), ncol = 1)
+X_d      = cbind(first_vector, Y_d)
+
+
+# Normal-inverse Wishart prior parameters
+############################################################
+V.tilde.inv     = t(X_d)%*%X_d + diag(1/diag(V.prior))
+V.tilde       = solve(V.tilde.inv)
+A.tilde       = V.tilde%*%(t(X_d)%*%Y_d + diag(1/diag(V.prior))%*%A.prior)
+nu.tilde      = nrow(Y_d) + nu.prior
+S.tilde       = S.prior + t(Y_d)%*%Y_d + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.tilde)%*%V.tilde.inv%*%A.tilde
+S.tilde.inv   = solve(S.tilde)
+
+############################################################
+# Normal-inverse Wishart posterior parameters
+V.bar.inv   = t(X_p)%*%X_p + diag(1/diag(V.tilde))
+V.bar       = solve(V.bar.inv)
+A.bar       = V.bar%*%(t(X_p)%*%Y_p + diag(1/diag(V.tilde))%*%A.tilde)
+nu.bar      = nrow(Y_p) + nu.tilde
+S.bar       = S.tilde + t(Y_p)%*%Y_p + t(A.tilde)%*%diag(1/diag(V.tilde))%*%A.tilde -
+              t(A.bar)%*%V.bar.inv%*%A.bar
+S.bar.inv   = solve(S.bar)
+  
+
+# Posterior draws 
+Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
+Sigma.posterior   = apply(Sigma.posterior,3,solve)
+Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
+A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
+L                 = t(chol(V.bar))
+for (s in 1:S){
+  A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%chol(Sigma.posterior[,,s])
+  }
+sample_dummy_proof    = list(A.posterior=A.posterior, Sigma.posterior=Sigma.posterior)
+
+# Report posterior means and sd of parameters
+A.E         = round(apply(sample_dummy_proof$A.posterior,1:2,mean),6)
+A.sd        = round(apply(sample_dummy_proof$A.posterior,1:2,sd),6)
+Sigma.E     = round(apply(sample_dummy_proof$Sigma.posterior,1:2,mean),6)
+Sigma.sd    = round(apply(sample_dummy_proof$Sigma.posterior,1:2,sd),6)
+
+kable(A.E, format = "html", caption = "Posterior mean of autoregressive",
+      col.names = paste0(1:ncol(A.E)))
+
+kable(Sigma.E, format = "html", caption = "Posterior mean of covarince",
+      col.names = paste0(1:ncol(Sigma.E)))
+
+```
 
 
 
