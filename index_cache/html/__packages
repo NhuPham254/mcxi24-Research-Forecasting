@@ -1,0 +1,17 @@
+readrba
+readabs
+ggplot2
+zoo
+xts
+tseries
+MSwM
+xtable
+knitr
+MASS
+mvtnorm
+HDInterval
+plot3D
+Rcpp
+RcppArmadillo
+gridExtra
+plotly
