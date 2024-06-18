@@ -8,7 +8,7 @@
 
 <meta name="author" content="Nhu Minh Pham">
 
-<title>Macroeconometrics Research Report - Forecasting Unemployment rate using Bayesian VARs with Regime change</title>
+<title>Macroeconometrics Research Report - Forecasting Unemployment rate n Australia using Bayesian VARs with Regime change</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -172,34 +172,38 @@ window.Quarto = {
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
   <li><a href="#motivation" id="toc-motivation" class="nav-link" data-scroll-target="#motivation">Motivation</a></li>
   <li><a href="#data-properties" id="toc-data-properties" class="nav-link" data-scroll-target="#data-properties">Data properties</a></li>
-  <li><a href="#data-visualisation" id="toc-data-visualisation" class="nav-link" data-scroll-target="#data-visualisation">Data Visualisation</a>
-  <ul class="collapse">
+  <li><a href="#data-visualisation" id="toc-data-visualisation" class="nav-link" data-scroll-target="#data-visualisation">Data Visualisation</a></li>
   <li><a href="#model" id="toc-model" class="nav-link" data-scroll-target="#model">Model</a>
   <ul class="collapse">
-  <li><a href="#hypothesis" id="toc-hypothesis" class="nav-link" data-scroll-target="#hypothesis">Hypothesis</a></li>
+  <li><a href="#hypothesis" id="toc-hypothesis" class="nav-link" data-scroll-target="#hypothesis">Hypothesis</a>
+  <ul class="collapse">
   <li><a href="#matrix-form" id="toc-matrix-form" class="nav-link" data-scroll-target="#matrix-form">Matrix form</a></li>
+  </ul></li>
   </ul></li>
   <li><a href="#basic-model" id="toc-basic-model" class="nav-link" data-scroll-target="#basic-model">Basic Model</a>
   <ul class="collapse">
-  <li><a href="#minnesota-prior-distribution" id="toc-minnesota-prior-distribution" class="nav-link" data-scroll-target="#minnesota-prior-distribution">Minnesota Prior distribution</a></li>
+  <li><a href="#minnesota-prior-distribution" id="toc-minnesota-prior-distribution" class="nav-link" data-scroll-target="#minnesota-prior-distribution">Minnesota Prior distribution</a>
+  <ul class="collapse">
   <li><a href="#the-joint-posterior-distribution" id="toc-the-joint-posterior-distribution" class="nav-link" data-scroll-target="#the-joint-posterior-distribution">The joint posterior distribution</a></li>
   </ul></li>
-  <li><a href="#extension-1-model" id="toc-extension-1-model" class="nav-link" data-scroll-target="#extension-1-model">Extension 1 Model</a>
+  </ul></li>
+  <li><a href="#extension-1-dummy-observation-prior" id="toc-extension-1-dummy-observation-prior" class="nav-link" data-scroll-target="#extension-1-dummy-observation-prior">Extension 1: Dummy observation prior</a>
   <ul class="collapse">
   <li><a href="#minnesota-and-dummy-observation-prior-distribution" id="toc-minnesota-and-dummy-observation-prior-distribution" class="nav-link" data-scroll-target="#minnesota-and-dummy-observation-prior-distribution">Minnesota and dummy observation prior distribution</a></li>
-  </ul></li>
+  <li><a href="#extension-2---regime-change" id="toc-extension-2---regime-change" class="nav-link" data-scroll-target="#extension-2---regime-change">Extension 2 - Regime change</a></li>
+  <li><a href="#final-model" id="toc-final-model" class="nav-link" data-scroll-target="#final-model">Final model</a></li>
   </ul></li>
   <li><a href="#forecasting" id="toc-forecasting" class="nav-link" data-scroll-target="#forecasting">Forecasting</a>
   <ul class="collapse">
   <li><a href="#basic-model-1" id="toc-basic-model-1" class="nav-link" data-scroll-target="#basic-model-1">Basic model</a></li>
-  <li><a href="#extended-model" id="toc-extended-model" class="nav-link" data-scroll-target="#extended-model">Extended model</a></li>
-  <li><a href="#extension-2---regime-change" id="toc-extension-2---regime-change" class="nav-link" data-scroll-target="#extension-2---regime-change">Extension 2 - Regime change</a></li>
-  <li><a href="#final-model" id="toc-final-model" class="nav-link" data-scroll-target="#final-model">Final model</a></li>
+  <li><a href="#extension-1" id="toc-extension-1" class="nav-link" data-scroll-target="#extension-1">Extension 1</a></li>
+  <li><a href="#extension-2" id="toc-extension-2" class="nav-link" data-scroll-target="#extension-2">Extension 2</a></li>
+  <li><a href="#final-model-1" id="toc-final-model-1" class="nav-link" data-scroll-target="#final-model-1">Final model</a></li>
   </ul></li>
   <li><a href="#model-proof" id="toc-model-proof" class="nav-link" data-scroll-target="#model-proof">Model Proof</a>
   <ul class="collapse">
   <li><a href="#basic-model-2" id="toc-basic-model-2" class="nav-link" data-scroll-target="#basic-model-2">Basic model</a></li>
-  <li><a href="#extended-model-1" id="toc-extended-model-1" class="nav-link" data-scroll-target="#extended-model-1">Extended model</a></li>
+  <li><a href="#extended-model" id="toc-extended-model" class="nav-link" data-scroll-target="#extended-model">Extended model</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
@@ -210,7 +214,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Forecasting Unemployment rate using Bayesian VARs with Regime change</h1>
+<h1 class="title">Forecasting Unemployment rate n Australia using Bayesian VARs with Regime change</h1>
 </div>
 
 
@@ -234,8 +238,8 @@ window.Quarto = {
 
 
 <blockquote class="blockquote">
-<p><strong>Abstract.</strong> Research on how Bayesian VARs with regime change affect the forecasting of unemployment rate</p>
-<p><strong>Keywords.</strong> bsvars, regime change, forecasting, R,</p>
+<p><strong>Abstract.</strong> Research on how Bayesian VARs with regime change affect the forecasting of unemployment rate in Australia</p>
+<p><strong>Keywords.</strong> bsvars, minnesota, dummy-observation, regime change, forecasting, R,</p>
 </blockquote>
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
@@ -249,8 +253,8 @@ window.Quarto = {
 <section id="data-properties" class="level1">
 <h1>Data properties</h1>
 <p>For the investigation of the problem at hand, the selection of variables includes a comprehensive set of economic indicators and demographic factors that are crucial for understanding labour market dynamics and their impact on unemployment rates.</p>
-<p>For instance, GDP growth provides a broad measure of economic activity, serving as an indicator of overall labour market. Consumer price index, wage price index and interest rate reflect macroeconomic conditions and monetary policy, influencing consumer spending, business investment, and hiring decisions, thereby affecting unemployment trends. Government spending impacts aggregate demand and employment levels, while demographic factors such as population growth rate, average age of the workforce, and level of highest educational attainment offer insights into labour force participation and composition.</p>
-<p>Each variable’s form/transformation will depend on its specific characteristics and the nature of its relationship with unemployment. For instance, variables like GDP growth may be included in their original form, while others, such as wpi might need to be computed from the index data.</p>
+<p>For instance, GDP growth provides a broad measure of economic activity, serving as an indicator of overall labour market. Consumer price index, wage price index and interest rate reflect macroeconomic conditions and monetary policy, influencing consumer spending, business investment, and hiring decisions, thereby affecting unemployment trends. Government spending impacts aggregate demand and employment levels, while demographic factors such as population growth rate, average age of the workforce, and level of highest educational attainment offer insights into labour force participation and composition. For the purpose of this research, the variables are GDP, wage price index and inflation.</p>
+<p>Each variable’s form/transformation will depend on its specific characteristics and the nature of its relationship with unemployment. For instance, variables like GDP may be included in their original form, while others, such as wpi might need to be computed from the index data.</p>
 <p>It’s important to note that all data will be quarterly since the interest forecasting for unemployment will be conducted at a quarterly frequency. Quarterly frequency is suitable for capturing the diverse movements influencing unemployment, including short-term shocks, long-term trends, and policy changes, providing a balanced perspective.</p>
 <p><span class="math display">\[\begin{align*}
 &amp; unmp_{t} &amp; : &amp; \text{Unemployment rate} \\
@@ -275,6 +279,7 @@ window.Quarto = {
 <h6 class="anchored" data-anchor-id="figure-1-time-series-plots">Figure 1: Time series plots</h6>
 </section>
 </div>
+<p>To stabilize the variance, log tranformation is performed on all variables except unemployment rate.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -284,8 +289,12 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>To stabilize the variance, log tranformation is performed on all variables except unemployment rate, participation rate and cash rate.</p>
-<p>From the plot of the variables, some show stationary and some non-stationary, which can make it challenging to analyse data. Therefore, the ACF test is performed to identify patterns and trend.</p>
+<div id="figure1" style="text-align: center; color: #696969;">
+<section id="figure-1-transformed-time-series-plots" class="level6">
+<h6 class="anchored" data-anchor-id="figure-1-transformed-time-series-plots">Figure 1: Transformed Time series plots</h6>
+</section>
+</div>
+<p>From the plot of the variables, some show stationary and some non-stationary, which can create some challenges in general analysis . Therefore, the ACF test is performed to identify patterns and trend.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -326,10 +335,11 @@ wpi_df             -2.265   0.467
 cashrate_df        -3.409   0.056</code></pre>
 </div>
 </div>
-<section id="model" class="level2">
-<h2 class="anchored" data-anchor-id="model">Model</h2>
-<section id="hypothesis" class="level3">
-<h3 class="anchored" data-anchor-id="hypothesis">Hypothesis</h3>
+</section>
+<section id="model" class="level1">
+<h1>Model</h1>
+<section id="hypothesis" class="level2">
+<h2 class="anchored" data-anchor-id="hypothesis">Hypothesis</h2>
 Var(p) model
 <span class="math display">\[\begin{aligned}
 y_t = \beta_0 + \beta_1 y_{t-1} + \beta_2 x_{1, t-1} + \beta_3 x_{2, t-1} + \ldots + \beta_n x_{n, t-1} + \varepsilon_t
@@ -342,7 +352,6 @@ Probability of transitioning from one state to another
 <span class="math display">\[\begin{aligned}
 P(S_t = j | S_{t-1} = i) &amp;= \pi_{ij}
 \end{aligned}\]</span>
-</section>
 <section id="matrix-form" class="level3">
 <h3 class="anchored" data-anchor-id="matrix-form">Matrix form</h3>
 <p><span class="math display">\[\begin{align*}
@@ -357,14 +366,15 @@ P(S_t = j | S_{t-1} = i) &amp;= \pi_{ij}
 <p>The model’s equations include time-varying parameters, such as the coefficients of lagged variables, which adapt to changing economic conditions.</p>
 </section>
 </section>
-<section id="basic-model" class="level2">
-<h2 class="anchored" data-anchor-id="basic-model">Basic Model</h2>
+</section>
+<section id="basic-model" class="level1">
+<h1>Basic Model</h1>
 <p>The model follows the Normal Inverse Wishart distribution.</p>
 <p>Likelihood function kernel <span class="math display">\[\begin{align}
 L(A,\Sigma|Y,X) \propto det(\Sigma)^{-\frac{T}{2}}exp\{-\frac{1}{2}tr[\Sigma^{-1}(Y-XA)'(Y-XA)]\}
 \end{align}\]</span></p>
-<section id="minnesota-prior-distribution" class="level3">
-<h3 class="anchored" data-anchor-id="minnesota-prior-distribution">Minnesota Prior distribution</h3>
+<section id="minnesota-prior-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="minnesota-prior-distribution">Minnesota Prior distribution</h2>
 <p>The Minnesota prior is commonly used in Bayesian Vector Autoregression (BVAR) models due to its ability to impose shrinkage towards zero on the coefficients, effectively regularizing the estimation process. The Minnesota prior aligns effectively with the stylized fact of nonstationarity observed in macroeconomic variables.</p>
 <p><span class="math display">\[\begin{align*}
 p(A, \Sigma) = p(A \mid \Sigma) \cdot p(\Sigma) \\
@@ -408,7 +418,6 @@ k_2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \cdots
 \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; 0 \\
 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \frac{k_1}{16}      
 \end{bmatrix}\]</span>
-</section>
 <section id="the-joint-posterior-distribution" class="level3">
 <h3 class="anchored" data-anchor-id="the-joint-posterior-distribution">The joint posterior distribution</h3>
 <p><span class="math display">\[\begin{align*}
@@ -432,6 +441,7 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 \overline{S} &amp;= \underline{S}+Y'Y+\underline{A}'\underline{V}^{-1}\underline{A}-\overline{A}'
 \overline{V}^{-1}\overline{A} \\
 \end{align}\]</span></p>
+<p>The posterior draws are obtain with the following code</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Posterior draws Normal-inverse Wishart</span></span>
@@ -469,8 +479,9 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 </section>
 </section>
 </section>
-<section id="extension-1-model" class="level2">
-<h2 class="anchored" data-anchor-id="extension-1-model">Extension 1 Model</h2>
+</section>
+<section id="extension-1-dummy-observation-prior" class="level1">
+<h1>Extension 1: Dummy observation prior</h1>
 <p>Cointegration is when the non-stationary variables have an equilibrium long term relationship or a common trend. The model is extended to incorporate dummy-observation-prior, aiming to account for the potential cointegration amongst the variables, capturing the underlying economic relationships and dynamics.</p>
 <p>This approach allows us to leverage both the observed data and additional information about the structural relationships among variables, leading to more accurate parameter estimation and potentially improved forecasting performance.</p>
 <p>Dummy observation prior also known as known as “sum-of-coefficients” proposed by Doan, Litterman, and Sims (1984) required a set of artificial observations for each variable.</p>
@@ -518,9 +529,9 @@ A \mid \Sigma &amp;\sim \text{MN}_{K \times N} (\underline{A}^{+}, \Sigma, \unde
 \underline{v}^{+} &amp;= T^{+} - K - N - 1\\
 \underline{S}^{+} &amp;= (Y^{+}-X^{+}\underline{A}^{+})^{'}(Y^{+}-X^{+}\underline{A}^{+})\\
 \end{align*}\]</span></p>
-<section id="minnesota-and-dummy-observation-prior-distribution" class="level3">
-<h3 class="anchored" data-anchor-id="minnesota-and-dummy-observation-prior-distribution">Minnesota and dummy observation prior distribution</h3>
-<p>The newly created matrix specified the model has 5 dummy observations. The above prior distribution is likely to encounter the problem of not having enough observations and lead to many challenges to meet the requirements for degree of freedom or invertibility of matrices. To resolve this, the combination of specifying the prior through both Normal inverse Wishart and dummy-observations is proposed, which is detived similarly to the posterior distribution in the basic model.</p>
+<section id="minnesota-and-dummy-observation-prior-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="minnesota-and-dummy-observation-prior-distribution">Minnesota and dummy observation prior distribution</h2>
+<p>The newly created matrix specified the model has 5 dummy observations. The above prior distribution is likely to encounter the problem of not having enough observations and lead to many challenges to meet the requirements for degree of freedom or invertibility of matrices. To resolve this, the combination of specifying the prior through both Normal inverse Wishart and dummy-observations is proposed, which is derived similarly to the posterior distribution in the basic model.</p>
 <p><span class="math display">\[\begin{align*}
 A \mid \Sigma &amp;\sim \text{MN}_{K \times N} (\widetilde{A}, \Sigma, \widetilde{V}) \\
 \Sigma &amp;\sim  \text{IW}_{N} (\widetilde{S}, \widetilde{v})\\
@@ -540,6 +551,7 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 \overline{S} &amp;= \widetilde{S}+Y'Y+\widetilde{A}'\widetilde{V}^{-1}\widetilde{A}-\overline{A}'
 \overline{V}^{-1}\overline{A} \\
 \end{align}\]</span></p>
+<p>The posterior draws are obtain with the following code</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Posterior draws for dummy prior</span></span>
@@ -601,186 +613,257 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 <span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>sample_dummy_Sigma  <span class="ot">=</span> sample_dummy<span class="sc">$</span>Sigma.posterior</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
+<section id="extension-2---regime-change" class="level2">
+<h2 class="anchored" data-anchor-id="extension-2---regime-change">Extension 2 - Regime change</h2>
+<p>With 2 regime states, we would have <span class="math inline">\(Y_m\)</span> and <span class="math inline">\(X_m\)</span></p>
+<p>The full conditional joint posterior have the following form <span class="math display">\[\begin{align}
+p(A|Y,X,\Sigma) &amp;\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\
+p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
+\\
+\overline{V_m} &amp;= (X'X + \underline{V}^{-1})^{-1} \\
+\overline{A_m} &amp;= \overline{V_m}(X_m'Y_m+\underline{V}^{-1}\underline{A}) \\
+\overline{v} &amp;= T_m + \underline{v} \\
+\overline{S_m} &amp;= \underline{S}+Y_m'Y_m+\underline{A}'\underline{V}^{-1}\underline{A}-\overline{A_m}'
+\overline{V_m}^{-1}\overline{A_m} \\
+\end{align}\]</span></p>
+<p>Markov Switching Initial probability of regimes <span class="math display">\[\begin{align}
+\begin{bmatrix}
+p_{1} &amp; p_{2}\\
+\end{bmatrix}
+\end{align}\]</span></p>
+<p>Probability transition matrix <span class="math display">\[\begin{align}
+\begin{bmatrix}
+p_{11} &amp; p_{12}\\
+p_{21} &amp; p_{22}\\
+\end{bmatrix}
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\xi_{t} = \begin{bmatrix}
+1\\
+0\\
+\end{bmatrix}, if s_t = 1
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\xi_{t} = \begin{bmatrix}
+0\\
+1\\
+\end{bmatrix}, if s_t = 2
+\end{align}\]</span> The posterior draws are done with Gibb sampling.</p>
+<p>To examine how the regime draws are distributed between the two states, we visualize the switching variable <span class="math inline">\(\xi\)</span>. Initially, the plot suggests that the regime assignments appear arbitrary. To address this issue, a label switching procedure is implemented to ensure consitency in how the two regimes are identified, in this case regime 1 is identified as the state with higher volatility. Following the label switching, the distinction between the two regimes becomes more evident. The drawn regimes indicate that regime 1 corresponds to the period around 2020, which aligns with the Covid-19 pandemic. This finding is intuitive as the Covid-19 pandemic significantly impacted the economy at large, including unemployment rates. Regime 2, on the other hand, represents other periods.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-20-2.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="final-model" class="level2">
+<h2 class="anchored" data-anchor-id="final-model">Final model</h2>
+<p>The final model is the combination of Minnesota prior, dummy observation prior and regime change to account for heteroskedasticity.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-24-2.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-25-2.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="forecasting" class="level1">
 <h1>Forecasting</h1>
 <section id="basic-model-1" class="level2">
 <h2 class="anchored" data-anchor-id="basic-model-1">Basic model</h2>
+<p>The forecasting process can be done with the following code.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>posterior_summary <span class="ot">&lt;-</span> <span class="cf">function</span>(sample) {</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Report posterior means and sd of parameters</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  A.E <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">apply</span>(sample<span class="sc">$</span>A.posterior, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, mean), <span class="dv">6</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  A.sd <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">apply</span>(sample<span class="sc">$</span>A.posterior, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, sd), <span class="dv">6</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  Sigma.E <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">apply</span>(sample<span class="sc">$</span>Sigma.posterior, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, mean), <span class="dv">6</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  Sigma.sd <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">apply</span>(sample<span class="sc">$</span>Sigma.posterior, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, sd), <span class="dv">6</span>)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create tables</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  A_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">rbind</span>(<span class="fu">t</span>(A.E)[<span class="dv">1</span>,], <span class="fu">t</span>(A.sd)[<span class="dv">1</span>,], <span class="fu">t</span>(A.E)[<span class="dv">2</span>,], <span class="fu">t</span>(A.sd)[<span class="dv">2</span>,]))</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  Sigma_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">rbind</span>(<span class="fu">t</span>(Sigma.E)[<span class="dv">1</span>,], <span class="fu">t</span>(Sigma.sd)[<span class="dv">1</span>,], <span class="fu">t</span>(Sigma.E)[<span class="dv">2</span>,],</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">t</span>(Sigma.sd)[<span class="dv">2</span>,]))</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Format tables using kable</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  A_table_html <span class="ot">&lt;-</span> <span class="fu">kable</span>(A_table, <span class="at">format =</span> <span class="st">"html"</span>, <span class="at">caption =</span> <span class="st">"Posterior A means and sd table"</span>,</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>                        <span class="at">col.names =</span> <span class="fu">paste0</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(A_table)))</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  Sigma_table_html <span class="ot">&lt;-</span> <span class="fu">kable</span>(Sigma_table, <span class="at">format =</span> <span class="st">"html"</span>, <span class="at">caption =</span> <span class="st">"Posterior Sigma means and sd</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="st">                            table"</span>, <span class="at">col.names =</span> <span class="fu">paste0</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(Sigma_table)))</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return tables as list</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(A_table_html, Sigma_table_html)</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="do">############################################################</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Point forecasts 2D plot</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>forecast_plots <span class="ot">&lt;-</span> <span class="cf">function</span>(Y, Y.h, h, theta, phi, xlim) {</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Define colors</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  mcxs1  <span class="ot">=</span> <span class="st">"#05386B"</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  mcxs2  <span class="ot">=</span> <span class="st">"#379683"</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>  mcxs3  <span class="ot">=</span> <span class="st">"#5CDB95"</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>  mcxs4  <span class="ot">=</span> <span class="st">"#8EE4AF"</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>  mcxs5  <span class="ot">=</span> <span class="st">"#EDF5E1"</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  mcxs1.rgb   <span class="ot">=</span> <span class="fu">col2rgb</span>(mcxs1)</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  mcxs1.shade1<span class="ot">=</span> <span class="fu">rgb</span>(mcxs1.rgb[<span class="dv">1</span>],mcxs1.rgb[<span class="dv">2</span>],mcxs1.rgb[<span class="dv">3</span>], <span class="at">alpha=</span><span class="dv">50</span>, <span class="at">maxColorValue=</span><span class="dv">255</span>)</span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  mcxs2.rgb   <span class="ot">=</span> <span class="fu">col2rgb</span>(mcxs2)</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>  mcxs2.shade1<span class="ot">=</span> <span class="fu">rgb</span>(mcxs2.rgb[<span class="dv">1</span>],mcxs2.rgb[<span class="dv">2</span>],mcxs2.rgb[<span class="dv">3</span>], <span class="at">alpha=</span><span class="dv">50</span>, <span class="at">maxColorValue=</span><span class="dv">255</span>)</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  point_forecast    <span class="ot">=</span> <span class="fu">apply</span>(Y.h[,<span class="dv">1</span>,],<span class="dv">1</span>,mean) </span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  interval_forecast <span class="ot">=</span> <span class="fu">apply</span>(Y.h[,<span class="dv">1</span>,],<span class="dv">1</span>,hdi,<span class="at">credMass=</span><span class="fl">0.90</span>)</span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  interval_forecast_1 <span class="ot">=</span> <span class="fu">apply</span>(Y.h[,<span class="dv">1</span>,],<span class="dv">1</span>,hdi,<span class="at">credMass=</span><span class="fl">0.68</span>)</span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  range             <span class="ot">=</span> <span class="fu">range</span>(Y[,<span class="dv">1</span>],interval_forecast)</span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="at">mar=</span><span class="fu">rep</span>(<span class="dv">3</span>,<span class="dv">4</span>),<span class="at">cex.axis=</span><span class="dv">1</span>)</span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>(<span class="fu">length</span>(Y[,<span class="dv">1</span>])), Y[,<span class="dv">1</span>], <span class="at">type=</span><span class="st">"l"</span>, <span class="at">axes=</span><span class="cn">FALSE</span>, </span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(Y)<span class="sc">+</span>h), <span class="at">ylim=</span>range, </span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab=</span><span class="st">""</span>, <span class="at">ylab=</span><span class="st">""</span>, </span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>       <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">col =</span> mcxs1)</span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(<span class="fu">length</span>(Y[,<span class="dv">1</span>])<span class="sc">:</span>(<span class="fu">length</span>(Y[,<span class="dv">1</span>]) <span class="sc">+</span> h), <span class="fu">c</span>(Y[<span class="fu">nrow</span>(Y), <span class="dv">1</span>],point_forecast), <span class="at">type=</span><span class="st">"l"</span>, </span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(Y)<span class="sc">+</span>h), <span class="at">ylim=</span>range,</span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab=</span><span class="st">""</span>, <span class="at">ylab=</span><span class="st">""</span>, </span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>        <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">col =</span> mcxs2)</span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">1</span>,<span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">23</span>,<span class="dv">43</span>,<span class="dv">63</span>,<span class="dv">83</span>,<span class="dv">101</span>,<span class="fu">nrow</span>(Y), <span class="fu">nrow</span>(Y)<span class="sc">+</span>h),</span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">"1999"</span>,<span class="st">"2003"</span>,<span class="st">"2008"</span>,<span class="st">"20013"</span>,<span class="st">"2018"</span>,<span class="st">"2023"</span>,<span class="st">""</span>, <span class="st">"2028"</span>), </span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>       <span class="at">col=</span><span class="st">"black"</span>)</span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at=</span><span class="fu">seq</span>(<span class="at">from=</span>range[<span class="dv">1</span>], <span class="at">to=</span>range[<span class="dv">2</span>], <span class="at">length.out=</span><span class="dv">5</span>), </span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels=</span><span class="fu">round</span>(<span class="fu">seq</span>(<span class="at">from=</span>range[<span class="dv">1</span>], <span class="at">to=</span>range[<span class="dv">2</span>], <span class="at">length.out=</span><span class="dv">5</span>), <span class="dv">2</span>),</span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>       <span class="at">col=</span><span class="st">"black"</span>)</span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>  end_y_value <span class="ot">&lt;-</span> point_forecast[<span class="dv">13</span>] </span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">h =</span> end_y_value, <span class="at">col=</span><span class="st">"red"</span>, <span class="at">lty=</span><span class="dv">2</span>, <span class="at">lwd=</span><span class="dv">1</span>)</span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">v =</span> <span class="fu">nrow</span>(Y), <span class="at">col =</span> <span class="st">"black"</span>)</span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="st">"bottomleft"</span>, <span class="at">legend=</span><span class="fu">c</span>(<span class="st">"Data"</span>, <span class="st">"Forecast"</span>), </span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>         <span class="at">col=</span><span class="fu">c</span>(mcxs1, mcxs2), <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="at">lwd=</span><span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">polygon</span>(<span class="fu">c</span>(<span class="fu">length</span>(Y[,<span class="dv">1</span>])<span class="sc">:</span>(<span class="fu">length</span>(Y[,<span class="dv">1</span>]) <span class="sc">+</span> h), (<span class="fu">length</span>(Y[,<span class="dv">1</span>])<span class="sc">:</span>(<span class="fu">length</span>(Y[,<span class="dv">1</span>]) <span class="sc">+</span> h))[(h<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="dv">1</span>]), </span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>          <span class="fu">c</span>(Y[<span class="fu">nrow</span>(Y), <span class="dv">1</span>], interval_forecast[<span class="dv">1</span>,], interval_forecast[<span class="dv">2</span>,h<span class="sc">:</span><span class="dv">1</span>], Y[<span class="fu">nrow</span>(Y), <span class="dv">1</span>]), </span>
-<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>          <span class="at">col =</span> mcxs1.shade1, <span class="at">border =</span> mcxs1.shade1)</span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">polygon</span>(<span class="fu">c</span>(<span class="fu">length</span>(Y[,<span class="dv">1</span>])<span class="sc">:</span>(<span class="fu">length</span>(Y[,<span class="dv">1</span>]) <span class="sc">+</span> h), (<span class="fu">length</span>(Y[,<span class="dv">1</span>])<span class="sc">:</span>(<span class="fu">length</span>(Y[,<span class="dv">1</span>]) <span class="sc">+</span> h))[(h<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="dv">1</span>]), </span>
-<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>          <span class="fu">c</span>(Y[<span class="fu">nrow</span>(Y), <span class="dv">1</span>], interval_forecast_1[<span class="dv">1</span>,], interval_forecast_1[<span class="dv">2</span>,h<span class="sc">:</span><span class="dv">1</span>], Y[<span class="fu">nrow</span>(Y), <span class="dv">1</span>]), </span>
-<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>          <span class="at">col =</span> mcxs1.shade1, <span class="at">border =</span> mcxs1.shade1)</span>
-<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>  limits<span class="fl">.1</span>    <span class="ot">=</span> <span class="fu">range</span>(Y.h[,<span class="dv">1</span>,])</span>
-<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>  point.f     <span class="ot">=</span> <span class="fu">apply</span>(Y.h[,<span class="dv">1</span>,],<span class="dv">1</span>,mean)</span>
-<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>  interval.f  <span class="ot">=</span> <span class="fu">apply</span>(Y.h[,<span class="dv">1</span>,],<span class="dv">1</span>,hdi,<span class="at">credMass=</span><span class="fl">0.90</span>)</span>
-<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>  x           <span class="ot">=</span> <span class="fu">seq</span>(<span class="at">from=</span>limits<span class="fl">.1</span>[<span class="dv">1</span>], <span class="at">to=</span>limits<span class="fl">.1</span>[<span class="dv">2</span>], <span class="at">length.out=</span><span class="dv">100</span>)</span>
-<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>  z           <span class="ot">=</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,h,<span class="dv">99</span>)</span>
-<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h){</span>
-<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>    z[i,]     <span class="ot">=</span> <span class="fu">hist</span>(Y.h[i,<span class="dv">1</span>,], <span class="at">breaks=</span>x, <span class="at">plot=</span><span class="cn">FALSE</span>)<span class="sc">$</span>density</span>
-<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>  x           <span class="ot">=</span> <span class="fu">hist</span>(Y.h[i,<span class="dv">1</span>,], <span class="at">breaks=</span>x, <span class="at">plot=</span><span class="cn">FALSE</span>)<span class="sc">$</span>mids</span>
-<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>  yy          <span class="ot">=</span> <span class="dv">1</span><span class="sc">:</span>h</span>
-<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>  z           <span class="ot">=</span> <span class="fu">t</span>(z)</span>
-<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Adjust xlim, ylim, zlim based on h</span></span>
-<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>  xlim <span class="ot">&lt;-</span> <span class="fu">c</span>(limits<span class="fl">.1</span>[<span class="dv">1</span>], limits<span class="fl">.1</span>[<span class="dv">2</span>])</span>
-<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>  ylim <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, h)</span>
-<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>  zlim <span class="ot">&lt;-</span> <span class="fu">range</span>(z)</span>
-<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>  f4 <span class="ot">&lt;-</span> <span class="fu">persp3D</span>(<span class="at">x=</span>x, <span class="at">y=</span>yy, <span class="at">z=</span>z, <span class="at">phi=</span>phi, <span class="at">theta=</span>theta, <span class="at">xlab=</span><span class="st">"</span><span class="sc">\n</span><span class="st">unmp[t+h|t]"</span>, <span class="at">ylab=</span><span class="st">"h"</span>,</span>
-<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>                <span class="at">zlab=</span><span class="st">"</span><span class="sc">\n</span><span class="st">predictive densities of unemployment rate"</span>, <span class="at">shade=</span><span class="cn">NA</span>, <span class="at">border=</span><span class="cn">NA</span>,</span>
-<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>                <span class="at">ticktype=</span><span class="st">"detailed"</span>, <span class="at">nticks=</span><span class="dv">3</span>,<span class="at">cex.lab=</span><span class="dv">1</span>, <span class="at">col=</span><span class="cn">NA</span>, <span class="at">plot=</span><span class="cn">FALSE</span>, </span>
-<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>                <span class="at">xlim =</span> xlim, <span class="at">ylim =</span> ylim, <span class="at">zlim =</span> zlim)</span>
-<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">perspbox</span>(<span class="at">x=</span>x, <span class="at">y=</span>yy, <span class="at">z=</span>z, <span class="at">bty=</span><span class="st">"f"</span>, <span class="at">col.axis=</span><span class="st">"black"</span>, <span class="at">phi=</span>phi, <span class="at">theta=</span>theta,</span>
-<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a>           <span class="at">xlab=</span><span class="st">"</span><span class="sc">\n</span><span class="st">unemployment[t+h|t]"</span>, <span class="at">ylab=</span><span class="st">"h"</span>, <span class="at">zlab=</span><span class="st">"</span><span class="sc">\n</span><span class="st">predictive densities of unemployment rate"</span>,</span>
-<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>           <span class="at">ticktype=</span><span class="st">"detailed"</span>, <span class="at">nticks=</span><span class="dv">3</span>, <span class="at">cex.lab=</span><span class="dv">1</span>, <span class="at">col =</span> <span class="cn">NULL</span>, <span class="at">plot =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>           <span class="at">xlim =</span> xlim, <span class="at">ylim =</span> ylim, <span class="at">zlim =</span> zlim)</span>
-<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a>  <span class="fu">polygon3D</span>(<span class="at">x =</span> <span class="fu">c</span>(interval.f[<span class="dv">1</span>,], interval.f[<span class="dv">2</span>,h<span class="sc">:</span><span class="dv">1</span>]), <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span>h, h<span class="sc">:</span><span class="dv">1</span>), <span class="at">z =</span> <span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="sc">*</span>h), </span>
-<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a>            <span class="at">col =</span> mcxs1.shade1, <span class="at">NAcol =</span> <span class="st">"white"</span>, <span class="at">border =</span> <span class="cn">NA</span>, <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">plot =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a>            <span class="at">xlim =</span> xlim, <span class="at">ylim =</span> ylim, <span class="at">zlim =</span> zlim)</span>
-<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h){</span>
-<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>    f4.l <span class="ot">&lt;-</span> <span class="fu">trans3d</span>(<span class="at">x =</span> x, <span class="at">y =</span> yy[i], <span class="at">z =</span> z[,i], <span class="at">pmat =</span> f4)</span>
-<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines</span>(f4.l, <span class="at">lwd =</span> <span class="fl">0.5</span>, <span class="at">col =</span> <span class="st">"black"</span>)</span>
-<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a>  f4.l1 <span class="ot">&lt;-</span> <span class="fu">trans3d</span>(<span class="at">x =</span> point.f, <span class="at">y =</span> yy, <span class="at">z =</span> <span class="dv">0</span>, <span class="at">pmat =</span> f4)</span>
-<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(f4.l1, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> mcxs1)</span>
-<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>forecast <span class="ot">&lt;-</span> <span class="cf">function</span>(S, sample_A, sample_Sigma, Y, p, h) {</span>
-<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Initialize the array to store forecasts</span></span>
-<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>  Y.h <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(h, N, S))</span>
-<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Loop over each sample</span></span>
-<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S) {</span>
-<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>    A.posterior.draw <span class="ot">&lt;-</span> sample_A[,,s]</span>
-<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior <span class="ot">&lt;-</span> sample_Sigma[,,s]</span>
-<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">&lt;-</span> Y[(<span class="fu">nrow</span>(Y) <span class="sc">-</span> p <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(Y),]</span>
-<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">&lt;-</span> x.Ti[p<span class="sc">:</span><span class="dv">1</span>,]</span>
-<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Forecast h steps ahead</span></span>
-<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h) {</span>
-<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a>      x.T <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">as.vector</span>(<span class="fu">t</span>(x.Ti)))</span>
-<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a>      Y.f <span class="ot">&lt;-</span> <span class="fu">rmvnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> x.T <span class="sc">%*%</span> A.posterior.draw, <span class="at">sigma =</span> Sigma.posterior)</span>
-<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a>      x.Ti <span class="ot">&lt;-</span> <span class="fu">rbind</span>(Y.f, x.Ti[<span class="dv">1</span><span class="sc">:</span>(p <span class="sc">-</span> <span class="dv">1</span>),])</span>
-<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a>      Y.h[i,,s] <span class="ot">&lt;-</span> Y.f[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
-<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Y.h)</span>
-<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>forecast <span class="ot">&lt;-</span> <span class="cf">function</span>(S, sample_A, sample_Sigma, Y, p, h) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Initialize the array to store forecasts</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  Y.h <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(h, N, S))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Loop over each sample</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S) {</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    A.posterior.draw <span class="ot">&lt;-</span> sample_A[,,s]</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior <span class="ot">&lt;-</span> sample_Sigma[,,s]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">&lt;-</span> Y[(<span class="fu">nrow</span>(Y) <span class="sc">-</span> p <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(Y),]</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">&lt;-</span> x.Ti[p<span class="sc">:</span><span class="dv">1</span>,]</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Forecast h steps ahead</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h) {</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>      x.T <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">as.vector</span>(<span class="fu">t</span>(x.Ti)))</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>      Y.f <span class="ot">&lt;-</span> <span class="fu">rmvnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> x.T <span class="sc">%*%</span> A.posterior.draw, <span class="at">sigma =</span> Sigma.posterior)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>      x.Ti <span class="ot">&lt;-</span> <span class="fu">rbind</span>(Y.f, x.Ti[<span class="dv">1</span><span class="sc">:</span>(p <span class="sc">-</span> <span class="dv">1</span>),])</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>      Y.h[i,,s] <span class="ot">&lt;-</span> Y.f[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Y.h)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Simulate draws from the predictive density</p>
 <div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "&lt;table&gt;\n&lt;caption&gt;Posterior A means and s.d. deviation table&lt;/caption&gt;\n &lt;thead&gt;\n  &lt;tr&gt;\n   &lt;th style=\"text-align:right;\"&gt; 1 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 2 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 3 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 4 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 5 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 6 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 7 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 8 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 9 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 10 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 11 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 12 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 13 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 14 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 15 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 16 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 17 &lt;/th&gt;\n  &lt;/tr&gt;\n &lt;/thead&gt;\n&lt;tbody&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.136077 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.960000 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.021506 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.053533 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.162047 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.037728 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003492 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.014125 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.154908 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.051878 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.006933 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.006051 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.036237 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.028663 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.002400 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.004038 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000543 &lt;/td&gt;\n  &lt;/tr&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 3.317267 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.119860 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.342575 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.366206 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.111462 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.132343 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.205321 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.207407 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.147811 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.102596 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.140604 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.141155 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.107893 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.078081 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.106231 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.106277 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.072322 &lt;/td&gt;\n  &lt;/tr&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.005136 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.005730 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.998521 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000516 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.001196 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.001224 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000218 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000099 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000603 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.002387 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000018 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000020 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000633 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.001204 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000047 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000021 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.001251 &lt;/td&gt;\n  &lt;/tr&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.109550 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003935 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.011301 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.012069 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003672 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.004373 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.006761 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.006855 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.004867 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003395 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.004615 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.004639 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003564 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.002553 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003507 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.003504 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.002386 &lt;/td&gt;\n  &lt;/tr&gt;\n&lt;/tbody&gt;\n&lt;/table&gt;\n\n&lt;table&gt;\n&lt;caption&gt;Posterior Sigma means and s.d. table&lt;/caption&gt;\n &lt;thead&gt;\n  &lt;tr&gt;\n   &lt;th style=\"text-align:right;\"&gt; 1 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 2 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 3 &lt;/th&gt;\n   &lt;th style=\"text-align:right;\"&gt; 4 &lt;/th&gt;\n  &lt;/tr&gt;\n &lt;/thead&gt;\n&lt;tbody&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.184892 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.002195 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.000112 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.031063 &lt;/td&gt;\n  &lt;/tr&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.026188 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000644 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000065 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.016407 &lt;/td&gt;\n  &lt;/tr&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; -0.002195 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000201 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000004 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000537 &lt;/td&gt;\n  &lt;/tr&gt;\n  &lt;tr&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000644 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000029 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000002 &lt;/td&gt;\n   &lt;td style=\"text-align:right;\"&gt; 0.000531 &lt;/td&gt;\n  &lt;/tr&gt;\n&lt;/tbody&gt;\n&lt;/table&gt;"</code></pre>
+</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-17-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-29-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>The plot of point forecast and density for 13 periods ahead, equivalent to 13 quarters or 3 years and 1 quarter from Q4 2023 to Q4 2026 shows a clear upward trend. The confidence interval is quite large. The unemployment rate seems to go back to the mean.</p>
+<p>The plot of point forecast and density for 21 periods ahead, equivalent to 21 quarters or 5 years and 1 quarter from Q4 2023 to Q4 2028 shows a clear upward trend. The confidence interval is quite large. The unemployment rate seems to converge to the mean and has a slight downward trend in the last horizons.</p>
 <p>For the 3D plot of the density, we can see that the further the period ahead, the density is more dispersed since the data is become less informative as horizon increases.</p>
 </section>
-<section id="extended-model" class="level2">
-<h2 class="anchored" data-anchor-id="extended-model">Extended model</h2>
+<section id="extension-1" class="level2">
+<h2 class="anchored" data-anchor-id="extension-1">Extension 1</h2>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-18-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-30-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>The plot of forecast for the extended model doesn’t show any significant differences visually. The confidence interval narrowed insignificantly.</p>
+<p>The plot of forecast for the dummy observation prior doesn’t show any significant differences visually. The confidence interval narrowed insignificantly.</p>
+</section>
+<section id="extension-2" class="level2">
+<h2 class="anchored" data-anchor-id="extension-2">Extension 2</h2>
+<p>After the regimes are correctly placed, we can forecast h-step ahead using the posterior draws.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Markov_forecast <span class="ot">&lt;-</span> <span class="cf">function</span>(S, sample, Y, p, h) {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">&lt;-</span> <span class="fu">ncol</span>(Y)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Initialize the array to store forecasts</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  Y.h <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(h, <span class="dv">2</span>, S))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    A.posterior.draw1 <span class="ot">=</span> sample<span class="sc">$</span>A.posterior1[,,s]</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    A.posterior.draw2 <span class="ot">=</span> sample<span class="sc">$</span>A.posterior2[,,s]</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior1 <span class="ot">=</span> sample<span class="sc">$</span>Sigma.posterior1[,,s]</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior2 <span class="ot">=</span> sample<span class="sc">$</span>Sigma.posterior2[,,s]</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    T <span class="ot">=</span> <span class="fu">dim</span>(sample<span class="sc">$</span>xi)[<span class="dv">2</span>]</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">=</span> Y[(<span class="fu">nrow</span>(Y)<span class="sc">-</span>p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(Y),]</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">=</span> x.Ti[p<span class="sc">:</span><span class="dv">1</span>,]</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    P_h <span class="ot">=</span> sample<span class="sc">$</span>P[,,s] <span class="sc">%*%</span> sample<span class="sc">$</span>xi[,T,s]  <span class="co"># Initializing P_h</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h){</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>      x.T <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">as.vector</span>(<span class="fu">t</span>(x.Ti)))</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (i <span class="sc">&gt;</span> <span class="dv">1</span>) {  <span class="co"># Only update P_h if i &gt; 1</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        P_h <span class="ot">=</span> sample<span class="sc">$</span>P[,,s] <span class="sc">%*%</span> P_h</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>      sample_m <span class="ot">=</span> <span class="fu">sample.int</span>(<span class="dv">2</span>,<span class="dv">1</span>, <span class="at">prob=</span><span class="fu">as.numeric</span>(P_h))</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (sample_m <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>        A.posterior.draw <span class="ot">=</span> A.posterior.draw1</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>        Sigma.posterior <span class="ot">=</span> Sigma.posterior1</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>        A.posterior.draw <span class="ot">=</span> A.posterior.draw2</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>        Sigma.posterior <span class="ot">=</span> Sigma.posterior2</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>      Y.f <span class="ot">=</span> <span class="fu">rmvnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> x.T <span class="sc">%*%</span> A.posterior.draw, <span class="at">sigma =</span> Sigma.posterior)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>      x.Ti <span class="ot">=</span> <span class="fu">rbind</span>(Y.f, x.Ti[<span class="dv">1</span><span class="sc">:</span>(p<span class="dv">-1</span>),])</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>      Y.h[i,,s] <span class="ot">=</span> Y.f[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Y.h)</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The plot below shows the forecast using Minnesota prior and regime change for unemployment rate.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-32-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="final-model-1" class="level2">
+<h2 class="anchored" data-anchor-id="final-model-1">Final model</h2>
+<p>Similarly to the baseline model, the prior will be a combination of Minnesota and dummy observation prior. Then the Markov-switching Gibb-sampling is done with these new priors to obtain posterior draws</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-33-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-620a2d9f81cf66bcd05e" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-620a2d9f81cf66bcd05e">{"x":{"visdat":{"eceaba69087":["function () ","plotlyVisDat"]},"cur_data":"eceaba69087","attrs":{"eceaba69087":{"y":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],"x":[6.8223000661250968,7.9686252420918811,9.1149504180586653,10.261275594025451,11.407600769992234,12.553925945959019,13.700251121925804,14.846576297892588,15.992901473859373],"z":[[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,1.744705640189089e-05,0.8723353730381439,0,0,0,0,0],[0,0,3.4894112803781779e-05,0.87231792598174207,0,0,0,0,0],[0,0,5.2341169205672672e-05,0.87230047892534013,0,0,0,0,0],[0,0,0.00012212939481323623,0.87223069069973258,0,0,0,0,0],[0,0,0.00017447056401890889,0.87217834953052686,0,0,0,0,0],[0,0,0.00048851757925294492,0.8718643025152929,0,0,0,0,0],[0,0,0.0011340586661229078,0.87121876142842292,0,0,0,0,0],[0,0,0.0016051291889739618,0.8707476909055718,0,0,0,0,0],[0,0,0.0024774820090685064,0.8698578910290754,1.7447056401890917e-05,0,0,0,0],[0,0,0.0035591995059857415,0.86877617353215819,1.7447056401890917e-05,0,0,0,0],[0,1.744705640189089e-05,0.0048677287361275582,0.86741530313281068,5.2341169205672747e-05,0,0,0,0],[0,3.4894112803781779e-05,0.0065600932071109746,0.86570549160542543,5.2341169205672747e-05,0,0,0,0],[0,5.2341169205672672e-05,0.0089154458213662451,0.86321056253995498,0.00015702350761701825,1.7447056401890863e-05,0,0,0],[0,5.2341169205672672e-05,0.011201010210013952,0.86087265698210158,0.00019191762042080007,3.4894112803781725e-05,0,0,0],[1.7447056401890903e-05,5.2341169205672672e-05,0.01373083338828813,0.85818581029621044,0.00033149407163592744,1.7447056401890863e-05,0,1.7447056401890917e-05,0],[1.7447056401890903e-05,0.00010468233841134534,0.016086186002543402,0.85569088123074,0.00038383524084160015,5.2341169205672591e-05,0,0,1.7447056401890863e-05],[3.4894112803781806e-05,0.00022681173322458158,0.019139420872874305,0.85213168172475429,0.00073277636887941853,8.723528200945431e-05,0,0,0]],"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"surface","colors":["#05386B","magenta2","#EDF5E1"],"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"Unemployment rate"},"yaxis":{"title":"h-step forecast"},"zaxis":{"title":"density"}},"title":"AUD/USD forecast densities for extended model","hovermode":"closest","showlegend":false,"legend":{"yanchor":"top","y":0.5}},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"colorbar":{"title":"","ticklen":2,"len":0.5,"lenmode":"fraction","y":1,"yanchor":"top"},"colorscale":[["0","rgba(5,56,107,1)"],["0.0416666666666667","rgba(40,58,117,1)"],["0.0833333333333333","rgba(62,60,127,1)"],["0.125","rgba(81,61,138,1)"],["0.166666666666667","rgba(99,62,148,1)"],["0.208333333333333","rgba(116,61,159,1)"],["0.25","rgba(134,60,170,1)"],["0.291666666666667","rgba(151,58,181,1)"],["0.333333333333333","rgba(168,55,192,1)"],["0.375","rgba(185,49,203,1)"],["0.416666666666667","rgba(203,42,215,1)"],["0.458333333333333","rgba(220,29,226,1)"],["0.5","rgba(238,0,238,1)"],["0.541666666666667","rgba(240,59,237,1)"],["0.583333333333333","rgba(242,85,237,1)"],["0.625","rgba(243,106,236,1)"],["0.666666666666667","rgba(244,125,235,1)"],["0.708333333333333","rgba(245,142,234,1)"],["0.75","rgba(245,158,233,1)"],["0.791666666666667","rgba(245,173,232,1)"],["0.833333333333333","rgba(245,188,231,1)"],["0.875","rgba(243,203,230,1)"],["0.916666666666667","rgba(242,217,228,1)"],["0.958333333333333","rgba(240,231,227,1)"],["1","rgba(237,245,225,1)"]],"showscale":true,"y":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],"x":[6.8223000661250968,7.9686252420918811,9.1149504180586653,10.261275594025451,11.407600769992234,12.553925945959019,13.700251121925804,14.846576297892588,15.992901473859373],"z":[[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,0,0.87235282009454584,0,0,0,0,0],[0,0,1.744705640189089e-05,0.8723353730381439,0,0,0,0,0],[0,0,3.4894112803781779e-05,0.87231792598174207,0,0,0,0,0],[0,0,5.2341169205672672e-05,0.87230047892534013,0,0,0,0,0],[0,0,0.00012212939481323623,0.87223069069973258,0,0,0,0,0],[0,0,0.00017447056401890889,0.87217834953052686,0,0,0,0,0],[0,0,0.00048851757925294492,0.8718643025152929,0,0,0,0,0],[0,0,0.0011340586661229078,0.87121876142842292,0,0,0,0,0],[0,0,0.0016051291889739618,0.8707476909055718,0,0,0,0,0],[0,0,0.0024774820090685064,0.8698578910290754,1.7447056401890917e-05,0,0,0,0],[0,0,0.0035591995059857415,0.86877617353215819,1.7447056401890917e-05,0,0,0,0],[0,1.744705640189089e-05,0.0048677287361275582,0.86741530313281068,5.2341169205672747e-05,0,0,0,0],[0,3.4894112803781779e-05,0.0065600932071109746,0.86570549160542543,5.2341169205672747e-05,0,0,0,0],[0,5.2341169205672672e-05,0.0089154458213662451,0.86321056253995498,0.00015702350761701825,1.7447056401890863e-05,0,0,0],[0,5.2341169205672672e-05,0.011201010210013952,0.86087265698210158,0.00019191762042080007,3.4894112803781725e-05,0,0,0],[1.7447056401890903e-05,5.2341169205672672e-05,0.01373083338828813,0.85818581029621044,0.00033149407163592744,1.7447056401890863e-05,0,1.7447056401890917e-05,0],[1.7447056401890903e-05,0.00010468233841134534,0.016086186002543402,0.85569088123074,0.00038383524084160015,5.2341169205672591e-05,0,0,1.7447056401890863e-05],[3.4894112803781806e-05,0.00022681173322458158,0.019139420872874305,0.85213168172475429,0.00073277636887941853,8.723528200945431e-05,0,0,0]],"type":"surface","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
 <p>The data used is up to September 2023. The subsequent unemployment rate is released by the</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -859,180 +942,6 @@ p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
 </div>
 </div>
 </section>
-<section id="extension-2---regime-change" class="level2">
-<h2 class="anchored" data-anchor-id="extension-2---regime-change">Extension 2 - Regime change</h2>
-<p>With 2 regime states, we would have <span class="math inline">\(Y_m\)</span> and <span class="math inline">\(X_m\)</span></p>
-<p>The full conditional joint posterior have the following form <span class="math display">\[\begin{align}
-p(A|Y,X,\Sigma) &amp;\sim MN_{K \times N}(\overline{A}, \Sigma,\overline{V} ) \\
-p(\Sigma|Y,X) &amp;\sim IW_{N}(\overline{S}, \overline{v})\\
-\\
-\overline{V_m} &amp;= (X'X + \underline{V}^{-1})^{-1} \\
-\overline{A_m} &amp;= \overline{V_m}(X_m'Y_m+\underline{V}^{-1}\underline{A}) \\
-\overline{v} &amp;= T_m + \underline{v} \\
-\overline{S_m} &amp;= \underline{S}+Y_m'Y_m+\underline{A}'\underline{V}^{-1}\underline{A}-\overline{A_m}'
-\overline{V_m}^{-1}\overline{A_m} \\
-\end{align}\]</span></p>
-<p>Markov Switching Initial probability of regimes <span class="math display">\[\begin{align}
-\begin{bmatrix}
-p_{1} &amp; p_{2}\\
-\end{bmatrix}
-\end{align}\]</span></p>
-<p>Probability transition matrix <span class="math display">\[\begin{align}
-\begin{bmatrix}
-p_{11} &amp; p_{12}\\
-p_{21} &amp; p_{22}\\
-\end{bmatrix}
-\end{align}\]</span></p>
-<p><span class="math display">\[\begin{align}
-\xi_{t} = \begin{bmatrix}
-1\\
-0\\
-\end{bmatrix}, if s_t = 1
-\end{align}\]</span></p>
-<p><span class="math display">\[\begin{align}
-\xi_{t} = \begin{bmatrix}
-0\\
-1\\
-\end{bmatrix}, if s_t = 2
-\end{align}\]</span> The posterior draws are done with Gibb sampling.</p>
-<p>To examine how the regime draws are distributed between the two states, we visualize the switching variable <span class="math inline">\(\xi\)</span>. Initially, the plot suggests that the regime assignments appear arbitrary. To address this issue, a label switching procedure is implemented to ensure consitency in how the two regimes are identified, in this case regime 1 is identified as the state with higher volatility. Following the label switching, the distinction between the two regimes becomes more evident. The drawn regimes indicate that regime 1 corresponds to the period around 2020, which aligns with the Covid-19 pandemic. This finding is intuitive as the Covid-19 pandemic significantly impacted the economy at large, including unemployment rates. Regime 2, on the other hand, represents other periods.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-25-2.png" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>After the regimes are correctly placed, we can forecast h-step ahead using the posterior draws.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Markov_forecast <span class="ot">&lt;-</span> <span class="cf">function</span>(S, sample, Y, p, h) {</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">&lt;-</span> <span class="fu">ncol</span>(Y)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Initialize the array to store forecasts</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  Y.h <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(h, <span class="dv">2</span>, S))</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    A.posterior.draw1 <span class="ot">=</span> sample<span class="sc">$</span>A.posterior1[,,s]</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    A.posterior.draw2 <span class="ot">=</span> sample<span class="sc">$</span>A.posterior2[,,s]</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior1 <span class="ot">=</span> sample<span class="sc">$</span>Sigma.posterior1[,,s]</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior2 <span class="ot">=</span> sample<span class="sc">$</span>Sigma.posterior2[,,s]</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    T <span class="ot">=</span> <span class="fu">dim</span>(sample<span class="sc">$</span>xi)[<span class="dv">2</span>]</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">=</span> Y[(<span class="fu">nrow</span>(Y)<span class="sc">-</span>p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(Y),]</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    x.Ti <span class="ot">=</span> x.Ti[p<span class="sc">:</span><span class="dv">1</span>,]</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    P_h <span class="ot">=</span> sample<span class="sc">$</span>P[,,s] <span class="sc">%*%</span> sample<span class="sc">$</span>xi[,T,s]  <span class="co"># Initializing P_h</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h){</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>      x.T <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">as.vector</span>(<span class="fu">t</span>(x.Ti)))</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (i <span class="sc">&gt;</span> <span class="dv">1</span>) {  <span class="co"># Only update P_h if i &gt; 1</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        P_h <span class="ot">=</span> sample<span class="sc">$</span>P[,,s] <span class="sc">%*%</span> P_h</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>      sample_m <span class="ot">=</span> <span class="fu">sample.int</span>(<span class="dv">2</span>,<span class="dv">1</span>, <span class="at">prob=</span><span class="fu">as.numeric</span>(P_h))</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (sample_m <span class="sc">==</span> <span class="dv">1</span>) {</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        A.posterior.draw <span class="ot">=</span> A.posterior.draw1</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        Sigma.posterior <span class="ot">=</span> Sigma.posterior1</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>        A.posterior.draw <span class="ot">=</span> A.posterior.draw2</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        Sigma.posterior <span class="ot">=</span> Sigma.posterior2</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>      Y.f <span class="ot">=</span> <span class="fu">rmvnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> x.T <span class="sc">%*%</span> A.posterior.draw, <span class="at">sigma =</span> Sigma.posterior)</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>      x.Ti <span class="ot">=</span> <span class="fu">rbind</span>(Y.f, x.Ti[<span class="dv">1</span><span class="sc">:</span>(p<span class="dv">-1</span>),])</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>      Y.h[i,,s] <span class="ot">=</span> Y.f[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Y.h)</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>The plot below shows the forecast using Minnesota prior and regime change for unemployment rate.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-27-2.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="final-model" class="level2">
-<h2 class="anchored" data-anchor-id="final-model">Final model</h2>
-<p>The final model is the combination of Minnesota prior, dummy observation prior and regime change to account for heteroskedasticity.</p>
-<p>Similarly to the baseline model, the prior will be a combination of Minnesota and dummy observation prior. Then the Markov-switching Gibb-sampling is done with these new priors to obtain posterior draws</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-31-2.png" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-32-2.png" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-33-2.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-060c355d509c74b89f47" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-060c355d509c74b89f47">{"x":{"visdat":{"e76c731bd3d5":["function () ","plotlyVisDat"]},"cur_data":"e76c731bd3d5","attrs":{"e76c731bd3d5":{"y":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],"x":[5.3835548574386802,6.3341204695317845,7.2846860816248888,8.2352516937179931,9.1858173058110975,10.1363829179042,11.086948529997304,12.037514142090409,12.988079754183513],"z":[[0,0,0,0,0,1.0520052348601641,0,0,0],[0,0,0,0,0,1.0520052348601641,0,0,0],[0,0,0,0,0,1.0520052348601641,0,0,0],[0,0,0,0,0,1.0520052348601641,0,0,0],[0,0,0,0,2.1040104697203244e-05,1.0519841947554669,0,0,0],[0,0,0,0,2.1040104697203244e-05,1.0519841947554669,0,0,0],[0,0,0,0,2.1040104697203244e-05,1.0519841947554669,0,0,0],[0,0,0,0,0.00010520052348601622,1.051900034336678,0,0,0],[0,0,0,0,0.00010520052348601622,1.051900034336678,0,0,0],[0,0,0,0,0.0003787218845496584,1.0516265129756144,0,0,0],[0,0,0,0,0.00069432345500770702,1.0513109114051564,0,0,0],[0,0,0,0,0.0011782458630433816,1.050742828578332,8.4160418788812975e-05,0,0],[0,0,0,0,0.0022512912026007473,1.0495856228199858,0.00016832083757762595,0,0],[0,0,0,0,0.0031770558092776898,1.0485546576898228,0.00027352136106364219,0,0],[0,0,0,4.2080209394406447e-05,0.0042501011488350554,1.0473553717220823,0.00035768177985245512,0,0],[0,0,0,6.3120314091609674e-05,0.0059122694199141117,1.0455248826134256,0.00050496251273287782,0,0],[0,0,4.2080209394406528e-05,6.3120314091609674e-05,0.0078689991567540123,1.043294631515522,0.00073640366440211357,0,0],[0,0,8.4160418788813057e-05,8.4160418788812894e-05,0.0094890872184386632,1.0413589418833793,0.00088368439728253622,0.00010520052348601622,0],[0,0,8.4160418788813057e-05,0.00018936094227482901,0.012077020096194662,1.0381818860741017,0.001388646910015414,6.3120314091609728e-05,2.1040104697203244e-05],[0,2.1040104697203244e-05,8.4160418788813057e-05,0.00018936094227482901,0.014433511822281425,1.0353625120446763,0.0017884088992622758,0.00010520052348601622,2.1040104697203244e-05],[2.1040104697203244e-05,6.3120314091609728e-05,2.1040104697203264e-05,0.00031560157045804836,0.017526407212770302,1.0316173734085741,0.002314411516692357,6.3120314091609728e-05,6.3120314091609728e-05]],"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"surface","colors":["#05386B","magenta2","#EDF5E1"],"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"Unemployment rate"},"yaxis":{"title":"h-step forecast"},"zaxis":{"title":"density"}},"title":"AUD/USD forecast densities for extended model","hovermode":"closest","showlegend":false,"legend":{"yanchor":"top","y":0.5}},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"colorbar":{"title":"","ticklen":2,"len":0.5,"lenmode":"fraction","y":1,"yanchor":"top"},"colorscale":[["0","rgba(5,56,107,1)"],["0.0416666666666667","rgba(40,58,117,1)"],["0.0833333333333333","rgba(62,60,127,1)"],["0.125","rgba(81,61,138,1)"],["0.166666666666667","rgba(99,62,148,1)"],["0.208333333333333","rgba(116,61,159,1)"],["0.25","rgba(134,60,170,1)"],["0.291666666666667","rgba(151,58,181,1)"],["0.333333333333333","rgba(168,55,192,1)"],["0.375","rgba(185,49,203,1)"],["0.416666666666667","rgba(203,42,215,1)"],["0.458333333333333","rgba(220,29,226,1)"],["0.5","rgba(238,0,238,1)"],["0.541666666666667","rgba(240,59,237,1)"],["0.583333333333333","rgba(242,85,237,1)"],["0.625","rgba(243,106,236,1)"],["0.666666666666667","rgba(244,125,235,1)"],["0.708333333333333","rgba(245,142,234,1)"],["0.75","rgba(245,158,233,1)"],["0.791666666666667","rgba(245,173,232,1)"],["0.833333333333333","rgba(245,188,231,1)"],["0.875","rgba(243,203,230,1)"],["0.916666666666667","rgba(242,217,228,1)"],["0.958333333333333","rgba(240,231,227,1)"],["1","rgba(237,245,225,1)"]],"showscale":true,"y":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],"x":[5.3835548574386802,6.3341204695317845,7.2846860816248888,8.2352516937179931,9.1858173058110975,10.1363829179042,11.086948529997304,12.037514142090409,12.988079754183513],"z":[[0,0,0,0,0,1.0520052348601641,0,0,0],[0,0,0,0,0,1.0520052348601641,0,0,0],[0,0,0,0,0,1.0520052348601641,0,0,0],[0,0,0,0,0,1.0520052348601641,0,0,0],[0,0,0,0,2.1040104697203244e-05,1.0519841947554669,0,0,0],[0,0,0,0,2.1040104697203244e-05,1.0519841947554669,0,0,0],[0,0,0,0,2.1040104697203244e-05,1.0519841947554669,0,0,0],[0,0,0,0,0.00010520052348601622,1.051900034336678,0,0,0],[0,0,0,0,0.00010520052348601622,1.051900034336678,0,0,0],[0,0,0,0,0.0003787218845496584,1.0516265129756144,0,0,0],[0,0,0,0,0.00069432345500770702,1.0513109114051564,0,0,0],[0,0,0,0,0.0011782458630433816,1.050742828578332,8.4160418788812975e-05,0,0],[0,0,0,0,0.0022512912026007473,1.0495856228199858,0.00016832083757762595,0,0],[0,0,0,0,0.0031770558092776898,1.0485546576898228,0.00027352136106364219,0,0],[0,0,0,4.2080209394406447e-05,0.0042501011488350554,1.0473553717220823,0.00035768177985245512,0,0],[0,0,0,6.3120314091609674e-05,0.0059122694199141117,1.0455248826134256,0.00050496251273287782,0,0],[0,0,4.2080209394406528e-05,6.3120314091609674e-05,0.0078689991567540123,1.043294631515522,0.00073640366440211357,0,0],[0,0,8.4160418788813057e-05,8.4160418788812894e-05,0.0094890872184386632,1.0413589418833793,0.00088368439728253622,0.00010520052348601622,0],[0,0,8.4160418788813057e-05,0.00018936094227482901,0.012077020096194662,1.0381818860741017,0.001388646910015414,6.3120314091609728e-05,2.1040104697203244e-05],[0,2.1040104697203244e-05,8.4160418788813057e-05,0.00018936094227482901,0.014433511822281425,1.0353625120446763,0.0017884088992622758,0.00010520052348601622,2.1040104697203244e-05],[2.1040104697203244e-05,6.3120314091609728e-05,2.1040104697203264e-05,0.00031560157045804836,0.017526407212770302,1.0316173734085741,0.002314411516692357,6.3120314091609728e-05,6.3120314091609728e-05]],"type":"surface","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
-</div>
-</div>
-</section>
 </section>
 <section id="model-proof" class="level1">
 <h1>Model Proof</h1>
@@ -1096,8 +1005,8 @@ p_{21} &amp; p_{22}\\
 </div>
 </div>
 </section>
-<section id="extended-model-1" class="level3">
-<h3 class="anchored" data-anchor-id="extended-model-1">Extended model</h3>
+<section id="extended-model" class="level3">
+<h3 class="anchored" data-anchor-id="extended-model">Extended model</h3>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -1158,6 +1067,10 @@ p_{21} &amp; p_{22}\\
 </section>
 <section id="references" class="level1 unnumbered">
 <h1 class="unnumbered">References</h1>
+<p>Woźniak, T. (2016), Bayesian Vector Autoregressions. Australian Economic Review, 49: 365-380. https://doi.org/10.1111/1467-8462.12179</p>
+<p>Giannone, Domenico, Lenza, Michele and Primiceri, Giorgio, (2015), Prior Selection for Vector Autoregressions, The Review of Economics and Statistics, 97, issue 2, p.&nbsp;436-451.</p>
+<p>Song, Y., &amp; Woźniak, T. (2021, March 25). Markov Switching. Oxford Research Encyclopedia of Economics and Finance. Retrieved 18 Jun.&nbsp;2024, from https://oxfordre.com/economics/view/10.1093/acrefore/9780190625979.001.0001/acrefore-9780190625979-e-174.</p>
+<p>Fu, W.; Smith, B.R.; Brewer, P.; Droms, S. Markov-Switching Bayesian Vector Autoregression Model in Mortality Forecasting. Risks 2023, 11, 152. https://doi.org/10.3390/risks11090152</p>
 
 
 </section>
